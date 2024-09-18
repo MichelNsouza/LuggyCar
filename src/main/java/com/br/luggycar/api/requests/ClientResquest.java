@@ -1,4 +1,4 @@
-package com.br.luggycar.api.entities;
+package com.br.luggycar.api.requests;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
