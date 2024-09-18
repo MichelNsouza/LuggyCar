@@ -1,10 +1,9 @@
 package com.br.luggycar.api.controllers;
 
 import com.br.luggycar.api.entities.Client;
-import com.br.luggycar.api.entities.ClientResquest;
+import com.br.luggycar.api.requests.ClientResquest;
 import com.br.luggycar.api.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
