@@ -10,9 +10,9 @@ Em construção
 Em construção
 
 ### Colaboradores
-[Elder Borges](https://github.com/eldersb)
-[Isabela Guimarães](https://github.com/guimaraesisabela)
-[Michel Nascimento](https://github.com/MichelNsouza)
-[Railan Ibraim](https://github.com/Ibraim999)
-[Thales Souza](https://github.com/Thaleszx7)
-[Thiago Sales](https://github.com/txiami)
+- [Elder Borges](https://github.com/eldersb)
+- [Isabela Guimarães](https://github.com/guimaraesisabela)
+- [Michel Nascimento](https://github.com/MichelNsouza)
+- [Railan Ibraim](https://github.com/Ibraim999)
+- [Thales Souza](https://github.com/Thaleszx7)
+- [Thiago Sales](https://github.com/txiami)
