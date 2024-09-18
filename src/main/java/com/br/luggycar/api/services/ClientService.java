@@ -1,7 +1,7 @@
 package com.br.luggycar.api.services;
 
 import com.br.luggycar.api.entities.Client;
-import com.br.luggycar.api.entities.ClientResquest;
+import com.br.luggycar.api.requests.ClientResquest;
 import com.br.luggycar.api.repositories.ClientRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
