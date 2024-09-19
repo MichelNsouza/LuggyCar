@@ -1,11 +1,16 @@
 package com.br.luggycar.api.requests;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import com.br.luggycar.api.models.vehicle.VehicleAccessorie;
+import com.br.luggycar.api.models.vehicle.VehicleColor;
+import com.br.luggycar.api.models.vehicle.VehicleManufacturer;
+import com.br.luggycar.api.models.vehicle.Vehicletransmission;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -14,17 +19,34 @@ import java.util.UUID;
 public class VehicleRequest {
 
     private String name;
-    private String manufacturer;
+
+    @Enumerated(EnumType.STRING)
+    private VehicleManufacturer manufacturer;
+
     private String version;
+
     private String urlFipe;
+
     private String plate;
-    private String color;
-    private String transmission;
+
+    @Enumerated(EnumType.STRING)  // Armazena os valores do enum como strings no banco de dados
+    private VehicleColor color;
+
+    @Enumerated(EnumType.STRING)
+    private Vehicletransmission transmission;
+
     private String currentKm;
+
     private String passangerCapacity;
+
     private String trunkCapacity;
-    private String accessories;
-    private String dailyRate;
-    private String registrationDate;
+
+    @ElementCollection  // Indica que estamos armazenando uma coleção de elementos
+    @Enumerated(EnumType.STRING)  // Armazena os valores do enum como strings no banco de dados
+    private Set<VehicleAccessorie> accessories;  // Um veículo pode ter múltiplos acessórios
+
+    private double dailyRate;
+
+    private Date registrationDate;
 
 }
