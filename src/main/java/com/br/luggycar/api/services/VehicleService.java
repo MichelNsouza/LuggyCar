@@ -1,11 +1,10 @@
 package com.br.luggycar.api.services;
 
-import com.br.luggycar.api.entities.Vehicle;
+import com.br.luggycar.api.entities.vehicle.Vehicle;
 import com.br.luggycar.api.repositories.VehicleRepository;
 import com.br.luggycar.api.requests.VehicleRequest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

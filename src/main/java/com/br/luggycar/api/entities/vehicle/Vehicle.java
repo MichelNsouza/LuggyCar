@@ -1,9 +1,6 @@
-package com.br.luggycar.api.entities;
+package com.br.luggycar.api.entities.vehicle;
 
-import com.br.luggycar.api.models.vehicle.VehicleAccessorie;
-import com.br.luggycar.api.models.vehicle.VehicleColor;
-import com.br.luggycar.api.models.vehicle.VehicleManufacturer;
-import com.br.luggycar.api.models.vehicle.Vehicletransmission;
+import com.br.luggycar.api.entities.category.Category;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,11 +26,14 @@ public class Vehicle {
 
     private String version;
 
+    @Enumerated(EnumType.STRING)
+    private Category category;
+
     private String urlFipe;
 
     private String plate;
 
-    @Enumerated(EnumType.STRING)  // Armazena os valores do enum como strings no banco de dados
+    @Enumerated(EnumType.STRING)
     private VehicleColor color;
 
     @Enumerated(EnumType.STRING)
@@ -45,9 +45,9 @@ public class Vehicle {
 
     private String trunkCapacity;
 
-    @ElementCollection  // Indica que estamos armazenando uma coleção de elementos
-    @Enumerated(EnumType.STRING)  // Armazena os valores do enum como strings no banco de dados
-    private Set<VehicleAccessorie> accessories;  // Um veículo pode ter múltiplos acessórios
+    @ElementCollection
+    @Enumerated(EnumType.STRING)
+    private Set<VehicleAccessorie> accessories;
 
     private double dailyRate;
 
