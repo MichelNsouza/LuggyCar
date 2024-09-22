@@ -1,4 +1,0 @@
-@Entity
-public class User {
-
-}
