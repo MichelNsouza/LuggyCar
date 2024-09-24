@@ -12,5 +12,5 @@ public enum VehicleColor {
     PURPLE,
     BROWN,
     PINK,
-    PRATA
+    SILVER
 }

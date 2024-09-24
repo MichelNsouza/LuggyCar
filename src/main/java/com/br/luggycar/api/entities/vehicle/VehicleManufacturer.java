@@ -19,6 +19,7 @@ public enum VehicleManufacturer {
     MAZDA,
     PORSCHE,
     VOLVO,
-    TESLAs,
+    TESLA,
     FERRARI,
+    BYD,
 }
