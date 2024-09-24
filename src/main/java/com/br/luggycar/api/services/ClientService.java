@@ -22,7 +22,7 @@ public class ClientService {
    public Client insert(ClientResquest clientResquest) {
 
        Client client = new Client();
-       BeanUtils.copyProperties(client, clientResquest);
+       BeanUtils.copyProperties(clientResquest, client);
 
        return clientRepository.save(client);
 

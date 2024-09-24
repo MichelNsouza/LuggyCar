@@ -1,9 +1,7 @@
 package com.br.luggycar.api.requests;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.br.luggycar.api.entities.Gender;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,12 +14,15 @@ import java.util.Date;
 @NoArgsConstructor
 public class ClientResquest {
 
-    private String status;
     private String name;
     private String lastName;
     private String cpf;
     private String email;
-    private String gender;
-    private Date date;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
+    private Date dateBirth;
+    private String endereco;
     private LocalDate registration;
 }
