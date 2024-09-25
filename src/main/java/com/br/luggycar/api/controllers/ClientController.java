@@ -34,6 +34,9 @@ public class ClientController {
     @PostMapping("/registration")
     public ResponseEntity<Client> insert(@RequestBody ClientResquest clientResquest) {
         Client client = clientService.insert(clientResquest);
+
+
+
         return ResponseEntity.status(HttpStatus.CREATED).body(client);
 
     }

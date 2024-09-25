@@ -7,6 +7,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +25,8 @@ public class ClientService {
 
        Client client = new Client();
        BeanUtils.copyProperties(clientResquest, client);
+
+       client.setRegistration(LocalDate.now());
 
        return clientRepository.save(client);
 

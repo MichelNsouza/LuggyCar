@@ -1,6 +1,7 @@
 package com.br.luggycar.api.requests;
 
 import com.br.luggycar.api.entities.Gender;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,7 +23,8 @@ public class ClientResquest {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private Date dateBirth;
+
     private String endereco;
-    private LocalDate registration;
 }
