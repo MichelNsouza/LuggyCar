@@ -21,7 +21,7 @@ public class VehicleService {
 public Vehicle insert (VehicleRequest vehicleRequest){
 
     Vehicle vehicle = new Vehicle();
-    BeanUtils.copyProperties(vehicle, vehicleRequest);
+    BeanUtils.copyProperties(vehicleRequest, vehicle);
 
     return vehicleRepository.save(vehicle);
 
