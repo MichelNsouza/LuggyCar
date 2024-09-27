@@ -43,19 +43,17 @@ public class ClientController {
     public ResponseEntity<Client> insert(@RequestBody ClientResquest clientResquest) {
         Client client = clientService.insert(clientResquest);
 
-
-
         return ResponseEntity.status(HttpStatus.CREATED).body(client);
 
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Client> update(@PathVariable Long id, @RequestBody ClientResquest clientResquest) {
+    public ResponseEntity<Client> update(@PathVariable Long id, @RequestBody ClientResquest clientResquest) throws ResourceNotFoundException {
 
             Optional<Client> client = clientService.findClientById(id);
 
             if (client.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                  throw new ResourceNotFoundException("Cliente não encontrado!");
             }
 
             Client clientResponse = clientService.update(id, clientResquest);
