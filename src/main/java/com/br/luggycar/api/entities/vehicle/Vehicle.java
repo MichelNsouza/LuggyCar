@@ -26,7 +26,8 @@ public class Vehicle {
 
     private String version;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     private String urlFipe;
