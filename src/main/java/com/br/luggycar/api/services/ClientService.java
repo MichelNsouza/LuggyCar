@@ -1,6 +1,7 @@
 package com.br.luggycar.api.services;
 
 import com.br.luggycar.api.entities.Client;
+import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.requests.ClientResquest;
 import com.br.luggycar.api.repositories.ClientRepository;
 import org.springframework.beans.BeanUtils;
@@ -31,6 +32,21 @@ public class ClientService {
        return clientRepository.save(client);
 
    }
+
+   public Client update(Long id, ClientResquest clientResquest) {
+
+       Optional<Client> client = findClientById(id);
+
+       if (client.isPresent()) {
+           Client updatedClient = client.get();
+           BeanUtils.copyProperties(clientResquest, updatedClient);
+           return clientRepository.save(updatedClient);
+       }
+
+       return null;
+   }
+
+
    public Optional<Client>findClientById(Long id){
        return clientRepository.findById(id);
    }
