@@ -1,13 +1,12 @@
 package com.br.luggycar.api.requests;
 
-import com.br.luggycar.api.entities.Gender;
+import com.br.luggycar.api.enums.client.Gender;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.Date;
 
 @Data

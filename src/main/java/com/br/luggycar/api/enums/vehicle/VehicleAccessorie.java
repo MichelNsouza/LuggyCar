@@ -1,4 +1,4 @@
-package com.br.luggycar.api.entities.vehicle;
+package com.br.luggycar.api.enums.vehicle;
 
 public enum VehicleAccessorie {
     CENTRAL_MULTIMIDIA,

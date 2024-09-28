@@ -1,6 +1,9 @@
-package com.br.luggycar.api.entities.vehicle;
+package com.br.luggycar.api.entities;
 
-import com.br.luggycar.api.entities.category.Category;
+import com.br.luggycar.api.enums.vehicle.VehicleAccessorie;
+import com.br.luggycar.api.enums.vehicle.VehicleColor;
+import com.br.luggycar.api.enums.vehicle.VehicleManufacturer;
+import com.br.luggycar.api.enums.vehicle.Vehicletransmission;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

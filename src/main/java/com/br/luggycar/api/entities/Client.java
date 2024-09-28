@@ -1,5 +1,6 @@
 package com.br.luggycar.api.entities;
 
+import com.br.luggycar.api.enums.client.Gender;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

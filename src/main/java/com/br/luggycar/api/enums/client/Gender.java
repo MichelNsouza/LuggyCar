@@ -1,4 +1,4 @@
-package com.br.luggycar.api.entities;
+package com.br.luggycar.api.enums.client;
 
 public enum Gender {
     MASCULINO,

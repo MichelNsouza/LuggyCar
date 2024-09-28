@@ -1,4 +1,4 @@
-package com.br.luggycar.api.entities.user;
+package com.br.luggycar.api.enums.user;
 
 public enum UserRole {
     ADMIN("admin"),
