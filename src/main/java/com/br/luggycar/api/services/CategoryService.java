@@ -1,7 +1,7 @@
 package com.br.luggycar.api.services;
 
 
-import com.br.luggycar.api.entities.category.Category;
+import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

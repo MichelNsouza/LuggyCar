@@ -1,4 +1,4 @@
-package com.br.luggycar.api.services.auth;
+package com.br.luggycar.api.services;
 
 
 import com.br.luggycar.api.repositories.UserRepository;
@@ -14,7 +14,7 @@ public class AuthorizationService implements UserDetailsService {
     @Autowired
     UserRepository repository;
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return repository.findByLogin(username);
+    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
+        return repository.findByLogin(login);
     }
 }

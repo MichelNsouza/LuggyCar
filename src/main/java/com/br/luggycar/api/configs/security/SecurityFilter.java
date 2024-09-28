@@ -1,7 +1,7 @@
 package com.br.luggycar.api.configs.security;
 
 import com.br.luggycar.api.repositories.UserRepository;
-import com.br.luggycar.api.services.auth.TokenService;
+import com.br.luggycar.api.services.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +37,11 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     private String recoverToken(HttpServletRequest request){
         var authHeader = request.getHeader("Authorization");
-        if(authHeader == null) return null;
-        return authHeader.replace("Bearer ", "");
+        if(authHeader != null){
+            return authHeader.replace("Bearer ", "");
+
+        }
+        return "";
     }
+
 }

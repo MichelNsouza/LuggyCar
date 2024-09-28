@@ -1,4 +1,4 @@
-package com.br.luggycar.api.entities.vehicle;
+package com.br.luggycar.api.enums.vehicle;
 
 public enum VehicleColor {
     WHITE,
@@ -12,5 +12,5 @@ public enum VehicleColor {
     PURPLE,
     BROWN,
     PINK,
-    PRATA
+    SILVER
 }

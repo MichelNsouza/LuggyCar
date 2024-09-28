@@ -1,9 +1,9 @@
 package com.br.luggycar.api.requests;
 
-import com.br.luggycar.api.entities.vehicle.VehicleAccessorie;
-import com.br.luggycar.api.entities.vehicle.VehicleColor;
-import com.br.luggycar.api.entities.vehicle.VehicleManufacturer;
-import com.br.luggycar.api.entities.vehicle.Vehicletransmission;
+import com.br.luggycar.api.enums.vehicle.VehicleAccessorie;
+import com.br.luggycar.api.enums.vehicle.VehicleColor;
+import com.br.luggycar.api.enums.vehicle.VehicleManufacturer;
+import com.br.luggycar.api.enums.vehicle.Vehicletransmission;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

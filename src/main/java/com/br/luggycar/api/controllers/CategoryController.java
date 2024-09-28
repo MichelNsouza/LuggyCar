@@ -1,7 +1,7 @@
 package com.br.luggycar.api.controllers;
 
 
-import com.br.luggycar.api.entities.category.Category;
+import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

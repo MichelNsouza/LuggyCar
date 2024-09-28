@@ -1,7 +1,7 @@
-package com.br.luggycar.api.entities.category;
+package com.br.luggycar.api.entities;
 
 
-import com.br.luggycar.api.entities.vehicle.Vehicle;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;

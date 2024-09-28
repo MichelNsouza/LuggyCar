@@ -1,5 +1,6 @@
-package com.br.luggycar.api.entities.user;
+package com.br.luggycar.api.entities;
 
+import com.br.luggycar.api.enums.user.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
+
 @Table(name = "users")
 @Entity(name = "users")
 @Getter
@@ -20,8 +22,8 @@ import java.util.List;
 @EqualsAndHashCode(of = "id")
 public class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String login;
     private String password;
     private UserRole role;

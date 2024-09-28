@@ -1,4 +1,4 @@
-package com.br.luggycar.api.entities.vehicle;
+package com.br.luggycar.api.enums.vehicle;
 
 public enum VehicleManufacturer {
     TOYOTA,
@@ -19,6 +19,7 @@ public enum VehicleManufacturer {
     MAZDA,
     PORSCHE,
     VOLVO,
-    TESLAs,
+    TESLA,
     FERRARI,
+    BYD,
 }

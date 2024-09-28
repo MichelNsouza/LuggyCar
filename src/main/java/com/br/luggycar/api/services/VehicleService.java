@@ -1,6 +1,6 @@
 package com.br.luggycar.api.services;
 
-import com.br.luggycar.api.entities.vehicle.Vehicle;
+import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.repositories.VehicleRepository;
 import com.br.luggycar.api.requests.VehicleRequest;
 import org.springframework.beans.BeanUtils;
@@ -21,7 +21,7 @@ public class VehicleService {
 public Vehicle insert (VehicleRequest vehicleRequest){
 
     Vehicle vehicle = new Vehicle();
-    BeanUtils.copyProperties(vehicle, vehicleRequest);
+    BeanUtils.copyProperties(vehicleRequest, vehicle);
 
     return vehicleRepository.save(vehicle);
 
