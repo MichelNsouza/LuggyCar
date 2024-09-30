@@ -30,4 +30,6 @@ public class VehicleController {
         return ResponseEntity.status(HttpStatus.CREATED).body(vehicle);
     }
 
+    @DeleteMapping
+
 }
