@@ -29,6 +29,10 @@ public Vehicle insert (VehicleRequest vehicleRequest){
 
 }
 
+    public void deleteVehicleById(Long id){
+        vehicleRepository.deleteById(id);
+    }
+
 
 
 }

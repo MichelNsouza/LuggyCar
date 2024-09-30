@@ -1,4 +1,5 @@
 package com.br.luggycar.api.controllers;
+import com.br.luggycar.api.entities.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.requests.VehicleRequest;
@@ -30,6 +31,12 @@ public class VehicleController {
         return ResponseEntity.status(HttpStatus.CREATED).body(vehicle);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Vehicle> deleteVehicle(@PathVariable Long id){
+        vehicleService.deleteVehicleById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+    }
+
 
 }
