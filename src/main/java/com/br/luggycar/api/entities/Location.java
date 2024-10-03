@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -18,21 +19,22 @@ public class Location{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String dailyRate;
-    private String totalDays;
-    private String deposit;
-    private String kmInitial;
-    private String kmFinal;
+    private BigDecimal dailyRate;
+    private int totalDays;
+    private BigDecimal deposit;
+    private BigDecimal kmInitial;
+    private BigDecimal kmFinal;
     private LocalDate registration;
 
-
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "client_id")
     private Client client;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
 
