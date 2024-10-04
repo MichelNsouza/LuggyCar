@@ -1,4 +1,4 @@
-package com.br.luggycar.api.services;
+package com.br.luggycar.api.services.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

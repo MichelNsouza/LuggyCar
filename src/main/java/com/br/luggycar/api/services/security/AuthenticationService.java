@@ -1,4 +1,4 @@
-package com.br.luggycar.api.services;
+package com.br.luggycar.api.services.security;
 
 import com.br.luggycar.api.entities.User;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;

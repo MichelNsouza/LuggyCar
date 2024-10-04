@@ -1,7 +1,7 @@
 package com.br.luggycar.api.configs.security;
 
 import com.br.luggycar.api.repositories.UserRepository;
-import com.br.luggycar.api.services.TokenService;
+import com.br.luggycar.api.services.security.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
