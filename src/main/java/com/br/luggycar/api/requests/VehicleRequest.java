@@ -1,4 +1,4 @@
-package com.br.luggycar.api.entities;
+package com.br.luggycar.api.requests;
 
 import com.br.luggycar.api.enums.vehicle.VehicleAccessorie;
 import com.br.luggycar.api.enums.vehicle.VehicleColor;
@@ -12,15 +12,10 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 import java.util.Set;
 
-@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Vehicle {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+public class VehicleRequest {
 
     private String name;
 
@@ -28,10 +23,6 @@ public class Vehicle {
     private VehicleManufacturer manufacturer;
 
     private String version;
-
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
 
     private String urlFipe;
 
