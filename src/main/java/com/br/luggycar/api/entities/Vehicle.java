@@ -1,5 +1,6 @@
 package com.br.luggycar.api.entities;
 
+import com.br.luggycar.api.enums.vehicle.Category;
 import com.br.luggycar.api.enums.vehicle.VehicleAccessorie;
 import com.br.luggycar.api.enums.vehicle.VehicleColor;
 import com.br.luggycar.api.enums.vehicle.VehicleManufacturer;
@@ -9,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Set;
 
@@ -29,8 +31,10 @@ public class Vehicle {
 
     private String version;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
+//    @ManyToOne
+//    @JoinColumn(name = "category_id", nullable = false)
+//    private Category category;
+    @Enumerated(EnumType.STRING)
     private Category category;
 
     private String urlFipe;
@@ -55,6 +59,6 @@ public class Vehicle {
 
     private double dailyRate;
 
-    private Date registrationDate;
+    private LocalDate registrationDate;
 
 }

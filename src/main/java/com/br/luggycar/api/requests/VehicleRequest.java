@@ -1,14 +1,12 @@
 package com.br.luggycar.api.requests;
 
-import com.br.luggycar.api.enums.vehicle.VehicleAccessorie;
-import com.br.luggycar.api.enums.vehicle.VehicleColor;
-import com.br.luggycar.api.enums.vehicle.VehicleManufacturer;
-import com.br.luggycar.api.enums.vehicle.Vehicletransmission;
+import com.br.luggycar.api.enums.vehicle.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Set;
 
@@ -23,6 +21,9 @@ public class VehicleRequest {
     private VehicleManufacturer manufacturer;
 
     private String version;
+
+    @Enumerated(EnumType.STRING)
+    private Category category;
 
     private String urlFipe;
 
@@ -46,6 +47,6 @@ public class VehicleRequest {
 
     private double dailyRate;
 
-    private Date registrationDate;
+    private LocalDate registrationDate;
 
 }
