@@ -14,32 +14,28 @@ import java.util.Optional;
 public class OptionalItemService {
 
     @Autowired
-    private OptionalItemRepository optionalRepository;
-    @Autowired
     private OptionalItemRepository optionalItemRepository;
 
     public List<OptionalItem> findAllOptionalItem() {
-        return optionalRepository.findAll();
+        return optionalItemRepository.findAll();
     }
 
     public Optional<OptionalItem> findOptionalItemById(Long id) {
-        return optionalRepository.findById(id);
+        return optionalItemRepository.findById(id);
     }
 
     public OptionalItem insertOptionalItem(OptionalItemRequest optionalItemRequest) {
-
         OptionalItem optionalItem = new OptionalItem();
         BeanUtils.copyProperties(optionalItemRequest, optionalItem);
-
-        return optionalRepository.save(optionalItem);
+        return optionalItemRepository.save(optionalItem);
     }
 
-    public OptionalItem updateOptionalItem(Long id, OptionalItemRequest optionalItemResquest) {
+    public OptionalItem updateOptionalItem(Long id, OptionalItemRequest optionalItemRequest) {
         Optional<OptionalItem> optionalItem = findOptionalItemById(id);
 
         if (optionalItem.isPresent()) {
             OptionalItem optionalItemToUpdate = optionalItem.get();
-            BeanUtils.copyProperties(optionalItemResquest, optionalItemToUpdate);
+            BeanUtils.copyProperties(optionalItemRequest, optionalItemToUpdate);
             return optionalItemRepository.save(optionalItemToUpdate);
         }
 
@@ -53,7 +49,7 @@ public class OptionalItemService {
             optionalItemRepository.delete(optionalItem.get());
             return true;
         }
+
         return false;
     }
-
 }
