@@ -22,7 +22,7 @@ public class ClientController {
     private ClientService clientService;
 
     @PostMapping
-    public ResponseEntity<Client> createCli(@RequestBody ClientResquest clientResquest) {
+    public ResponseEntity<Client> createClient(@RequestBody ClientResquest clientResquest) {
         Client client = clientService.createClient(clientResquest);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(client);

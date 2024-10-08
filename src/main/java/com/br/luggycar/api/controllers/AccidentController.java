@@ -52,6 +52,7 @@ public class AccidentController {
 
     }
 
+
     @GetMapping("/{id}")
     public ResponseEntity<Accident> getAccidentById(@PathVariable Long id) {
         return ResponseEntity.ok(accidentService.findAccidentById(id));

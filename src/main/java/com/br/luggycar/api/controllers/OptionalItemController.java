@@ -52,7 +52,7 @@ public class OptionalItemController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<OptionalItem> readOptionalItemById(@PathVariable long id) {
+    public ResponseEntity<OptionalItem> getOptionalItemById(@PathVariable long id) {
         Optional<OptionalItem> optionalItem = optionalItemService.findOptionalItemById(id);
 
         if (optionalItem.isPresent()) {
