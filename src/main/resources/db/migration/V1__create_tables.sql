@@ -1,14 +1,15 @@
-
 CREATE TABLE accident (
-    id BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
-    severity ENUM('HIGH', 'LOW', 'MEDIUM'),
-    description VARCHAR(250),
-    registration_date DATETIME NOT NULL
+  id BIGINT AUTO_INCREMENT NOT NULL,
+   severity VARCHAR(255) NULL,
+   `description` VARCHAR(255) NULL,
+   registration_date datetime NULL,
+   CONSTRAINT pk_accident PRIMARY KEY (id)
 );
 
-CREATE TABLE optional (
-        id BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
-        name VARCHAR(255),
-        quantity_available FLOAT(53) NOT NULL,
-        rental_value FLOAT(53) NOT NULL,
- );
+CREATE TABLE optional_item (
+  id BIGINT AUTO_INCREMENT NOT NULL,
+   name VARCHAR(255) NULL,
+   rental_value DOUBLE NOT NULL,
+   quantity_available DOUBLE NOT NULL,
+   CONSTRAINT pk_optionalitem PRIMARY KEY (id)
+);
