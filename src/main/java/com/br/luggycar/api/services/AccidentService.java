@@ -16,21 +16,42 @@ public class AccidentService {
     @Autowired
     private AccidentRepository accidentRepository;
 
+    public Accident createAccident(AccidentRequest accidentRequest) {
+        Accident accident = new Accident();
+        BeanUtils.copyProperties(accidentRequest, accident);
+        return accidentRepository.save(accident);
+    }
 
-    public List<Accident> getAllAccidents() {
+    public List<Accident> readAllAccident() {
         return accidentRepository.findAll();
+    }
+
+    public Accident updateAccident(Long id, AccidentRequest accidentRequest) {
+        Optional<Accident> accident = findAccidentById(id);
+
+        if (accident.isPresent()) {
+            Accident accidentToUpdate = accident.get();
+            BeanUtils.copyProperties(accidentRequest, accidentToUpdate);
+            return accidentRepository.save(accidentToUpdate);
+        }
+
+        return null;
+    }
+
+    public boolean deleteAccident(Long id) {
+        Optional<Accident> accident = findAccidentById(id);
+
+        if (accident.isPresent()) {
+            accidentRepository.delete(accident.get());
+            return true;
+        }
+
+        return false;
     }
 
 
     public Accident findAccidentById(Long id) {
         Optional<Accident> accident = accidentRepository.findById(id);
         return accident.orElseThrow(() -> new RuntimeException("Acidente não encontrado."));
-    }
-
-
-    public Accident insertAccident(AccidentRequest accidentRequest) {
-        Accident accident = new Accident();
-        BeanUtils.copyProperties(accidentRequest, accident);
-        return accidentRepository.save(accident);
     }
 }

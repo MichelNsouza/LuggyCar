@@ -16,36 +16,16 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class VehicleRequest {
-
     private String name;
-
-    @Enumerated(EnumType.STRING)
     private VehicleManufacturer manufacturer;
-
     private String version;
-
     private String urlFipe;
-
     private String plate;
-
-    @Enumerated(EnumType.STRING)
     private VehicleColor color;
-
-    @Enumerated(EnumType.STRING)
     private Vehicletransmission transmission;
-
     private String currentKm;
-
     private String passangerCapacity;
-
     private String trunkCapacity;
-
-    @ElementCollection
-    @Enumerated(EnumType.STRING)
-    private Set<VehicleAccessorie> accessories;
-
     private double dailyRate;
-
     private Date registrationDate;
-
 }

@@ -4,7 +4,6 @@ import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.requests.ClientResquest;
 import com.br.luggycar.api.services.ClientService;
-import jakarta.persistence.Id;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,33 +21,22 @@ public class ClientController {
     @Autowired
     private ClientService clientService;
 
-    @GetMapping
-    public ResponseEntity<List<Client>> getAll(){
-        return ResponseEntity.ok(clientService.getAll());
-
-    }
-    @GetMapping("/{id}")
-    public ResponseEntity<Client> getClient(@PathVariable Long id) throws ResourceNotFoundException {
-        Optional<Client> client = clientService.findClientById(id);
-
-        if (client.isEmpty())  {
-            throw new ResourceNotFoundException("Cliente não encontrado!");
-        }
-
-        return ResponseEntity.ok().body(client.get());
-
-    }
-
-    @PostMapping("/registration")
-    public ResponseEntity<Client> insert(@RequestBody ClientResquest clientResquest) {
-        Client client = clientService.insert(clientResquest);
+    @PostMapping
+    public ResponseEntity<Client> createCli(@RequestBody ClientResquest clientResquest) {
+        Client client = clientService.createClient(clientResquest);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(client);
 
     }
 
+    @GetMapping
+    public ResponseEntity<List<Client>> readAllClient(){
+        return ResponseEntity.ok(clientService.readAllClient());
+
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<Client> update(@PathVariable Long id, @RequestBody ClientResquest clientResquest) throws ResourceNotFoundException {
+    public ResponseEntity<Client> updateClient(@PathVariable Long id, @RequestBody ClientResquest clientResquest) throws ResourceNotFoundException {
 
             Optional<Client> client = clientService.findClientById(id);
 
@@ -56,7 +44,7 @@ public class ClientController {
                   throw new ResourceNotFoundException("Cliente não encontrado!");
             }
 
-            Client clientResponse = clientService.update(id, clientResquest);
+            Client clientResponse = clientService.updateClient(id, clientResquest);
 
             return ResponseEntity.ok().body(clientResponse);
 
@@ -64,8 +52,21 @@ public class ClientController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Client> deleteClient(@PathVariable Long id){
-       clientService.deleteClientById(id);
+       clientService.deleteClient(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+    }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Client> getClientbyId(@PathVariable Long id) throws ResourceNotFoundException {
+        Optional<Client> client = clientService.findClientById(id);
+
+        if (client.isEmpty())  {
+            throw new ResourceNotFoundException("Cliente não encontrado!");
+        }
+
+        return ResponseEntity.ok().body(client.get());
 
     }
 

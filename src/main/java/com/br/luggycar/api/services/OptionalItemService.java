@@ -16,18 +16,14 @@ public class OptionalItemService {
     @Autowired
     private OptionalItemRepository optionalItemRepository;
 
-    public List<OptionalItem> findAllOptionalItem() {
-        return optionalItemRepository.findAll();
-    }
-
-    public Optional<OptionalItem> findOptionalItemById(Long id) {
-        return optionalItemRepository.findById(id);
-    }
-
-    public OptionalItem insertOptionalItem(OptionalItemRequest optionalItemRequest) {
+    public OptionalItem createOptionalItem(OptionalItemRequest optionalItemRequest) {
         OptionalItem optionalItem = new OptionalItem();
         BeanUtils.copyProperties(optionalItemRequest, optionalItem);
         return optionalItemRepository.save(optionalItem);
+    }
+
+    public List<OptionalItem> readAllOptionalItem() {
+        return optionalItemRepository.findAll();
     }
 
     public OptionalItem updateOptionalItem(Long id, OptionalItemRequest optionalItemRequest) {
@@ -52,4 +48,10 @@ public class OptionalItemService {
 
         return false;
     }
+
+
+    public Optional<OptionalItem> findOptionalItemById(Long id) {
+        return optionalItemRepository.findById(id);
+    }
+
 }

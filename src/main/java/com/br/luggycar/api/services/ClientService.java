@@ -1,7 +1,6 @@
 package com.br.luggycar.api.services;
 
 import com.br.luggycar.api.entities.Client;
-import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.requests.ClientResquest;
 import com.br.luggycar.api.repositories.ClientRepository;
 import org.springframework.beans.BeanUtils;
@@ -18,22 +17,22 @@ public class ClientService {
    @Autowired
    private ClientRepository clientRepository;
 
-   public List<Client> getAll(){
+    public Client createClient(ClientResquest clientResquest) {
+
+        Client client = new Client();
+        BeanUtils.copyProperties(clientResquest, client);
+
+        client.setRegistration(LocalDate.now());
+
+        return clientRepository.save(client);
+
+    }
+
+    public List<Client> readAllClient(){
         return clientRepository.findAll();
     }
 
-   public Client insert(ClientResquest clientResquest) {
-
-       Client client = new Client();
-       BeanUtils.copyProperties(clientResquest, client);
-
-       client.setRegistration(LocalDate.now());
-
-       return clientRepository.save(client);
-
-   }
-
-   public Client update(Long id, ClientResquest clientResquest) {
+   public Client updateClient(Long id, ClientResquest clientResquest) {
 
        Optional<Client> client = findClientById(id);
 
@@ -46,11 +45,12 @@ public class ClientService {
        return null;
    }
 
-   public Optional<Client>findClientById(Long id){
-       return clientRepository.findById(id);
-   }
-
-   public void deleteClientById(Long id){
+   public void deleteClient(Long id){
         clientRepository.deleteById(id);
    }
+
+
+    public Optional<Client>findClientById(Long id){
+        return clientRepository.findById(id);
+    }
 }

@@ -19,12 +19,12 @@ public class RentController {
 
     @GetMapping
     public ResponseEntity<List<Rent>> getAll() {
-        return ResponseEntity.ok(rentService.getAll());
+        return ResponseEntity.ok(rentService.readAllRent());
     }
 
     @PostMapping("/registration")
     public ResponseEntity<Rent> saveLocation(@RequestBody RentRequest rentRequest) {
-        Rent rent = rentService.save(rentRequest);
+        Rent rent = rentService.creatRent(rentRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(rent);
 
