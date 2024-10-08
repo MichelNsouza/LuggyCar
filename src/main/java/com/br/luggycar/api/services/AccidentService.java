@@ -26,28 +26,28 @@ public class AccidentService {
         return accidentRepository.findAll();
     }
 
-    public Accident updateAccident(Long id, AccidentRequest accidentRequest) {
-        Optional<Accident> accident = findAccidentById(id);
-
-        if (accident.isPresent()) {
-            Accident accidentToUpdate = accident.get();
-            BeanUtils.copyProperties(accidentRequest, accidentToUpdate);
-            return accidentRepository.save(accidentToUpdate);
-        }
-
-        return null;
-    }
-
-    public boolean deleteAccident(Long id) {
-        Optional<Accident> accident = findAccidentById(id);
-
-        if (accident.isPresent()) {
-            accidentRepository.delete(accident.get());
-            return true;
-        }
-
-        return false;
-    }
+//    public Accident updateAccident(Long id, AccidentRequest accidentRequest) {
+//        Optional<Accident> accident = findAccidentById(id);
+//
+//        if (accident.isPresent()) {
+//            Accident accidentToUpdate = accident.get();
+//            BeanUtils.copyProperties(accidentRequest, accidentToUpdate);
+//            return accidentRepository.save(accidentToUpdate);
+//        }
+//
+//        return null;
+//    }
+//
+//    public boolean deleteAccident(Long id) {
+//        Optional<Accident> accident = findAccidentById(id);
+//
+//        if (accident.isPresent()) {
+//            accidentRepository.delete(accident.get());
+//            return true;
+//        }
+//
+//        return false;
+//    }
 
 
     public Accident findAccidentById(Long id) {

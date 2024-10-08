@@ -70,12 +70,5 @@ public class ClientController {
 
     }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleException (ResourceNotFoundException ex){
-        Map<String, String> responseMessage = new HashMap<>();
-        responseMessage.put("messege", ex.getMessage());
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMessage);
-    }
 
 }

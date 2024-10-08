@@ -30,27 +30,27 @@ public class AccidentController {
         return accidentService.readAllAccident();
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Accident> updateAccident(@PathVariable Long id, @RequestBody AccidentRequest accidentRequest) throws ResourceNotFoundException {
+//    @PutMapping("/{id}")
+//    public ResponseEntity<Accident> updateAccident(@PathVariable Long id, @RequestBody AccidentRequest accidentRequest) throws ResourceNotFoundException {
+//
+//        Optional<Accident> accident = accidentService.findAccidentById(id);
+//
+//        if (accident.isEmpty()) {
+//            throw new ResourceNotFoundException("Sinistro não encontrado!");
+//        }
+//
+//        Accident accidentResponse = accidentService.updateAccident(id, accidentRequest);
+//
+//        return ResponseEntity.ok().body(accidentResponse);
+//
+//    }
 
-        Optional<Accident> accident = accidentService.findAccidentById(id);
-
-        if (accident.isEmpty()) {
-            throw new ResourceNotFoundException("Sinistro não encontrado!");
-        }
-
-        Accident accidentResponse = accidentService.updateAccident(id, accidentRequest);
-
-        return ResponseEntity.ok().body(accidentResponse);
-
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Accident> deleteAccident(@PathVariable Long id){
-        accidentService.deleteAccident(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-
-    }
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Accident> deleteAccident(@PathVariable Long id){
+//        accidentService.deleteAccident(id);
+//        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+//
+//    }
 
 
     @GetMapping("/{id}")
