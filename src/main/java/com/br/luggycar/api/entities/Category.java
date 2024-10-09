@@ -23,9 +23,5 @@ public class Category {
 
     private String image;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<Vehicle> vehicles;
-
 //    private LocalDate registration;
 }
