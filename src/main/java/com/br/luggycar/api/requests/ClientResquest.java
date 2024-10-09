@@ -9,21 +9,12 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class ClientResquest {
-
-    private String name;
-    private String lastName;
-    private String cpf;
-    private String email;
-
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-    private Date dateBirth;
-
-    private String endereco;
-}
+public record ClientResquest(
+    String name,
+    String lastName,
+    String cpf,
+    String email,
+    Gender gender,
+    Date dateBirth,
+    String endereco
+){}

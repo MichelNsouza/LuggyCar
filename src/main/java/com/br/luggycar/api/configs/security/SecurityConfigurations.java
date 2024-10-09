@@ -26,10 +26,11 @@ public class SecurityConfigurations {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/vehicle").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                        //.requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        //.requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                        //.requestMatchers(HttpMethod.POST, "/api/vehicle").hasRole("ADMIN")
+                        //.anyRequest().authenticated()
+                        .anyRequest().permitAll() //todas rota liberadas por enquanto
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
