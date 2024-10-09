@@ -4,10 +4,13 @@ import com.br.luggycar.api.enums.vehicle.VehicleAccessorie;
 import com.br.luggycar.api.enums.vehicle.VehicleColor;
 import com.br.luggycar.api.enums.vehicle.VehicleManufacturer;
 import com.br.luggycar.api.enums.vehicle.Vehicletransmission;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Set;
 
@@ -30,6 +33,7 @@ public class Vehicle {
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
+    @JsonBackReference
     private Category category;
 
     private String urlFipe;
@@ -54,5 +58,5 @@ public class Vehicle {
 
     private double dailyRate;
 
-    private Date registrationDate;
+    private LocalDate registrationDate;
 }

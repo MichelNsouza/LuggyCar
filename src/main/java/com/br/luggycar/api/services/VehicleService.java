@@ -9,6 +9,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,7 +28,9 @@ public class VehicleService {
         // Verifique se a categoria existe e está sendo associada corretamente
         Category category = categoryRepository.findById(vehicle.getCategory().getId())
                 .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+
         vehicle.setCategory(category);
+        vehicle.setRegistrationDate(LocalDate.now());
         return vehicleRepository.save(vehicle);
     }
 
