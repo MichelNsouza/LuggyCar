@@ -9,9 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -30,7 +28,7 @@ public class ClientController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Client>> readAllClient(){
+    public ResponseEntity<List<Client>> readAllClient() {
         return ResponseEntity.ok(clientService.readAllClient());
 
     }
@@ -38,31 +36,31 @@ public class ClientController {
     @PutMapping("/{id}")
     public ResponseEntity<Client> updateClient(@PathVariable Long id, @RequestBody ClientResquest clientResquest) throws ResourceNotFoundException {
 
-            Optional<Client> client = clientService.findClientById(id);
+        Optional<Client> client = clientService.findClientById(id);
 
-            if (client.isEmpty()) {
-                  throw new ResourceNotFoundException("Cliente não encontrado!");
-            }
+        if (client.isEmpty()) {
+            throw new ResourceNotFoundException("Cliente não encontrado!");
+        }
 
-            Client clientResponse = clientService.updateClient(id, clientResquest);
+        Client clientResponse = clientService.updateClient(id, clientResquest);
 
-            return ResponseEntity.ok().body(clientResponse);
+        return ResponseEntity.ok().body(clientResponse);
 
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Client> deleteClient(@PathVariable Long id){
-       clientService.deleteClient(id);
+    public ResponseEntity<Client> deleteClient(@PathVariable Long id) {
+        clientService.deleteClient(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
     }
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Client> getClientbyId(@PathVariable Long id) throws ResourceNotFoundException {
+    public ResponseEntity<Client> findClientbyId(@PathVariable Long id) throws ResourceNotFoundException {
         Optional<Client> client = clientService.findClientById(id);
 
-        if (client.isEmpty())  {
+        if (client.isEmpty()) {
             throw new ResourceNotFoundException("Cliente não encontrado!");
         }
 

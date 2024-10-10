@@ -1,43 +1,25 @@
 package com.br.luggycar.api.requests;
 
+
 import com.br.luggycar.api.entities.Category;
-import com.br.luggycar.api.enums.vehicle.VehicleAccessorie;
 import com.br.luggycar.api.enums.vehicle.VehicleColor;
 import com.br.luggycar.api.enums.vehicle.VehicleManufacturer;
 import com.br.luggycar.api.enums.vehicle.Vehicletransmission;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.util.Date;
-import java.util.Set;
+public record VehicleRequest(
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class VehicleRequest {
-    private String name;
+        String name,
+        VehicleManufacturer manufacturer,
+        String version,
+        Category category,
+        String urlFipe,
+        String plate,
+        VehicleColor color,
+        Vehicletransmission transmission,
+        String currentKm,
+        String passangerCapacity,
+        String trunkCapacity,
+        double dailyRate
 
-    private VehicleManufacturer manufacturer;
-
-    private String version;
-
-    private Category category;
-
-    private String urlFipe;
-
-    private String plate;
-
-    private VehicleColor color;
-
-    private Vehicletransmission transmission;
-
-    private String currentKm;
-
-    private String passangerCapacity;
-
-    private String trunkCapacity;
-
-    private double dailyRate;
+) {
 }

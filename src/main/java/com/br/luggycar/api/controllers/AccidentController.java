@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/accident")
@@ -21,40 +20,29 @@ public class AccidentController {
 
     @PostMapping
     public ResponseEntity<Accident> createAccident(@RequestBody AccidentRequest accidentRequest) {
-        Accident newAccident = accidentService.createAccident(accidentRequest);
-        return ResponseEntity.ok(newAccident);
+        return ResponseEntity.ok(accidentService.createAccident(accidentRequest));
     }
 
     @GetMapping
-    public List<Accident> readAllAccidents() {
-        return accidentService.readAllAccident();
+    public ResponseEntity<List<Accident>> readAllAccidents() {
+        return ResponseEntity.ok(accidentService.readAllAccident());
     }
 
-//    @PutMapping("/{id}")
-//    public ResponseEntity<Accident> updateAccident(@PathVariable Long id, @RequestBody AccidentRequest accidentRequest) throws ResourceNotFoundException {
-//
-//        Optional<Accident> accident = accidentService.findAccidentById(id);
-//
-//        if (accident.isEmpty()) {
-//            throw new ResourceNotFoundException("Sinistro não encontrado!");
-//        }
-//
-//        Accident accidentResponse = accidentService.updateAccident(id, accidentRequest);
-//
-//        return ResponseEntity.ok().body(accidentResponse);
-//
-//    }
+    @PutMapping("/{id}")
+    public ResponseEntity<Accident> updateAccident(@PathVariable Long id, @RequestBody AccidentRequest accidentRequest) throws ResourceNotFoundException {
+        return ResponseEntity.ok().body(accidentService.updateAccident(id, accidentRequest));
+    }
 
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Accident> deleteAccident(@PathVariable Long id){
-//        accidentService.deleteAccident(id);
-//        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-//
-//    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Accident> deleteAccident(@PathVariable Long id) {
+        accidentService.deleteAccident(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+    }
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Accident> getAccidentById(@PathVariable Long id) {
+    public ResponseEntity<Accident> findAccidentById(@PathVariable Long id) {
         return ResponseEntity.ok(accidentService.findAccidentById(id));
     }
 

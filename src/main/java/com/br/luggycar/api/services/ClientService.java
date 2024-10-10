@@ -14,8 +14,8 @@ import java.util.Optional;
 @Service
 public class ClientService {
 
-   @Autowired
-   private ClientRepository clientRepository;
+    @Autowired
+    private ClientRepository clientRepository;
 
     public Client createClient(ClientResquest clientResquest) {
 
@@ -28,29 +28,29 @@ public class ClientService {
 
     }
 
-    public List<Client> readAllClient(){
+    public List<Client> readAllClient() {
         return clientRepository.findAll();
     }
 
-   public Client updateClient(Long id, ClientResquest clientResquest) {
+    public Client updateClient(Long id, ClientResquest clientResquest) {
 
-       Optional<Client> client = findClientById(id);
+        Optional<Client> client = findClientById(id);
 
-       if (client.isPresent()) {
-           Client updatedClient = client.get();
-           BeanUtils.copyProperties(clientResquest, updatedClient);
-           return clientRepository.save(updatedClient);
-       }
+        if (client.isPresent()) {
+            Client updatedClient = client.get();
+            BeanUtils.copyProperties(clientResquest, updatedClient);
+            return clientRepository.save(updatedClient);
+        }
 
-       return null;
-   }
+        return null;
+    }
 
-   public void deleteClient(Long id){
+    public void deleteClient(Long id) {
         clientRepository.deleteById(id);
-   }
+    }
 
 
-    public Optional<Client>findClientById(Long id){
+    public Optional<Client> findClientById(Long id) {
         return clientRepository.findById(id);
     }
 }

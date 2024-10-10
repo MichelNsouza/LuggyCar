@@ -32,15 +32,15 @@ public class AuthenticationService {
 
         var auth = this.authenticationManager.authenticate(usernamePassword);
 
-        var token = tokenService.generateToken((User)auth.getPrincipal());
+        var token = tokenService.generateToken((User) auth.getPrincipal());
 
         return token;
     }
 
     public User createUser(RegisterRequest registerRequest) throws ResourceNotFoundException {
 
-        if(this.userRepository.findByLogin(registerRequest.login()) != null){
-            throw  new ResourceNotFoundException("Usuario já existe");
+        if (this.userRepository.findByLogin(registerRequest.login()) != null) {
+            throw new ResourceNotFoundException("Usuario já existe");
         }
         String encryptedPassword = new BCryptPasswordEncoder().encode(registerRequest.password());
 
@@ -49,6 +49,7 @@ public class AuthenticationService {
 
         return userRepository.save(user);
     }
+
 
 
 }

@@ -11,7 +11,7 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleException (ResourceNotFoundException ex){
+    public ResponseEntity<Map<String, String>> handleException(ResourceNotFoundException ex) {
         Map<String, String> responseMessage = new HashMap<>();
         responseMessage.put("messege", ex.getMessage());
 

@@ -26,9 +26,11 @@ public class Rent {
     private BigDecimal kmFinal;
     private LocalDate registration;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    private User user;
+
+    private String user;
 
     @OneToOne
     @JoinColumn(name = "client_id")

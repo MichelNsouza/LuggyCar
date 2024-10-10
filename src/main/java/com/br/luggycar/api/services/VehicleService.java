@@ -15,16 +15,14 @@ import java.util.Optional;
 
 @Service
 public class VehicleService {
+
     @Autowired
     private VehicleRepository vehicleRepository;
-
-    public List <Vehicle> getAll() {
-        return vehicleRepository.findAll();
-    }
-
     @Autowired
     private CategoryRepository categoryRepository;
-    public Vehicle save(Vehicle vehicle) {
+
+
+    public Vehicle createVehicle(Vehicle vehicle) {
         // Verifique se a categoria existe e está sendo associada corretamente
         Category category = categoryRepository.findById(vehicle.getCategory().getId())
                 .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
@@ -34,7 +32,24 @@ public class VehicleService {
         return vehicleRepository.save(vehicle);
     }
 
-    public Vehicle update(Long id, VehicleRequest vehicleRequest) {
+    public List<Vehicle> readAllVehicle() {
+
+
+//        List <VehicleRequest> vehicleResponse = vehicleRepository.findAll();
+//
+//        List<Vehicle> vehicles =  new ArrayList<>();
+//
+//
+//
+//        BeanUtils.copyProperties(vehicleResponse, vehicles);
+//
+//
+//        return vehicleResponse;
+
+        return vehicleRepository.findAll();
+    }
+
+    public Vehicle updateVehicle(Long id, VehicleRequest vehicleRequest) {
         Optional<Vehicle> vehicle = findVehicleById(id);
 
         if (vehicle.isPresent()) {
@@ -46,14 +61,13 @@ public class VehicleService {
         return null;
     }
 
-    public Optional<Vehicle> findVehicleById(Long id) {
-        return vehicleRepository.findById(id);
-    }
-
-    public void deleteVehicleById(Long id){
+    public void deleteVehicle(Long id) {
         vehicleRepository.deleteById(id);
     }
 
 
+    public Optional<Vehicle> findVehicleById(Long id) {
+        return vehicleRepository.findById(id);
+    }
 
 }
