@@ -17,17 +17,19 @@ public class RentController {
     @Autowired
     RentService rentService;
 
-    @GetMapping
-    public ResponseEntity<List<Rent>> getAll() {
-        return ResponseEntity.ok(rentService.getAll());
-    }
 
-    @PostMapping("/registration")
-    public ResponseEntity<Rent> saveLocation(@RequestBody RentRequest rentRequest) {
-        Rent rent = rentService.save(rentRequest);
+    @PostMapping
+    public ResponseEntity<Rent> createRent(@RequestBody RentRequest rentRequest) {
+
+        Rent rent = rentService.createRent(rentRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(rent);
 
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Rent>> readAllRent() {
+        return ResponseEntity.ok(rentService.readAllRent());
     }
 
 }

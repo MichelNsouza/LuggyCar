@@ -10,23 +10,14 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class RentRequest {
-
-    private String dailyRate;
-    private String totalDays;
-    private String deposit;
-    private String kmInitial;
-    private String kmFinal;
-    private LocalDate registration;
-
-    private User user;
-
-    private Client client;
-
-    private Vehicle vehicle;
-
-
-}
+public record RentRequest(
+     String dailyRate,
+     String totalDays,
+     String deposit,
+     String kmInitial,
+     String kmFinal,
+     LocalDate registration,
+     User user,
+     Client client,
+     Vehicle vehicle
+){}

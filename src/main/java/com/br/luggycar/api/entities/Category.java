@@ -1,12 +1,11 @@
 package com.br.luggycar.api.entities;
 
-
-
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -25,14 +24,5 @@ public class Category {
 
     private String image;
 
-    @OneToMany(mappedBy = "category")
-    //@OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
-    //especificações de relacionamento que serão adicionadas posteriormente
-    private List<Vehicle> vehicles;
-
-    private LocalDateTime createdDate;
-
-
-
-
+//    private LocalDate registration;
 }

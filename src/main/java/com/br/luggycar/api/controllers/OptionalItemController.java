@@ -18,26 +18,15 @@ public class OptionalItemController {
     @Autowired
     private OptionalItemService optionalItemService;
 
-    @GetMapping
-    public ResponseEntity<List<OptionalItem>> getAllOptionalItem() {
-        return ResponseEntity.ok(optionalItemService.findAllOptionalItem());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<OptionalItem> getOptionalItemById(@PathVariable long id) {
-        Optional<OptionalItem> optionalItem = optionalItemService.findOptionalItemById(id);
-
-        if (optionalItem.isPresent()) {
-            return ResponseEntity.ok(optionalItem.get());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-    }
-
-    @PostMapping("/registration")
-    public ResponseEntity<OptionalItem> saveOptionalItem(@RequestBody OptionalItemRequest optionalItemRequest) {
-        OptionalItem optionalItem = optionalItemService.insertOptionalItem(optionalItemRequest);
+    @PostMapping
+    public ResponseEntity<OptionalItem> createOptionalItem(@RequestBody OptionalItemRequest optionalItemRequest) {
+        OptionalItem optionalItem = optionalItemService.createOptionalItem(optionalItemRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(optionalItem);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<OptionalItem>> readAllOptionalItem() {
+        return ResponseEntity.ok(optionalItemService.readAllOptionalItem());
     }
 
     @PutMapping("/{id}")
@@ -60,4 +49,17 @@ public class OptionalItemController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
         }
     }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<OptionalItem> findOptionalItemById(@PathVariable long id) {
+        Optional<OptionalItem> optionalItem = optionalItemService.findOptionalItemById(id);
+
+        if (optionalItem.isPresent()) {
+            return ResponseEntity.ok(optionalItem.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
 }

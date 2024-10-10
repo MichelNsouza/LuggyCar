@@ -3,6 +3,8 @@ package com.br.luggycar.api.services;
 
 import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.repositories.CategoryRepository;
+import com.br.luggycar.api.requests.CategoryRequest;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,26 +17,28 @@ public class CategoryService {
     @Autowired
     private CategoryRepository CategoryRepository;
 
-
-    public Category SaveCategory(Category category){
+    public Category createCategory(Category category) {
         return CategoryRepository.save(category);
     }
 
-    public Category findByName(String name){
-        return (Category) CategoryRepository.findByName(name).get();
-    }
-
-    public Category findById(long id){
-        return CategoryRepository.findById(id).get();
-    }
-    public List<Category> getAllCategories(){
+    public List<Category> readAllCategories() {
         return CategoryRepository.findAll();
     }
 
-//    public boolean updateCategory(Long id){
-//
-//
-//    }
+    public Category updateCategory(Long id, CategoryRequest categoryRequest) {
+
+        Optional<Category> category = CategoryRepository.findById(id);
+
+        if (category.isPresent()) {
+
+            Category categoryToUpdate = category.get();
+
+            BeanUtils.copyProperties(categoryRequest, categoryToUpdate);
+
+            return CategoryRepository.save(categoryToUpdate);
+        }
+        return null;
+    }
 
     public boolean deleteCategory(long id) {
         Optional<Category> category = CategoryRepository.findById(id);
@@ -47,5 +51,12 @@ public class CategoryService {
         }
     }
 
+    public Category findCategoryByName(String name) {
+        return (Category) CategoryRepository.findByName(name).get();
+    }
+
+    public Category findCategoryById(long id) {
+        return CategoryRepository.findById(id).get();
+    }
 
 }

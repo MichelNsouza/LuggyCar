@@ -4,11 +4,14 @@ import com.br.luggycar.api.enums.vehicle.VehicleAccessorie;
 import com.br.luggycar.api.enums.vehicle.VehicleColor;
 import com.br.luggycar.api.enums.vehicle.VehicleManufacturer;
 import com.br.luggycar.api.enums.vehicle.Vehicletransmission;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Set;
 
@@ -55,6 +58,5 @@ public class Vehicle {
 
     private double dailyRate;
 
-    private Date registrationDate;
-
+    private LocalDate registrationDate;
 }
