@@ -12,6 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +34,8 @@ public class RentService {
 
         Rent rent = new Rent();
         BeanUtils.copyProperties(rentRequest, rent);
+
+        rent.setRegistration(LocalDate.now());
 
         Optional <Client> client = clientService.findClientById(rentRequest.client().getId());
         rent.setClient(client.get());
