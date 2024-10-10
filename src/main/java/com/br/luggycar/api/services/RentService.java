@@ -34,7 +34,6 @@ public class RentService {
         Rent rent = new Rent();
         BeanUtils.copyProperties(rentRequest, rent);
 
-
         Optional <Client> client = clientService.findClientById(rentRequest.client().getId());
         rent.setClient(client.get());
 
@@ -43,6 +42,8 @@ public class RentService {
 
         String usuario = authUtil.getAuthenticatedUsername();
         rent.setUser(usuario);
+
+        System.out.println(rent);
 
         return rentRepository.save(rent);
 
