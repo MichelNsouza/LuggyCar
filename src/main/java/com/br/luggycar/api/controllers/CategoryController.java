@@ -3,7 +3,7 @@ package com.br.luggycar.api.controllers;
 
 import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
-import com.br.luggycar.api.requests.CategoryRequest;
+import com.br.luggycar.api.dtos.requests.CategoryRequest;
 import com.br.luggycar.api.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +20,8 @@ public class CategoryController {
 
 
     @PostMapping
-    public ResponseEntity<Category> createCategory(@RequestBody Category category) {
-        return ResponseEntity.ok(categoryService.createCategory(category));
+    public ResponseEntity<Category> createCategory(@RequestBody CategoryRequest categoryRequest) {
+        return ResponseEntity.ok(categoryService.createCategory(categoryRequest));
     }
 
     @GetMapping

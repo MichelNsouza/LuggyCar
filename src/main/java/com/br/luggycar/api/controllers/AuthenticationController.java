@@ -3,8 +3,8 @@ package com.br.luggycar.api.controllers;
 
 import com.br.luggycar.api.entities.User;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
-import com.br.luggycar.api.requests.LoginRequest;
-import com.br.luggycar.api.requests.RegisterRequest;
+import com.br.luggycar.api.dtos.requests.LoginRequest;
+import com.br.luggycar.api.dtos.requests.RegisterRequest;
 import com.br.luggycar.api.services.security.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

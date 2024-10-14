@@ -2,11 +2,9 @@ package com.br.luggycar.api.services;
 
 import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.entities.Rent;
-import com.br.luggycar.api.entities.User;
 import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.repositories.RentRepository;
-import com.br.luggycar.api.requests.RentRequest;
-import com.br.luggycar.api.requests.UserResponse;
+import com.br.luggycar.api.dtos.requests.RentRequest;
 import com.br.luggycar.api.utils.AuthUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

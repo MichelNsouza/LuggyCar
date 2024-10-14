@@ -2,7 +2,7 @@ package com.br.luggycar.api.controllers;
 
 import com.br.luggycar.api.entities.Accident;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
-import com.br.luggycar.api.requests.AccidentRequest;
+import com.br.luggycar.api.dtos.requests.AccidentRequest;
 import com.br.luggycar.api.services.AccidentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

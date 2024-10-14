@@ -3,7 +3,7 @@ package com.br.luggycar.api.services;
 
 import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.repositories.CategoryRepository;
-import com.br.luggycar.api.requests.CategoryRequest;
+import com.br.luggycar.api.dtos.requests.CategoryRequest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,11 @@ public class CategoryService {
     @Autowired
     private CategoryRepository CategoryRepository;
 
-    public Category createCategory(Category category) {
+    public Category createCategory(CategoryRequest categoryRequest) {
+
+        Category category = new Category();
+        BeanUtils.copyProperties(categoryRequest, category);
+
         return CategoryRepository.save(category);
     }
 

@@ -2,7 +2,7 @@ package com.br.luggycar.api.services;
 
 import com.br.luggycar.api.entities.OptionalItem;
 import com.br.luggycar.api.repositories.OptionalItemRepository;
-import com.br.luggycar.api.requests.OptionalItemRequest;
+import com.br.luggycar.api.dtos.requests.OptionalItemRequest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

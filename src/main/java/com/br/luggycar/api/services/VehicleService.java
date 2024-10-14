@@ -4,7 +4,7 @@ import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.repositories.CategoryRepository;
 import com.br.luggycar.api.repositories.VehicleRepository;
-import com.br.luggycar.api.requests.VehicleRequest;
+import com.br.luggycar.api.dtos.requests.VehicleRequest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

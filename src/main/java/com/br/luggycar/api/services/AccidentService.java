@@ -2,7 +2,7 @@ package com.br.luggycar.api.services;
 
 import com.br.luggycar.api.entities.Accident;
 import com.br.luggycar.api.repositories.AccidentRepository;
-import com.br.luggycar.api.requests.AccidentRequest;
+import com.br.luggycar.api.dtos.requests.AccidentRequest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

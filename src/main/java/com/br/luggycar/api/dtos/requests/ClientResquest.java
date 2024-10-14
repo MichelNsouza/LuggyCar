@@ -1,4 +1,4 @@
-package com.br.luggycar.api.requests;
+package com.br.luggycar.api.dtos.requests;
 
 import com.br.luggycar.api.enums.client.Gender;
 import com.fasterxml.jackson.annotation.JsonFormat;
