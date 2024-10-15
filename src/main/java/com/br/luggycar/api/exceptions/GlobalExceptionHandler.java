@@ -17,4 +17,12 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMessage);
     }
+
+    @ExceptionHandler(ResourceExistsException.class)
+    public ResponseEntity<Map<String, String>> handleException(ResourceExistsException ex) {
+        Map<String, String> responseMessage = new HashMap<>();
+        responseMessage.put("messege", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+    }
 }

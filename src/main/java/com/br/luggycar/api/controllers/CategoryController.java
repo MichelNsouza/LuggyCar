@@ -2,6 +2,7 @@ package com.br.luggycar.api.controllers;
 
 
 import com.br.luggycar.api.entities.Category;
+import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.dtos.requests.CategoryRequest;
 import com.br.luggycar.api.services.CategoryService;
@@ -20,7 +21,7 @@ public class CategoryController {
 
 
     @PostMapping
-    public ResponseEntity<Category> createCategory(@RequestBody CategoryRequest categoryRequest) {
+    public ResponseEntity<Category> createCategory(@RequestBody CategoryRequest categoryRequest) throws ResourceExistsException {
         return ResponseEntity.ok(categoryService.createCategory(categoryRequest));
     }
 
@@ -31,7 +32,7 @@ public class CategoryController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody CategoryRequest categoryRequest) throws ResourceNotFoundException {
+    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody CategoryRequest categoryRequest) throws ResourceExistsException {
         return ResponseEntity.ok().body(categoryService.updateCategory(id, categoryRequest));
     }
 
