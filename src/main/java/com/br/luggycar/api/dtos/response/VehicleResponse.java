@@ -1,5 +1,6 @@
 package com.br.luggycar.api.dtos.response;
 
+import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.enums.vehicle.VehicleAccessorie;
 import com.br.luggycar.api.enums.vehicle.VehicleColor;
 import com.br.luggycar.api.enums.vehicle.VehicleManufacturer;
@@ -22,4 +23,21 @@ public record VehicleResponse(
         Set<VehicleAccessorie> accessories,
         double dailyRate
 ) {
+    public VehicleResponse(Vehicle vehicle) {
+        this(
+                vehicle.getName(),
+                vehicle.getManufacturer(),
+                vehicle.getVersion(),
+                vehicle.getCategory().getId(),
+                vehicle.getUrlFipe(),
+                vehicle.getPlate(),
+                vehicle.getColor(),
+                vehicle.getTransmission(),
+                vehicle.getCurrentKm(),
+                vehicle.getPassangerCapacity(),
+                vehicle.getTrunkCapacity(),
+                vehicle.getAccessories(),
+                vehicle.getDailyRate()
+        );
+    }
 }

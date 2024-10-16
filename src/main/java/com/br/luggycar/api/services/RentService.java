@@ -38,6 +38,7 @@ public class RentService {
         Optional <Client> client = clientService.findClientById(rentRequest.client().getId());
         rent.setClient(client.get());
 
+        // Quebrando essa parte do código por causa do método findVehicleById que está no VehicleService
         Optional <Vehicle> vehicle = vehicleService.findVehicleById(rentRequest.vehicle().getId());
         rent.setVehicle(vehicle.get());
 

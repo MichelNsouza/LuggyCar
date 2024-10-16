@@ -36,21 +36,27 @@ public class VehicleController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Vehicle>> readAllVehicles() {
-        return ResponseEntity.ok(vehicleService.readAllVehicle());
+    public ResponseEntity<List<VehicleResponse>> readAllVehicles() {
+        List<VehicleResponse> vehicleResponses = vehicleService.readAllVehicle();
+        return ResponseEntity.ok(vehicleResponses);
+//        return ResponseEntity.ok(vehicleService.readAllVehicle());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Vehicle> updateVehicle(@PathVariable Long id, @RequestBody VehicleRequest vehicleRequest) throws ResourceNotFoundException {
-        Optional<Vehicle> vehicle = vehicleService.findVehicleById(id);
+    public ResponseEntity<VehicleResponse> updateVehicle(@PathVariable Long id, @RequestBody VehicleRequest vehicleRequest) throws ResourceNotFoundException {
 
-        if (vehicle.isEmpty()) {
-            throw new ResourceNotFoundException("Veículo não encontrado");
-        }
+        VehicleResponse updatedVehicleResponse = vehicleService.updateVehicle(id, vehicleRequest);
+        return ResponseEntity.ok(updatedVehicleResponse);
 
-        Vehicle vehicleResponse = vehicleService.updateVehicle(id, vehicleRequest);
-
-        return ResponseEntity.ok().body(vehicleResponse);
+        //        Optional<VehicleResponse> vehicle = vehicleService.findVehicleById(id);
+//
+//        if (vehicle.isEmpty()) {
+//            throw new ResourceNotFoundException("Veículo não encontrado");
+//        }
+//
+//        Vehicle vehicleResponse = vehicleService.updateVehicle(id, vehicleRequest);
+//
+//        return ResponseEntity.ok().body(vehicleResponse);
     }
 
     @DeleteMapping("/{id}")
@@ -61,13 +67,13 @@ public class VehicleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Vehicle> findVehicleById(@PathVariable Long id) throws ResourceNotFoundException {
-        Optional<Vehicle> vehicle = vehicleService.findVehicleById(id);
+    public ResponseEntity<VehicleResponse> findVehicleById(@PathVariable Long id) throws ResourceNotFoundException {
+        Optional<VehicleResponse> vehicleResponse = vehicleService.findVehicleById(id);
 
-        if (vehicle.isEmpty()) {
+        if (vehicleResponse.isEmpty()) {
             throw new ResourceNotFoundException("Veículo não encontrado!");
         }
-        return ResponseEntity.ok().body(vehicle.get());
+        return ResponseEntity.ok().body(vehicleResponse.get());
 
     }
 
