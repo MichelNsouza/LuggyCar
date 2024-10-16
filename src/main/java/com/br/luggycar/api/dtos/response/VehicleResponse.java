@@ -1,17 +1,13 @@
-package com.br.luggycar.api.dtos.requests;
+package com.br.luggycar.api.dtos.response;
 
-
-import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.enums.vehicle.VehicleAccessorie;
 import com.br.luggycar.api.enums.vehicle.VehicleColor;
 import com.br.luggycar.api.enums.vehicle.VehicleManufacturer;
 import com.br.luggycar.api.enums.vehicle.Vehicletransmission;
 
-import java.util.List;
 import java.util.Set;
 
-public record VehicleRequest(
-
+public record VehicleResponse(
         String name,
         VehicleManufacturer manufacturer,
         String version,
@@ -25,6 +21,5 @@ public record VehicleRequest(
         String trunkCapacity,
         Set<VehicleAccessorie> accessories,
         double dailyRate
-
 ) {
 }

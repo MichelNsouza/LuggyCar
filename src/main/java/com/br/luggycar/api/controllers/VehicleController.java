@@ -1,5 +1,6 @@
 package com.br.luggycar.api.controllers;
 
+import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.dtos.requests.VehicleRequest;
@@ -26,15 +27,11 @@ public class VehicleController {
 
 
     @PostMapping
-    public ResponseEntity<Vehicle> createVehicle(@RequestBody Vehicle vehicle) {
+    public ResponseEntity<VehicleResponse> createVehicle(@RequestBody VehicleRequest vehicleRequest) {
 
-        Category category = categoryService.findCategoryById(vehicle.getCategory().getId());
+        VehicleResponse savedVehicle = vehicleService.createVehicle(vehicleRequest);
 
-        vehicle.setCategory(category);
-
-        Vehicle savedVehicle = vehicleService.createVehicle(vehicle);
-
-        return ResponseEntity.ok(savedVehicle);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedVehicle);
 
     }
 
