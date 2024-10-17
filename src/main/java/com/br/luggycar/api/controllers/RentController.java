@@ -37,14 +37,14 @@ public class RentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Rent> updateClient(@PathVariable Long id, @RequestBody RentRequest rentRequest) throws ResourceNotFoundException {
-        Optional<Rent> rent = rentService.findRentById(id);
+    public ResponseEntity<RentResponse> updateClient(@PathVariable Long id, @RequestBody RentRequest rentRequest) throws ResourceNotFoundException {
+         Optional<RentResponse> rentOpt = rentService.findRentById(id);
 
-        if (rent.isEmpty()) {
+        if (rentOpt.isEmpty()) {
             throw new ResourceNotFoundException("Locação não encontrada!");
         }
 
-        Rent rentResponse = rentService.updateRent(id, rentRequest);
+        RentResponse rentResponse = rentService.updateRent(id, rentRequest);
 
         return ResponseEntity.ok().body(rentResponse);
 
@@ -57,8 +57,8 @@ public class RentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Rent> findRentById(@PathVariable Long id) throws ResourceNotFoundException {
-        Optional<Rent> rent = rentService.findRentById(id);
+    public ResponseEntity<RentResponse> findRentById(@PathVariable Long id) throws ResourceNotFoundException {
+        Optional<RentResponse> rent = rentService.findRentById(id);
 
         if (rent.isEmpty()) {
             throw new ResourceNotFoundException("Locação não encontrada!");

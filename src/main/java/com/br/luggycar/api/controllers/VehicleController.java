@@ -42,7 +42,8 @@ public class VehicleController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<VehicleResponse> updateVehicle(@PathVariable Long id, @RequestBody VehicleRequest vehicleRequest) throws ResourceNotFoundException {
+    public ResponseEntity<VehicleResponse> updateVehicle(@PathVariable Long id, @RequestBody VehicleRequest vehicleRequest)
+            throws ResourceNotFoundException {
 
         VehicleResponse updatedVehicleResponse = vehicleService.updateVehicle(id, vehicleRequest);
         return ResponseEntity.ok(updatedVehicleResponse);

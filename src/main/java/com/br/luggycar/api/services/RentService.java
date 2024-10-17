@@ -71,17 +71,20 @@ public class RentService {
                 .collect(Collectors.toList());
     }
 
-    public Rent updateRent(Long id, RentRequest rentRequest) {
+    public RentResponse updateRent(Long id, RentRequest rentRequest) {
 
-        Optional<Rent> rent = findRentById(id);
+        Optional<Rent> rentOpt = rentRepository.findById(id);
 
-        if (rent.isPresent()) {
-            Rent updatedRent = rent.get();
-            BeanUtils.copyProperties(rentRequest, updatedRent);
-            return rentRepository.save(updatedRent);
+        if (rentOpt.isPresent()) {
+            Rent updatedRent = rentOpt.get();
+            BeanUtils.copyProperties(rentRequest, updatedRent, "id", "registration");
+
+            Rent savedRent = rentRepository.save(updatedRent);
+            return new RentResponse(savedRent);
         }
 
         return null;
+
     }
 
     public void deleteRent(Long id){
@@ -89,8 +92,10 @@ public class RentService {
     }
 
 
-    public Optional<Rent>findRentById(Long id){
-        return rentRepository.findById(id);
+    public Optional<RentResponse>findRentById(Long id){
+        return rentRepository.findById(id)
+                .map(RentResponse::new);
+
     }
 
 }

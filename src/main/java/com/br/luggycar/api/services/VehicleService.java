@@ -54,13 +54,10 @@ public class VehicleService {
         Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado"));
 
-        // Atualiza as propriedades do veículo com os dados do DTO
         BeanUtils.copyProperties(vehicleRequest, vehicle, "id", "registrationDate"); // Ignora ID e data de registro
 
-        // Salva o veículo atualizado no repositório
         Vehicle updatedVehicle = vehicleRepository.save(vehicle);
 
-        // Retorna o DTO atualizado
         return new VehicleResponse(updatedVehicle);
     }
 
