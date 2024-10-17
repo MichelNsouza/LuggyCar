@@ -1,5 +1,7 @@
 package com.br.luggycar.api.controllers;
 
+import com.br.luggycar.api.dtos.response.RentResponse;
+import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.entities.Rent;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.dtos.requests.RentRequest;
@@ -20,17 +22,18 @@ public class RentController {
     RentService rentService;
 
     @PostMapping
-    public ResponseEntity<Rent> createRent(@RequestBody RentRequest rentRequest) {
+    public ResponseEntity<RentResponse> createRent(@RequestBody RentRequest rentRequest) {
 
-        Rent rent = rentService.createRent(rentRequest);
+        RentResponse rentResponse = rentService.createRent(rentRequest);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(rent);
+        return ResponseEntity.status(HttpStatus.CREATED).body(rentResponse);
 
     }
 
     @GetMapping
-    public ResponseEntity<List<Rent>> readAllRent() {
-        return ResponseEntity.ok(rentService.readAllRent());
+    public ResponseEntity<List<RentResponse>> readAllRent() {
+        List<RentResponse> rentResponses = rentService.readAllRent();
+        return ResponseEntity.ok(rentResponses);
     }
 
     @PutMapping("/{id}")

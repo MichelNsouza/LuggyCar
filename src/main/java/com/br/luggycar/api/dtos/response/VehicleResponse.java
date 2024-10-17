@@ -9,6 +9,7 @@ import com.br.luggycar.api.enums.vehicle.Vehicletransmission;
 import java.util.Set;
 
 public record VehicleResponse(
+        Long id,
         String name,
         VehicleManufacturer manufacturer,
         String version,
@@ -25,6 +26,7 @@ public record VehicleResponse(
 ) {
     public VehicleResponse(Vehicle vehicle) {
         this(
+                vehicle.getId(),
                 vehicle.getName(),
                 vehicle.getManufacturer(),
                 vehicle.getVersion(),

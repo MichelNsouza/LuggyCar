@@ -39,7 +39,6 @@ public class VehicleController {
     public ResponseEntity<List<VehicleResponse>> readAllVehicles() {
         List<VehicleResponse> vehicleResponses = vehicleService.readAllVehicle();
         return ResponseEntity.ok(vehicleResponses);
-//        return ResponseEntity.ok(vehicleService.readAllVehicle());
     }
 
     @PutMapping("/{id}")
@@ -48,15 +47,6 @@ public class VehicleController {
         VehicleResponse updatedVehicleResponse = vehicleService.updateVehicle(id, vehicleRequest);
         return ResponseEntity.ok(updatedVehicleResponse);
 
-        //        Optional<VehicleResponse> vehicle = vehicleService.findVehicleById(id);
-//
-//        if (vehicle.isEmpty()) {
-//            throw new ResourceNotFoundException("Veículo não encontrado");
-//        }
-//
-//        Vehicle vehicleResponse = vehicleService.updateVehicle(id, vehicleRequest);
-//
-//        return ResponseEntity.ok().body(vehicleResponse);
     }
 
     @DeleteMapping("/{id}")
