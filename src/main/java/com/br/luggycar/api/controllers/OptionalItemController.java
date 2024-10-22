@@ -1,7 +1,7 @@
 package com.br.luggycar.api.controllers;
 
 import com.br.luggycar.api.entities.OptionalItem;
-import com.br.luggycar.api.requests.OptionalItemRequest;
+import com.br.luggycar.api.dtos.requests.OptionalItemRequest;
 import com.br.luggycar.api.services.OptionalItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

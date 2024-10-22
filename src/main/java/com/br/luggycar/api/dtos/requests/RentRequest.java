@@ -1,4 +1,4 @@
-package com.br.luggycar.api.requests;
+package com.br.luggycar.api.dtos.requests;
 
 
 import com.br.luggycar.api.entities.Client;
@@ -8,14 +8,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record RentRequest(
-     String dailyRate,
-     String totalDays,
-     String deposit,
-     String kmInitial,
-     String kmFinal,
+     BigDecimal dailyRate,
+     int totalDays,
+     BigDecimal deposit,
+     BigDecimal kmInitial,
+     BigDecimal kmFinal,
      LocalDate registration,
      User user,
      Client client,
