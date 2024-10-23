@@ -25,4 +25,9 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
     }
+
+    @ExceptionHandler(ResourceDatabaseException.class)
+    public ResponseEntity<String> handleDatabaseException(ResourceDatabaseException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
 }
