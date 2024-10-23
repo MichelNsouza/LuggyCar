@@ -39,6 +39,7 @@ public class RentService {
         BeanUtils.copyProperties(rentRequest, rent);
 
         rent.setRegistration(LocalDate.now());
+        rent.setActive(true);
 
 //        Optional <Client> client = clientService.findClientById(rentRequest.client().getId());
 //        rent.setClient(client.get());

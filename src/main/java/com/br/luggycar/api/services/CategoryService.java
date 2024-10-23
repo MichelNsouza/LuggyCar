@@ -76,8 +76,7 @@ public class CategoryService {
         for (Vehicle vehicle : vehicles) {
             List<Rent> activeRents = rentRepository.findByVehicleIdAndActive(vehicle.getId(), true);
             if (!activeRents.isEmpty()) {
-                System.out.println("Locação ativa encontrada para o veículo: " + vehicle.getName());
-                throw new ResourceExistsException("Não é possível excluir a categoria enquanto houver locações ativas para os veículos associados.");
+                throw new ResourceExistsException("Não é possível excluir a categoria pois existe locação ativa.");
             }
         }
 

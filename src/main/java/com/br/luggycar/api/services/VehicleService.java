@@ -36,17 +36,16 @@ public class VehicleService {
 
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
 
-        // Implementação do retorno de um Response de veículo
         return new VehicleResponse(savedVehicle);
 
     }
 
     public List<VehicleResponse> readAllVehicle() {
 
-        List<Vehicle> vehicles = vehicleRepository.findAll(); // Busca todos os veículos e implementa em vehicles
-        return vehicles.stream() // Converto a lista em um fluxo stream, me permitindo aplicar operações como map/filter
-                .map(VehicleResponse::new) // Aplica o construtor para cada elemento do fluxo
-                .collect(Collectors.toList()); // coletor que converte os elementos do fluxo em uma lista novamente.
+        List<Vehicle> vehicles = vehicleRepository.findAll();
+        return vehicles.stream()
+                .map(VehicleResponse::new)
+                .collect(Collectors.toList());
 
     }
 
@@ -54,7 +53,7 @@ public class VehicleService {
         Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado"));
 
-        BeanUtils.copyProperties(vehicleRequest, vehicle, "id", "registrationDate"); // Ignora ID e data de registro
+        BeanUtils.copyProperties(vehicleRequest, vehicle, "id", "registrationDate");
 
         Vehicle updatedVehicle = vehicleRepository.save(vehicle);
 
