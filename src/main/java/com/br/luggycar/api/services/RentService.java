@@ -1,5 +1,8 @@
 package com.br.luggycar.api.services;
 
+import com.br.luggycar.api.dtos.response.RentResponse;
+import com.br.luggycar.api.dtos.response.VehicleResponse;
+import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.entities.Rent;
 import com.br.luggycar.api.entities.Vehicle;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -28,7 +32,7 @@ public class RentService {
     private AuthUtil authUtil;
 
 
-    public Rent createRent(RentRequest rentRequest) {
+    public RentResponse createRent(RentRequest rentRequest) {
 
         Rent rent = new Rent();
         BeanUtils.copyProperties(rentRequest, rent);
@@ -38,33 +42,49 @@ public class RentService {
         Optional <Client> client = clientService.findClientById(rentRequest.client().getId());
         rent.setClient(client.get());
 
-        Optional <Vehicle> vehicle = vehicleService.findVehicleById(rentRequest.vehicle().getId());
-        rent.setVehicle(vehicle.get());
+        Optional <VehicleResponse> vehicleResponseOpt = vehicleService.findVehicleById(rentRequest.vehicle().getId());
+
+        if (vehicleResponseOpt.isPresent()) {
+            VehicleResponse vehicleResponse = vehicleResponseOpt.get();
+
+            Vehicle vehicle = new Vehicle();
+            vehicle.setId(vehicleResponse.id());
+
+            rent.setVehicle(vehicle);
+        }
 
         String usuario = authUtil.getAuthenticatedUsername();
         rent.setUser(usuario);
 
-        System.out.println(rent);
+        Rent savedRent = rentRepository.save(rent);
 
-        return rentRepository.save(rent);
+        return new RentResponse(savedRent);
 
     }
 
-    public List<Rent> readAllRent() {
-        return rentRepository.findAll();
+    public List<RentResponse> readAllRent() {
+
+        List<Rent> rents = rentRepository.findAll();
+
+        return rents.stream()
+                .map(RentResponse::new)
+                .collect(Collectors.toList());
     }
 
-    public Rent updateRent(Long id, RentRequest rentRequest) {
+    public RentResponse updateRent(Long id, RentRequest rentRequest) {
 
-        Optional<Rent> rent = findRentById(id);
+        Optional<Rent> rentOpt = rentRepository.findById(id);
 
-        if (rent.isPresent()) {
-            Rent updatedRent = rent.get();
-            BeanUtils.copyProperties(rentRequest, updatedRent);
-            return rentRepository.save(updatedRent);
+        if (rentOpt.isPresent()) {
+            Rent updatedRent = rentOpt.get();
+            BeanUtils.copyProperties(rentRequest, updatedRent, "id", "registration");
+
+            Rent savedRent = rentRepository.save(updatedRent);
+            return new RentResponse(savedRent);
         }
 
         return null;
+
     }
 
     public void deleteRent(Long id){
@@ -72,8 +92,10 @@ public class RentService {
     }
 
 
-    public Optional<Rent>findRentById(Long id){
-        return rentRepository.findById(id);
+    public Optional<RentResponse>findRentById(Long id){
+        return rentRepository.findById(id)
+                .map(RentResponse::new);
+
     }
 
 }

@@ -1,5 +1,7 @@
 package com.br.luggycar.api.controllers;
 
+import com.br.luggycar.api.dtos.response.RentResponse;
+import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.entities.Rent;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.dtos.requests.RentRequest;
@@ -20,28 +22,29 @@ public class RentController {
     RentService rentService;
 
     @PostMapping
-    public ResponseEntity<Rent> createRent(@RequestBody RentRequest rentRequest) {
+    public ResponseEntity<RentResponse> createRent(@RequestBody RentRequest rentRequest) {
 
-        Rent rent = rentService.createRent(rentRequest);
+        RentResponse rentResponse = rentService.createRent(rentRequest);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(rent);
+        return ResponseEntity.status(HttpStatus.CREATED).body(rentResponse);
 
     }
 
     @GetMapping
-    public ResponseEntity<List<Rent>> readAllRent() {
-        return ResponseEntity.ok(rentService.readAllRent());
+    public ResponseEntity<List<RentResponse>> readAllRent() {
+        List<RentResponse> rentResponses = rentService.readAllRent();
+        return ResponseEntity.ok(rentResponses);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Rent> updateClient(@PathVariable Long id, @RequestBody RentRequest rentRequest) throws ResourceNotFoundException {
-        Optional<Rent> rent = rentService.findRentById(id);
+    public ResponseEntity<RentResponse> updateClient(@PathVariable Long id, @RequestBody RentRequest rentRequest) throws ResourceNotFoundException {
+         Optional<RentResponse> rentOpt = rentService.findRentById(id);
 
-        if (rent.isEmpty()) {
+        if (rentOpt.isEmpty()) {
             throw new ResourceNotFoundException("Locação não encontrada!");
         }
 
-        Rent rentResponse = rentService.updateRent(id, rentRequest);
+        RentResponse rentResponse = rentService.updateRent(id, rentRequest);
 
         return ResponseEntity.ok().body(rentResponse);
 
@@ -54,8 +57,8 @@ public class RentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Rent> findRentById(@PathVariable Long id) throws ResourceNotFoundException {
-        Optional<Rent> rent = rentService.findRentById(id);
+    public ResponseEntity<RentResponse> findRentById(@PathVariable Long id) throws ResourceNotFoundException {
+        Optional<RentResponse> rent = rentService.findRentById(id);
 
         if (rent.isEmpty()) {
             throw new ResourceNotFoundException("Locação não encontrada!");

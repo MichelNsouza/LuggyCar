@@ -1,7 +1,9 @@
 package com.br.luggycar.api.services;
 
+import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.entities.Vehicle;
+import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.CategoryRepository;
 import com.br.luggycar.api.repositories.VehicleRepository;
 import com.br.luggycar.api.dtos.requests.VehicleRequest;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class VehicleService {
@@ -21,44 +24,41 @@ public class VehicleService {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    public VehicleResponse createVehicle(VehicleRequest vehicleRequest) {
 
-    public Vehicle createVehicle(Vehicle vehicle) {
-        // Verifique se a categoria existe e está sendo associada corretamente
-        Category category = categoryRepository.findById(vehicle.getCategory().getId())
+        Category category = categoryRepository.findById(vehicleRequest.categoryId())
                 .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
 
+        Vehicle vehicle = new Vehicle();
+        BeanUtils.copyProperties(vehicleRequest, vehicle);
         vehicle.setCategory(category);
         vehicle.setRegistrationDate(LocalDate.now());
-        return vehicleRepository.save(vehicle);
+
+        Vehicle savedVehicle = vehicleRepository.save(vehicle);
+
+        // Implementação do retorno de um Response de veículo
+        return new VehicleResponse(savedVehicle);
+
     }
 
-    public List<Vehicle> readAllVehicle() {
+    public List<VehicleResponse> readAllVehicle() {
 
+        List<Vehicle> vehicles = vehicleRepository.findAll(); // Busca todos os veículos e implementa em vehicles
+        return vehicles.stream() // Converto a lista em um fluxo stream, me permitindo aplicar operações como map/filter
+                .map(VehicleResponse::new) // Aplica o construtor para cada elemento do fluxo
+                .collect(Collectors.toList()); // coletor que converte os elementos do fluxo em uma lista novamente.
 
-//        List <VehicleRequest> vehicleResponse = vehicleRepository.findAll();
-//
-//        List<Vehicle> vehicles =  new ArrayList<>();
-//
-//
-//
-//        BeanUtils.copyProperties(vehicleResponse, vehicles);
-//
-//
-//        return vehicleResponse;
-
-        return vehicleRepository.findAll();
     }
 
-    public Vehicle updateVehicle(Long id, VehicleRequest vehicleRequest) {
-        Optional<Vehicle> vehicle = findVehicleById(id);
+    public VehicleResponse updateVehicle(Long id, VehicleRequest vehicleRequest) throws ResourceNotFoundException {
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado"));
 
-        if (vehicle.isPresent()) {
-            Vehicle updatedVehicle = vehicle.get();
-            BeanUtils.copyProperties(vehicleRequest, updatedVehicle);
-            return vehicleRepository.save(updatedVehicle);
-        }
+        BeanUtils.copyProperties(vehicleRequest, vehicle, "id", "registrationDate"); // Ignora ID e data de registro
 
-        return null;
+        Vehicle updatedVehicle = vehicleRepository.save(vehicle);
+
+        return new VehicleResponse(updatedVehicle);
     }
 
     public void deleteVehicle(Long id) {
@@ -66,8 +66,9 @@ public class VehicleService {
     }
 
 
-    public Optional<Vehicle> findVehicleById(Long id) {
-        return vehicleRepository.findById(id);
+    public Optional<VehicleResponse> findVehicleById(Long id) {
+        return vehicleRepository.findById(id)
+                .map(VehicleResponse::new);
     }
 
 }
