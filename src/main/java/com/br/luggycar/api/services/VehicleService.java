@@ -26,7 +26,10 @@ public class VehicleService {
 
     public VehicleResponse createVehicle(VehicleRequest vehicleRequest) {
 
-        Category category = categoryRepository.findById(vehicleRequest.categoryId())
+//        Category category = categoryRepository.findById(vehicleRequest.categoryId())
+//                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+
+        Category category = categoryRepository.findByName(vehicleRequest.categoryName())
                 .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
 
         Vehicle vehicle = new Vehicle();
