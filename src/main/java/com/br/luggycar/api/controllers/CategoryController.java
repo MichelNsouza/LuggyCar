@@ -38,7 +38,7 @@ public class CategoryController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> deleteCategory(@PathVariable long id) {
+    public ResponseEntity<Boolean> deleteCategory(@PathVariable long id) throws ResourceExistsException{
         return ResponseEntity.ok(categoryService.deleteCategory(id));
     }
 

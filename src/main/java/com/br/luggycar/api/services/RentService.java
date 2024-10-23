@@ -6,6 +6,7 @@ import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.entities.Rent;
 import com.br.luggycar.api.entities.Vehicle;
+import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.RentRepository;
 import com.br.luggycar.api.dtos.requests.RentRequest;
 import com.br.luggycar.api.utils.AuthUtil;
@@ -39,8 +40,15 @@ public class RentService {
 
         rent.setRegistration(LocalDate.now());
 
-        Optional <Client> client = clientService.findClientById(rentRequest.client().getId());
-        rent.setClient(client.get());
+//        Optional <Client> client = clientService.findClientById(rentRequest.client().getId());
+//        rent.setClient(client.get());
+
+        Optional<Client> clientOptional = clientService.findClientEntityById(rentRequest.client().getId());
+        if (clientOptional.isEmpty()) {
+            throw new ResourceNotFoundException("Cliente não encontrado");
+        }
+        Client client = clientOptional.get();
+        rent.setClient(client);
 
         Optional <VehicleResponse> vehicleResponseOpt = vehicleService.findVehicleById(rentRequest.vehicle().getId());
 

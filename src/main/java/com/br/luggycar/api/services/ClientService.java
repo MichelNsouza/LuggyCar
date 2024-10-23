@@ -82,19 +82,28 @@ public class ClientService {
         }
     }
 
-
-    public ClientResponse findClientById(Long id) throws ResourceNotFoundException{
-
-        try {
-            Client client = clientRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Sem registros de cliente com o ID: " + id
-                    ));
-            return new ClientResponse(client);
-
-        } catch (ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao buscar o cliente no banco de dados", e);
-        }
-
+    public Optional<Client> findClientEntityById(Long id) {
+        return clientRepository.findById(id);
     }
+
+    public ClientResponse findClientById(Long id) throws ResourceNotFoundException {
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
+        return new ClientResponse(client);
+    }
+
+//    public ClientResponse findClientById(Long id) throws ResourceNotFoundException{
+//
+//        try {
+//            Client client = clientRepository.findById(id)
+//                    .orElseThrow(() -> new ResourceNotFoundException(
+//                            "Sem registros de cliente com o ID: " + id
+//                    ));
+//            return new ClientResponse(client);
+//
+//        } catch (ResourceDatabaseException e) {
+//            throw new ResourceDatabaseException("Erro ao buscar o cliente no banco de dados", e);
+//        }
+//
+//    }
 }
