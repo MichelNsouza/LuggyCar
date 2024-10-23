@@ -30,4 +30,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleDatabaseException(ResourceDatabaseException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }
+
+    @ExceptionHandler(ResourceClientHasActiveRentalsException.class)
+    public ResponseEntity<String> handleClientHasActiveRentalsException(ResourceClientHasActiveRentalsException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }

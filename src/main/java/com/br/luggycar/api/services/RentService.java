@@ -6,6 +6,7 @@ import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.entities.Rent;
 import com.br.luggycar.api.entities.Vehicle;
+import com.br.luggycar.api.enums.rent.RentStatus;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.RentRepository;
 import com.br.luggycar.api.dtos.requests.RentRequest;
@@ -106,5 +107,7 @@ public class RentService {
                 .map(RentResponse::new);
 
     }
-
+    public boolean hasActiveRentals(Long clientId) {
+        return rentRepository.existsActiveRentByClientId(clientId, RentStatus.ATIVO);
+    }
 }
