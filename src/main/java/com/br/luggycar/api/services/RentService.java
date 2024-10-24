@@ -107,7 +107,5 @@ public class RentService {
                 .map(RentResponse::new);
 
     }
-    public boolean hasActiveRentals(Long clientId) {
-        return rentRepository.existsActiveRentByClientId(clientId, RentStatus.ATIVO);
-    }
+
 }
