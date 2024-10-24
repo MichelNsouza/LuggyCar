@@ -2,6 +2,7 @@ package com.br.luggycar.api.services;
 
 import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.entities.Category;
+import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.CategoryRepository;
@@ -72,5 +73,6 @@ public class VehicleService {
         return vehicleRepository.findById(id)
                 .map(VehicleResponse::new);
     }
+
 
 }

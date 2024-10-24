@@ -1,6 +1,7 @@
 package com.br.luggycar.api.services;
 import com.br.luggycar.api.dtos.requests.ClientRequest;
 import com.br.luggycar.api.dtos.response.ClientResponse;
+import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.enums.client.PersonType;
 import com.br.luggycar.api.enums.rent.RentStatus;
@@ -134,7 +135,6 @@ public class ClientService {
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
         return new ClientResponse(client);
     }
-
 
 
 //    public ClientResponse findClientById(Long id) throws ResourceNotFoundException{
