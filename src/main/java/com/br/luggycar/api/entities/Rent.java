@@ -1,6 +1,7 @@
 package com.br.luggycar.api.entities;
 
 
+import com.br.luggycar.api.enums.rent.RentStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,7 +33,7 @@ public class Rent {
 
     private String user;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;
 
@@ -41,5 +42,8 @@ public class Rent {
     private Vehicle vehicle;
 
     private boolean active;
+
+    @Enumerated(EnumType.STRING)
+    private RentStatus status;
 
 }

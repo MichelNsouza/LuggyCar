@@ -2,9 +2,15 @@ package com.br.luggycar.api.services;
 import com.br.luggycar.api.dtos.requests.ClientRequest;
 import com.br.luggycar.api.dtos.response.ClientResponse;
 import com.br.luggycar.api.entities.Client;
+import com.br.luggycar.api.enums.client.PersonType;
+import com.br.luggycar.api.enums.rent.RentStatus;
+import com.br.luggycar.api.exceptions.ResourceClientHasActiveRentalsException;
 import com.br.luggycar.api.exceptions.ResourceDatabaseException;
+import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.ClientRepository;
+import com.br.luggycar.api.repositories.RentRepository;
+import com.br.luggycar.api.utils.JWTUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,8 +25,18 @@ public class ClientService {
 
     @Autowired
     private ClientRepository clientRepository;
+    @Autowired
+    private RentRepository rentRepository;
 
     public ClientResponse createClient(ClientRequest clientRequest) {
+
+        Optional<Client> client = (clientRequest.personType() == PersonType.PF)
+                ? clientRepository.findByCpf(clientRequest.cpf())
+                : clientRepository.findByCnpj(clientRequest.cnpj());
+
+        if (client.isPresent()) {
+            throw new ResourceExistsException("já existe um cliente com esse documento.");
+        }
 
         try {
             Client clientResponse = new Client();
@@ -75,12 +91,39 @@ public class ClientService {
 
     public void deleteClient(Long id) {
 
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Sem registros de cliente com o ID: " + id
+                ));
+
+        if (this.hasActiveRentals(id)) {
+            throw new ResourceClientHasActiveRentalsException("Não é possível remover o cliente com ID " + id + " porque ele possui aluguéis ativos.");
+        }
+
         try {
-            clientRepository.deleteById(id);
+            if (client.getPersonType() == PersonType.PF) {
+                client.setNaturalPersonName(JWTUtils.generateToken(client.getNaturalPersonName()));
+                client.setCpf(JWTUtils.generateToken(client.getCpf()));
+            }else {
+                client.setCompanyName(JWTUtils.generateToken(client.getCompanyName()));
+                client.setCnpj(JWTUtils.generateToken(client.getCnpj()));
+            }
+
+            client.setEmail(JWTUtils.generateToken(client.getEmail()));
+            client.setCep(JWTUtils.generateToken(client.getCep()));
+            client.setEndereco(JWTUtils.generateToken(client.getEndereco()));
+
+            clientRepository.save(client);
+
         } catch (ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao deletar os dados do cliente no banco de dados", e);
+            throw new ResourceDatabaseException("Erro ao pseudonimizar os dados do cliente no banco de dados", e);
         }
     }
+
+    public boolean hasActiveRentals(Long clientId) {
+        return rentRepository.existsActiveRentByClientId(clientId, RentStatus.ATIVO);
+    }
+
 
     public Optional<Client> findClientEntityById(Long id) {
         return clientRepository.findById(id);
@@ -91,6 +134,8 @@ public class ClientService {
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
         return new ClientResponse(client);
     }
+
+
 
 //    public ClientResponse findClientById(Long id) throws ResourceNotFoundException{
 //
