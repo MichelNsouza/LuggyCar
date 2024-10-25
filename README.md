@@ -3,16 +3,27 @@
 # Sumário
 
 - [Sobre o Projeto](#Sobre-o-Projeto)
-- [Configuração do Projeto](#Configuração-do-Projeto)
 - [Endpoints](#Endpoints)
+- [Configuração do Projeto](#Configuração-do-Projeto)
 - [Contribuição](#Contribuição)
 
+
 ## Sobre o Projeto
-LuggyCar é um projeto acadêmico desenvolvido pela turma de Web 2 - 2024.2 do Centro Universitário UNIME de Lauro de Freitas. 
-O projeto foi construído sob orientação do professor Paulo Reis dos Santos, veja nossas [tasks](https://dear-creature-6bf.notion.site/Projeto-Web-2-2024-2-0c6c1c28636549c0b5287e058371c714).
+
+**LuggyCar** é um sistema de back-end para gestão de aluguel de carros, desenvolvido pela turma de Programação Web II - 2024.2 do Centro Universitário UNIME de Lauro de Freitas. Com o LuggyCar, é possível realizar a administração completa de clientes, usuários, veículos e locações, oferecendo um sistema robusto para o mercado de locação de automóveis.
+
+O sistema permite gerenciar:
+
+- **Clientes** e **usuários** do sistema com segurança.
+- **Carros**, incluindo suas categorias, opcionais, acessórios e registro de sinistros.
+- **Locações**, proporcionando um controle detalhado de todos os processos de aluguel.
+
+Este projeto foi orientado pelo professor Paulo Reis e detalhado em um levantamento de [requisitos](https://dear-creature-6bf.notion.site/Projeto-Web-2-2024-2-0c6c1c28636549c0b5287e058371c714) no Notion.
+
 
 ### Tecnologias Utilizadas
 - Java
+
 - Spring framework
 - Maven
 - MySQL
@@ -20,46 +31,20 @@ O projeto foi construído sob orientação do professor Paulo Reis dos Santos, v
 ## Configuração do Projeto
 
 ### Pré-requisitos
-* JDK 17 ou superio
+* JDK 17 ou superior
 * Apache Maven
 * MySQL
 
-### Recomendamos 
-* O uso de IntelliJ IDEA 
+# Endpoints
 
-### Passo a passo
+## Usuario
+Existem dois tipos de usuarios no sistema: 
+- ADMIN
 
+Tem autorização de acessar todas as rotas com todos os metodos HTTP.
+- USER
 
-#### 1. **Clonar o repositório**
-   - Para clonar o projeto, use o comando `git clone` com o URL do repositório.
-     ```bash
-     git clone https://github.com/MichelNsouza/LuggyCar.git
-     ```
-   - Navegue para o diretório do projeto:
-     ```bash
-     cd LuggyCar
-     ```
-
-#### 2. **Compilar o projeto**
-   - Antes de executar o projeto, você deve garantir que ele está compilado corretamente. No IntelliJ procure pelo icone do maven ou no diretório do projeto, execute o comando Maven para compilar:
-     ```bash
-     mvn clean install
-     ```
-   - Isso irá baixar todas as dependências e compilar o código.
-
-#### 4. **Executar o projeto**
-   - Para executar o projeto Spring Boot, no IntelliJ você pode clicar no icone verde de play (►) ou pode usar o seguinte comando:
-     ```bash
-     mvn spring-boot:run
-     ```
-   - Isso iniciará o servidor embutido (geralmente Tomcat) e a aplicação ficará disponível na porta padrão (geralmente `http://localhost:8080`).
-
-#### 5. **Conclusão**
-   - Acesse a aplicação pelo navegador ou use ferramentas como `curl` ou Postman para fazer requisições à API (exemplo: `http://localhost:8080/`).
-
-
-
-## Endpoints
+Tem autorização de acessar todas as rotas mas somente com os metodos HTTP GET.
 
 1. **Criar um novo usuario**
    - **Método HTTP:** `POST`
@@ -74,6 +59,7 @@ O projeto foi construído sob orientação do professor Paulo Reis dos Santos, v
     "role":"ADMIN"
 }
 ```
+
 2. **Logar no sistema**
    - **Método HTTP:** `POST`
    - **Rota:** `/auth/login`
@@ -85,6 +71,11 @@ O projeto foi construído sob orientação do professor Paulo Reis dos Santos, v
     "password":"123456789"
 }
 ```
+**OBS**: Ao logar no sistema, recebe um token para fazer requisições com validade de 2 horas.
+
+## Veiculos
+
+
 ### Rotas para Veiculos
 1. **Listar todos os veiculos**
    - **Método HTTP:** `GET`
@@ -117,22 +108,27 @@ O projeto foi construído sob orientação do professor Paulo Reis dos Santos, v
 Para criar ou atualizar um veiculo, utilize o seguinte modelo JSON:
 
 ```json
-    {
-        "name": "NXR Bros",
-        "manufacturer": "HONDA",
-        "version": "160cc esdd flexone",
-        "urlFipe": "UrlFIpe.com/bros",
-        "plate": "ABCD1234",
-        "color": "BLACK",
-        "transmission": "MANUAL",
-        "currentKm": "10.000",
-        "passangerCapacity": "2",
-        "trunkCapacity": "0",
-        "accessories": ["ABS"],
-        "dailyRate": "119.99",
-        "category": "ID_CATEGORIA"
-    }
+{
+  "name": "Creta",
+  "manufacturer": "HONDA",
+  "version": "flex",
+  "categoryName": "Cabriolet",
+  "urlFipe": "https://www.fipe.org.br/mustang-gt",
+  "plate": "CBC1234",
+  "color": "SILVER",
+  "transmission": "MANUAL",
+  "currentKm": "15000",
+  "passangerCapacity": "4",
+  "trunkCapacity": "450",
+  "accessories": ["AIRBAGS", "GPS"],
+  "dailyRate": 500.00
+}
 ```
+
+## Clientes
+Para diferenciar os clientes juridicos das pessoas fisicas, utilizamos o "personType" como "PF" ou "PJ".
+No caso de PF os campos específicos para pessoa jurídica (cnpj, companyName) devem ser nulos, e vice-versa para pessoa jurídica. Essa estrutura permite flexibilidade, adaptando-se às necessidades de identificação e armazenamento de dados para ambos os tipos de pessoa.
+O CEP é validado pela API dos correios.
 
 ### Rotas para Clientes
 1. **Listar todos os clientes**
@@ -151,12 +147,17 @@ Para criar ou atualizar um veiculo, utilize o seguinte modelo JSON:
    - **Rota:** `/api/client/{id}`
    - **Descrição:** Recupera as informações de um cliente baseado no `id`.
 
-4. **Atualizar um cliente em específico**
+4. **Mostrar um cliente específico por documento**
+   - **Método HTTP:** `GET`
+   - **Rota:** `/api/client/{doc}`
+   - **Descrição:** Recupera as informações de um cliente baseado no CNPJ ou CPF.
+
+5. **Atualizar um cliente em específico**
    - **Método HTTP:** `PUT`
    - **Rota:** `/api/client/{id}`
    - **Descrição:** Atualiza um cliente específico baseado no `id`. Os dados atualizados devem ser enviados no corpo da requisição. (modelo json mais a baixo).
 
-5. **Excluir um cliente específico**
+6. **Excluir um cliente específico**
    - **Método HTTP:** `DELETE`
    - **Rota:** `/api/client/{id}`
    - **Descrição:** Remove um cliente específico baseado no `id`.
@@ -166,13 +167,25 @@ Para criar ou atualizar um veiculo, utilize o seguinte modelo JSON:
 Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
 
 ```json
-    {
-
-    }
+    
+   {
+   "personType": "PF",
+   "naturalPersonName": "João Silva",
+   "cpf": "123.456.455-10",
+   "cnpj": null,
+   "companyName": null,
+   "email": "joao.silva@example.com",
+   "gender": "MASCULINO",
+   "dateBirth": "1990-05-15",
+   "cep": "40000-000",
+   "endereco": "Rua das Flores, 123, Bairro Centro"
+   } 
+    
 ```
 
 
-### Rotas para Clientes
+## Rotas para Locações
+
 1. **Listar todoa as locações**
    - **Método HTTP:** `GET`
    - **Rota:** `/api/rent`
@@ -204,10 +217,54 @@ Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
 Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
 
 ```json
-    {
-
-    }
+{
+	"dailyRate": 100.00,
+	"totalDays": 1,
+	"deposit": 100.00,
+	"kmInitial": 15.000,
+	"kmFinal": 15.800,
+	"client": {
+		"id": 1
+	},
+	"vehicle":{
+		"id": 1
+	}
+} 
 ```
+
+
+### Passo a passo para executar o projeto
+
+#### Recomendamos 
+* O uso de IntelliJ IDEA 
+
+#### 1. **Clonar o repositório**
+   - Para clonar o projeto, use o comando `git clone` com o URL do repositório.
+     ```bash
+     git clone https://github.com/MichelNsouza/LuggyCar.git
+     ```
+   - Navegue para o diretório do projeto:
+     ```bash
+     cd LuggyCar
+     ```
+
+#### 2. **Compilar o projeto**
+   - Antes de executar o projeto, você deve garantir que ele está compilado corretamente. No IntelliJ procure pelo icone do maven ou no diretório do projeto, execute o comando Maven para compilar:
+     ```bash
+     mvn clean install
+     ```
+   - Isso irá baixar todas as dependências e compilar o código.
+
+#### 4. **Executar o projeto**
+   - Para executar o projeto Spring Boot, no IntelliJ você pode clicar no icone verde de play (►) ou pode usar o seguinte comando:
+     ```bash
+     mvn spring-boot:run
+     ```
+   - Isso iniciará o servidor embutido (geralmente Tomcat) e a aplicação ficará disponível na porta padrão (geralmente `http://localhost:8080`).
+
+#### 5. **Conclusão**
+   - Acesse a aplicação pelo navegador ou use ferramentas como `curl` ou Postman para fazer requisições à API (exemplo: `http://localhost:8080/`).
+
 
 ## Contribuição
 
