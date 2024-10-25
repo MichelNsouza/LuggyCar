@@ -5,10 +5,7 @@ import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.enums.client.PersonType;
 import com.br.luggycar.api.enums.rent.RentStatus;
-import com.br.luggycar.api.exceptions.ResourceClientHasActiveRentalsException;
-import com.br.luggycar.api.exceptions.ResourceDatabaseException;
-import com.br.luggycar.api.exceptions.ResourceExistsException;
-import com.br.luggycar.api.exceptions.ResourceNotFoundException;
+import com.br.luggycar.api.exceptions.*;
 import com.br.luggycar.api.repositories.ClientRepository;
 import com.br.luggycar.api.repositories.RentRepository;
 import com.br.luggycar.api.utils.JWTUtils;
@@ -30,6 +27,10 @@ public class ClientService {
     private RentRepository rentRepository;
 
     public ClientResponse createClient(ClientRequest clientRequest) {
+
+        if (clientRequest.personType() == null) {
+            throw new ResourceNullException("O campo 'personType' não pode ser nulo.");
+        }
 
         Optional<Client> client = (clientRequest.personType() == PersonType.PF)
                 ? clientRepository.findByCpf(clientRequest.cpf())

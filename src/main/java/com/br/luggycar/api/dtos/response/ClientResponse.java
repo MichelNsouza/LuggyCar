@@ -3,10 +3,13 @@ package com.br.luggycar.api.dtos.response;
 import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.enums.client.Gender;
 import com.br.luggycar.api.enums.client.PersonType;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.time.ZoneId;
 
 import java.time.LocalDate;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record ClientResponse(
         Long id,
         PersonType personType,
