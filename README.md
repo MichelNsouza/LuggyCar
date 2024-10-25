@@ -10,7 +10,7 @@
 
 ## Sobre o Projeto
 
-**LuggyCar** é um sistema de back-end para gestão de aluguel de carros, desenvolvido pela turma de Programação Web II - 2024.2 do Centro Universitário UNIME de Lauro de Freitas. Com o LuggyCar, é possível realizar a administração completa de clientes, usuários, veículos e locações, oferecendo um sistema robusto para o mercado de locação de automóveis.
+**LuggyCar** é um sistema de back-end para gestão de aluguel de carros, desenvolvido pela turma de Bacharelado em Sistemas da informação, durante o 6º semestre (2024.2) pela materia de Programação Web II do Centro Universitário UNIME de Lauro de Freitas. Com o LuggyCar, é possível realizar a administração completa de clientes, usuários, veículos e locações, oferecendo um sistema robusto para o mercado de locação de automóveis.
 
 O sistema permite gerenciar:
 
