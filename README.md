@@ -54,9 +54,9 @@ Tem autorização de acessar todas as rotas mas somente com os metodos HTTP GET.
 
 ```json
 {
-    "login":"admin",
-    "password":"123456789",
-    "role":"ADMIN"
+  "login":"admin",
+  "password":"123456789",
+  "role":"ADMIN"
 }
 ```
 
@@ -67,8 +67,8 @@ Tem autorização de acessar todas as rotas mas somente com os metodos HTTP GET.
    
 ```json
 {
-    "login":"admin",
-    "password":"123456789"
+  "login":"admin",
+  "password":"123456789"
 }
 ```
 **OBS**: Ao logar no sistema, recebe um token para fazer requisições com validade de 2 horas.
@@ -167,7 +167,6 @@ O CEP é validado pela API dos correios.
 Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
 
 ```json
-    
    {
    "personType": "PF",
    "naturalPersonName": "João Silva",
@@ -180,7 +179,6 @@ Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
    "cep": "40000-000",
    "endereco": "Rua das Flores, 123, Bairro Centro"
    } 
-    
 ```
 
 
@@ -218,18 +216,18 @@ Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
 
 ```json
 {
-	"dailyRate": 100.00,
-	"totalDays": 1,
-	"deposit": 100.00,
-	"kmInitial": 15.000,
-	"kmFinal": 15.800,
-	"client": {
-		"id": 1
-	},
-	"vehicle":{
-		"id": 1
-	}
-} 
+  "dailyRate": 100.00,
+  "totalDays": 1,
+  "deposit": 100.00,
+  "kmInitial": 15.000,
+  "kmFinal": 15.800,
+  "client": {
+	      "id": 1
+            },
+  "vehicle":{
+              "id": 1
+	    }
+}
 ```
 
 
