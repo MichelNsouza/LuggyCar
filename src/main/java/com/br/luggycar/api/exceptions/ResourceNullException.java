@@ -1,7 +1,16 @@
 package com.br.luggycar.api.exceptions;
 
-public class ResourceNullException extends RuntimeException{
-    public ResourceNullException(String message) {
-        super(message);
+import java.util.List;
+
+public class ResourceNullException extends RuntimeException {
+    private final List<String> messages;
+
+    public ResourceNullException(List<String> messages) {
+        super();
+        this.messages = messages;
+    }
+
+    public List<String> getMessages() {
+        return messages;
     }
 }
