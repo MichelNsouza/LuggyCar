@@ -222,11 +222,11 @@ Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
   "kmInitial": 15.000,
   "kmFinal": 15.800,
   "client": {
-	      "id": 1
-            },
+    "id": 1
+  },
   "vehicle":{
-              "id": 1
-	    }
+    "id": 1
+  }
 }
 ```
 
