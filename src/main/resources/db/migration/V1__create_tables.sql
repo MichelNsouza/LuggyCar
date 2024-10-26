@@ -75,7 +75,6 @@ CREATE TABLE rent (
    user VARCHAR(255) NULL,
    client_id BIGINT NULL,
    vehicle_id BIGINT NULL,
-   active BIT(1) NOT NULL,
    status VARCHAR(255) NULL,
    CONSTRAINT pk_rent PRIMARY KEY (id)
 );

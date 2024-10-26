@@ -6,9 +6,11 @@ import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.enums.client.PersonType;
 import com.br.luggycar.api.enums.rent.RentStatus;
 import com.br.luggycar.api.exceptions.*;
+import com.br.luggycar.api.http.viaCepClient;
 import com.br.luggycar.api.repositories.ClientRepository;
 import com.br.luggycar.api.repositories.RentRepository;
 import com.br.luggycar.api.utils.JWTUtils;
+import jakarta.validation.constraints.Email;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,9 @@ public class ClientService {
     private ClientRepository clientRepository;
     @Autowired
     private RentRepository rentRepository;
+    @Autowired
+    private viaCepClient cephttpClient;
+
 
     public ClientResponse createClient(ClientRequest clientRequest) {
 
@@ -38,6 +43,13 @@ public class ClientService {
 
         if (client.isPresent()) {
             throw new ResourceExistsException("já existe um cliente com esse documento.");
+        }
+
+         // manter 404 ou criar outro exception?
+        try {
+            cephttpClient.validaCep(clientRequest.cep());
+        }catch (Exception e){
+            throw new ResourceNotFoundException("CEP não encontrado ou é invalido.");
         }
 
         try {
@@ -98,7 +110,8 @@ public class ClientService {
                         "Sem registros de cliente com o ID: " + id
                 ));
 
-        if (this.hasActiveRentals(id)) {
+        //não esta funcionando
+        if (hasActiveRentals(id)) {
             throw new ResourceClientHasActiveRentalsException("Não é possível remover o cliente com ID " + id + " porque ele possui aluguéis ativos.");
         }
 
@@ -123,33 +136,17 @@ public class ClientService {
     }
 
     public boolean hasActiveRentals(Long clientId) {
-        return rentRepository.existsActiveRentByClientId(clientId, RentStatus.ATIVO);
-    }
-
-
-    public Optional<Client> findClientEntityById(Long id) {
-        return clientRepository.findById(id);
+        return rentRepository.existsActiveRentByClientId(clientId, RentStatus.IN_PROGRESS);
     }
 
     public ClientResponse findClientById(Long id) throws ResourceNotFoundException {
+        try {
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
         return new ClientResponse(client);
+        } catch (ResourceDatabaseException e) {
+            throw new ResourceDatabaseException("Erro ao buscar o cliente no banco de dados", e);
+        }
     }
 
-
-//    public ClientResponse findClientById(Long id) throws ResourceNotFoundException{
-//
-//        try {
-//            Client client = clientRepository.findById(id)
-//                    .orElseThrow(() -> new ResourceNotFoundException(
-//                            "Sem registros de cliente com o ID: " + id
-//                    ));
-//            return new ClientResponse(client);
-//
-//        } catch (ResourceDatabaseException e) {
-//            throw new ResourceDatabaseException("Erro ao buscar o cliente no banco de dados", e);
-//        }
-//
-//    }
 }

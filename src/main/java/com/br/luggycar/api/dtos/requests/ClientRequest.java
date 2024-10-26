@@ -17,4 +17,16 @@ public record ClientRequest(
         String cep,
         String endereco
 
-) {}
+) {
+    public ClientRequest {
+
+    if (cpf != null) {
+        cpf = cpf.replace(".", "").replace("-", "");
+    }
+
+    if (cnpj != null) {
+        cnpj = cnpj.replace(".", "").replace("-", "").replace("/", "");
+        }
+    }
+
+}

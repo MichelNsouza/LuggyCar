@@ -39,12 +39,12 @@ INSERT INTO client (person_type, company_name, cnpj, email, cep, endereco, regis
 INSERT INTO client (person_type, company_name, cnpj, email, cep, endereco, registration)VALUES
 ('PJ', 'Construtora ABC S.A.', '98.765.432/0001-55', 'contato@abcconstrutora.com', '65432-098', 'Avenida das Empresas, 321, Cidade D', '2024-04-22');
 
-INSERT INTO rent (daily_rate, total_days, deposit, km_initial, km_final, registration, user, client_id, vehicle_id, active, status)VALUES
-(100.00, 7, 500.00, 10000.00, 10500.00, '2024-01-10', 'usuario1', 1, 1, 1, 'COMPLETED'),
-(120.00, 5, 600.00, 12000.00, 12500.00, '2024-02-15', 'usuario2', 2, 2, 1, 'PENDING'),
-(150.00, 3, 700.00, 13000.00, 13200.00, '2024-03-20', 'usuario3', 3, 3, 1, 'IN_PROGRESS'),
-(180.00, 10, 800.00, 14000.00, 14500.00, '2024-04-12', 'usuario4', 4, 4, 1, 'COMPLETED'),
-(160.00, 12, 500.00, 15000.00, 15600.00, '2024-05-08', 'usuario5', 1, 5, 1, 'CANCELED');
+INSERT INTO rent (daily_rate, total_days, deposit, km_initial, km_final, registration, user, client_id, vehicle_id, status)VALUES
+(100.00, 7, 500.00, 10000.00, 10500.00, '2024-01-10', 'usuario1', 1, 1,  'COMPLETED'),
+(120.00, 5, 600.00, 12000.00, 12500.00, '2024-02-15', 'usuario2', 2, 2,  'PENDING'),
+(150.00, 3, 700.00, 13000.00, 13200.00, '2024-03-20', 'usuario3', 3, 3,  'IN_PROGRESS'),
+(180.00, 10, 800.00, 14000.00, 14500.00, '2024-04-12', 'usuario4', 4, 4,  'COMPLETED'),
+(160.00, 12, 500.00, 15000.00, 15600.00, '2024-05-08', 'usuario5', 1, 5,  'CANCELED');
 
 
 

@@ -4,6 +4,7 @@ package com.br.luggycar.api.services;
 import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.entities.Rent;
 import com.br.luggycar.api.entities.Vehicle;
+import com.br.luggycar.api.enums.rent.RentStatus;
 import com.br.luggycar.api.exceptions.ResourceDatabaseException;
 import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
@@ -89,7 +90,7 @@ public class CategoryService {
             List<Vehicle> vehicles = vehicleRepository.findByCategoryId(id);
 
             for (Vehicle vehicle : vehicles) {
-                List<Rent> activeRents = rentRepository.findByVehicleIdAndActive(vehicle.getId(), true);
+                List<Rent> activeRents = rentRepository.findByVehicleIdAndStatus(vehicle.getId(), RentStatus.IN_PROGRESS);
                 if (!activeRents.isEmpty()) {
                     throw new ResourceExistsException("Não é possível excluir a categoria pois existe locação ativa.");
                 }

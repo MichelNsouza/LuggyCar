@@ -27,10 +27,6 @@ public class Rent {
     private BigDecimal kmFinal;
     private LocalDate registration;
 
-//    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    private User user;
-
     private String user;
 
     @ManyToOne
@@ -40,8 +36,6 @@ public class Rent {
     @OneToOne
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
-
-    private boolean active;
 
     @Enumerated(EnumType.STRING)
     private RentStatus status;
