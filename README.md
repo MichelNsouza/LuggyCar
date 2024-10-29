@@ -4,14 +4,13 @@
 
 - [Sobre o Projeto](#Sobre-o-Projeto)
 - [Endpoints](#Endpoints)
-- [Usuarios](#Usuarios)
-- [Categorias](#Categorias)
-- [Veiculos](#Veiculos)
-- [Clientes](#Clientes)
-- [Sinistros](#Sinistros)
-- [Itens Opcionais](#Opcionais)
-- [Locações](#Locações)
-
+   - [Usuarios](#Usuarios)
+   - [Categorias](#Categorias)
+   - [Veiculos](#Veiculos)
+   - [Clientes](#Clientes)
+   - [Sinistros](#Sinistros)
+   - [Itens Opcionais](#Opcionais)
+   - [Locações](#Locações)
 - [Configuração do Projeto](#Configuração-do-Projeto)
 - [Contribuição](#Contribuição)
 
