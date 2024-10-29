@@ -181,6 +181,7 @@ Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
    } 
 ```
 
+## Locações
 
 ## Rotas para Locações
 
@@ -315,7 +316,7 @@ Em construção
 }
 ```
 
-### Passo a passo para executar o projeto
+## Passo a passo para executar o projeto
 
 #### Recomendamos 
 * O uso de IntelliJ IDEA 
