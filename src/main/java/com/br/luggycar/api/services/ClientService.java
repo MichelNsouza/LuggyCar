@@ -30,9 +30,9 @@ public class ClientService {
 
     public ClientResponse createClient(ClientRequest clientRequest) {
 
-        if (clientRequest.personType() == null) {
-            throw new ResourceNullException("O campo 'personType' não pode ser nulo.");
-        }
+//        if (clientRequest.personType() == null) {
+//            throw new ResourceNullException("O campo 'personType' não pode ser nulo.");
+//        }
 
         Optional<Client> client = (clientRequest.personType() == PersonType.PF)
                 ? clientRepository.findByCpf(clientRequest.cpf())

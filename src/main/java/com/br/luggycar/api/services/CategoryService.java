@@ -1,7 +1,11 @@
 package com.br.luggycar.api.services;
 
 
+import com.br.luggycar.api.dtos.response.CategoryResponse;
+import com.br.luggycar.api.dtos.response.ClientResponse;
+import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.entities.Category;
+import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.entities.Rent;
 import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.exceptions.ResourceDatabaseException;
@@ -17,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
@@ -30,7 +35,7 @@ public class CategoryService {
     @Autowired
     private RentRepository rentRepository;
 
-    public Category createCategory(CategoryRequest categoryRequest) throws ResourceExistsException {
+    public CategoryResponse createCategory(CategoryRequest categoryRequest) {
 
         Optional<Category> existingCategory = categoryRepository.findByName(categoryRequest.name());
 
@@ -43,7 +48,9 @@ public class CategoryService {
 
             BeanUtils.copyProperties(categoryRequest, category);
 
-            return categoryRepository.save(category);
+             Category savedCategory = categoryRepository.save(category);
+
+            return new CategoryResponse(savedCategory);
 
         } catch (ResourceDatabaseException e) {
             throw new ResourceDatabaseException("Erro ao salvar a categoria no banco de dados", e);
@@ -52,11 +59,21 @@ public class CategoryService {
 
     }
 
-    public List<Category> readAllCategories() {
-        return categoryRepository.findAll();
+    public List<CategoryResponse> readAllCategories() {
+        try {
+            List<Category> categories = categoryRepository.findAll();
+            return categories
+                    .stream()
+                    .map(CategoryResponse::new)
+                    .collect(Collectors.toList());
+
+        } catch (ResourceDatabaseException e) {
+            throw new ResourceDatabaseException("Erro ao Buscar categorias no banco de dados", e);
+        }
+
     }
 
-    public Category updateCategory(Long id, CategoryRequest categoryRequest)  {
+    public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest)  {
 
         try {
             Optional<Category> category = categoryRepository.findById(id);
@@ -69,7 +86,10 @@ public class CategoryService {
 
                 BeanUtils.copyProperties(categoryRequest, categoryToUpdate);
 
-                return categoryRepository.save(categoryToUpdate);
+                categoryRepository.save(categoryToUpdate);
+
+                return new CategoryResponse(categoryToUpdate);
+
             } else {
                 throw new ResourceExistsException("Categoria não encontrada!");
             }
@@ -108,12 +128,17 @@ public class CategoryService {
 
     }
 
-    public Category findCategoryByName(String name) {
-        return (Category) categoryRepository.findByName(name).get();
-    }
+//    public Category findCategoryByName(String name) {
+////        return (Category) categoryRepository.findByName(name).get();
+//        return categoryRepository.findByName(name)
+//                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada com o nome: " + name));
+//    }
 
-    public Category findCategoryById(long id) {
-        return categoryRepository.findById(id).get();
+    public CategoryResponse findCategoryById(long id) {
+//        return categoryRepository.findById(id).get();
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category não encontrado"));
+        return new CategoryResponse(category);
     }
 
 }
