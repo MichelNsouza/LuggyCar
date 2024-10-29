@@ -160,7 +160,7 @@ O CEP é validado pela API dos correios.
 6. **Excluir um cliente específico**
    - **Método HTTP:** `DELETE`
    - **Rota:** `/api/client/{id}`
-   - **Descrição:** Remove um cliente específico baseado no `id`.
+   - **Descrição:** Faz a pseudonimização dos dados sensiveis de um cliente específico baseado no `id`.
 
 
 ### Estrutura Json do cliente
@@ -210,6 +210,11 @@ Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
    - **Rota:** `/api/rent/{id}`
    - **Descrição:** Remove uma locação em específico baseado no `id`.
 
+6. **Dar baixa em uma locação específica**
+   - **Método HTTP:** `Em construção`
+   - **Rota:** `Em construção`
+   - **Descrição:** Em construção.
+
 
 ### Estrutura Json da locação
 Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
@@ -230,6 +235,85 @@ Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
 }
 ```
 
+## Veiculos
+
+
+### Rotas para Sinistro
+1. **Listar todos os veiculos**
+   - **Método HTTP:** `GET`
+   - **Rota:** `/api/accident`
+   - **Descrição:** Recupera uma lista de sinistros de todos os veiculos.
+
+2. **Registra um novo sinistro**
+   - **Método HTTP:** `POST`
+   - **Rota:** `/api/accident`
+   - **Descrição:** Cria um novo registro de sinistro. 
+   É necessário enviar os dados do sinistro no corpo da requisição (modelo json mais a baixo).
+
+3. **Mostrar um sinistroespecífico por id**
+   - **Método HTTP:** `GET`
+   - **Rota:** `/api/sinistro/{id}`
+   - **Descrição:** Recupera as informações de um sinistro baseado no `id`.
+
+4. **Atualizar um sinistro em específico**
+   - **Método HTTP:** `PUT`
+   - **Rota:** `/api/accident/{id}`
+   - **Descrição:** Atualiza um sinistro específico baseado no `id`. Os dados atualizados devem ser enviados no corpo da requisição. (modelo json mais a baixo).
+
+5. **Excluir um sinistro específico**
+   - **Método HTTP:** `DELETE`
+   - **Rota:** `/api/accident/{id}`
+   - **Descrição:** Remove um sinistro específico baseado no `id`.
+
+
+### Estrutura Json do Sinistro
+Para criar ou atualizar um sinistro, utilize o seguinte modelo JSON:
+
+```json
+{
+
+}
+```
+
+## Opcionais
+
+
+### Rotas para Itens Opcionais
+1. **Listar todos os Opcionais**
+   - **Método HTTP:** `GET`
+   - **Rota:** `/api/optionalitem`
+   - **Descrição:** Recupera uma lista de registro de todos os Opcionais.
+
+2. **Criar um novo opcional**
+   - **Método HTTP:** `POST`
+   - **Rota:** `/api/optionalitem`
+   - **Descrição:** Cria um novo registro de opcional. 
+   É necessário enviar os dados do opcional no corpo da requisição (modelo json mais a baixo).
+
+3. **Mostrar um opcional específico por id**
+   - **Método HTTP:** `GET`
+   - **Rota:** `/api/optionalitem/{id}`
+   - **Descrição:** Recupera as informações de um opcional baseado no `id`.
+
+4. **Atualizar um opcional em específico**
+   - **Método HTTP:** `PUT`
+   - **Rota:** `/api/optionalitem/{id}`
+   - **Descrição:** Atualiza um opcional específico baseado no `id`. Os dados atualizados devem ser enviados no corpo da requisição. (modelo json mais a baixo).
+
+5. **Excluir um opcional específico**
+   - **Método HTTP:** `DELETE`
+   - **Rota:** `/api/optionalitem/{id}`
+   - **Descrição:** Remove um opcional específico baseado no `id`.
+
+
+### Estrutura Json do veiculo
+Para criar ou atualizar um veiculo, utilize o seguinte modelo JSON:
+
+```json
+{
+
+}
+```
 
 ### Passo a passo para executar o projeto
 
