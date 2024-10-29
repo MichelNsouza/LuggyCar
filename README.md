@@ -4,6 +4,14 @@
 
 - [Sobre o Projeto](#Sobre-o-Projeto)
 - [Endpoints](#Endpoints)
+- [Usuarios](#Usuarios)
+- [Categorias](#Categorias)
+- [Veiculos](#Veiculos)
+- [Clientes](#Clientes)
+- [Sinistros](#Sinistros)
+- [Itens Opcionais](#Opcionais)
+- [Locações](#Locações)
+
 - [Configuração do Projeto](#Configuração-do-Projeto)
 - [Contribuição](#Contribuição)
 
@@ -37,7 +45,7 @@ Este projeto foi orientado pelo professor Paulo Reis e detalhado em um levantame
 
 # Endpoints
 
-## Usuario
+## Usuarios
 Existem dois tipos de usuarios no sistema: 
 - ADMIN
 
@@ -73,8 +81,48 @@ Tem autorização de acessar todas as rotas mas somente com os metodos HTTP GET.
 ```
 **OBS**: Ao logar no sistema, recebe um token para fazer requisições com validade de 2 horas.
 
-## Veiculos
 
+## Categorias
+
+## Rotas para Categorias
+
+1. **Listar todas as Categorias**
+   - **Método HTTP:** `GET`
+   - **Rota:** `/api/category`
+   - **Descrição:** Recupera uma lista de registro de todas as Categoria.
+
+2. **Criar uma nova Categoria**
+   - **Método HTTP:** `POST`
+   - **Rota:** `/api/category`
+   - **Descrição:** Cria um novo registro de Categoria. 
+   É necessário enviar os dados da Categoria no corpo da requisição (modelo json mais a baixo).
+
+3. **Mostrar uma Categoria específico por id**
+   - **Método HTTP:** `GET`
+   - **Rota:** `/api/category/{id}`
+   - **Descrição:** Recupera as informações de uma Categoria baseado no `id`.
+
+4. **Atualizar uma Categoria em específico**
+   - **Método HTTP:** `PUT`
+   - **Rota:** `/api/category/{id}`
+   - **Descrição:** Atualiza uma Categoria específico baseado no `id`. Os dados atualizados devem ser enviados no corpo da requisição. (modelo json mais a baixo).
+
+5. **Excluir uma Categoria específica**
+   - **Método HTTP:** `DELETE`
+   - **Rota:** `/api/category/{id}`
+   - **Descrição:** Remove uma Categoria em específico baseado no `id`.
+
+
+### Estrutura Json da Categoria
+Para criar ou atualizar uma Categoria, utilize o seguinte modelo JSON:
+
+```json
+{
+  Em Construção
+}
+```
+
+## Veiculos
 
 ### Rotas para Veiculos
 1. **Listar todos os veiculos**
@@ -126,6 +174,7 @@ Para criar ou atualizar um veiculo, utilize o seguinte modelo JSON:
 ```
 
 ## Clientes
+
 Para diferenciar os clientes juridicos das pessoas fisicas, utilizamos o "personType" como "PF" ou "PJ".
 No caso de PF os campos específicos para pessoa jurídica (cnpj, companyName) devem ser nulos, e vice-versa para pessoa jurídica. Essa estrutura permite flexibilidade, adaptando-se às necessidades de identificação e armazenamento de dados para ambos os tipos de pessoa.
 O CEP é validado pela API dos correios.
@@ -181,62 +230,7 @@ Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
    } 
 ```
 
-## Locações
-
-## Rotas para Locações
-
-1. **Listar todoa as locações**
-   - **Método HTTP:** `GET`
-   - **Rota:** `/api/rent`
-   - **Descrição:** Recupera uma lista de registro de todos os locações.
-
-2. **Criar uma nova locação**
-   - **Método HTTP:** `POST`
-   - **Rota:** `/api/rent`
-   - **Descrição:** Cria um novo registro de locação. 
-   É necessário enviar os dados da locação no corpo da requisição (modelo json mais a baixo).
-
-3. **Mostrar uma locação específico por id**
-   - **Método HTTP:** `GET`
-   - **Rota:** `/api/rent/{id}`
-   - **Descrição:** Recupera as informações de uma locação baseado no `id`.
-
-4. **Atualizar uma locação em específico**
-   - **Método HTTP:** `PUT`
-   - **Rota:** `/api/rent/{id}`
-   - **Descrição:** Atualiza uma locação específico baseado no `id`. Os dados atualizados devem ser enviados no corpo da requisição. (modelo json mais a baixo).
-
-5. **Excluir uma locação específica**
-   - **Método HTTP:** `DELETE`
-   - **Rota:** `/api/rent/{id}`
-   - **Descrição:** Remove uma locação em específico baseado no `id`.
-
-6. **Dar baixa em uma locação específica**
-   - **Método HTTP:** `Em construção`
-   - **Rota:** `Em construção`
-   - **Descrição:** Em construção.
-
-
-### Estrutura Json da locação
-Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
-
-```json
-{
-  "dailyRate": 100.00,
-  "totalDays": 1,
-  "deposit": 100.00,
-  "kmInitial": 15.000,
-  "kmFinal": 15.800,
-  "client": {
-    "id": 1
-  },
-  "vehicle":{
-    "id": 1
-  }
-}
-```
-
-## Sinistro
+## Sinistros
 
 
 ### Rotas para Sinistro
@@ -315,6 +309,63 @@ Para criar ou atualizar um opcional, utilize o seguinte modelo JSON:
 Em construção
 }
 ```
+
+
+## Locações
+
+## Rotas para Locações
+
+1. **Listar todas as locações**
+   - **Método HTTP:** `GET`
+   - **Rota:** `/api/rent`
+   - **Descrição:** Recupera uma lista de registro de todas as locações.
+
+2. **Criar uma nova locação**
+   - **Método HTTP:** `POST`
+   - **Rota:** `/api/rent`
+   - **Descrição:** Cria um novo registro de locação. 
+   É necessário enviar os dados da locação no corpo da requisição (modelo json mais a baixo).
+
+3. **Mostrar uma locação específico por id**
+   - **Método HTTP:** `GET`
+   - **Rota:** `/api/rent/{id}`
+   - **Descrição:** Recupera as informações de uma locação baseado no `id`.
+
+4. **Atualizar uma locação em específico**
+   - **Método HTTP:** `PUT`
+   - **Rota:** `/api/rent/{id}`
+   - **Descrição:** Atualiza uma locação específico baseado no `id`. Os dados atualizados devem ser enviados no corpo da requisição. (modelo json mais a baixo).
+
+5. **Excluir uma locação específica**
+   - **Método HTTP:** `DELETE`
+   - **Rota:** `/api/rent/{id}`
+   - **Descrição:** Remove uma locação em específico baseado no `id`.
+
+6. **Dar baixa em uma locação específica**
+   - **Método HTTP:** `Em construção`
+   - **Rota:** `Em construção`
+   - **Descrição:** Em construção.
+
+
+### Estrutura Json da locação
+Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
+
+```json
+{
+  "dailyRate": 100.00,
+  "totalDays": 1,
+  "deposit": 100.00,
+  "kmInitial": 15.000,
+  "kmFinal": 15.800,
+  "client": {
+    "id": 1
+  },
+  "vehicle":{
+    "id": 1
+  }
+}
+```
+
 
 ## Passo a passo para executar o projeto
 
