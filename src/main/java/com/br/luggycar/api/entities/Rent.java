@@ -41,8 +41,6 @@ public class Rent {
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
 
-    private boolean active;
-
     @Enumerated(EnumType.STRING)
     private RentStatus status;
 

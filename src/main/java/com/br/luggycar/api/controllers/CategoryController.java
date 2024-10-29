@@ -43,14 +43,15 @@ public class CategoryController {
         CategoryResponse updatedCategoryResponse = categoryService.updateCategory(id, categoryRequest);
         return ResponseEntity.ok(updatedCategoryResponse);
 
-//        return ResponseEntity.ok().body(categoryService.updateCategory(id, categoryRequest));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> deleteCategory(@PathVariable long id) throws ResourceExistsException{
-        return ResponseEntity.ok(categoryService.deleteCategory(id));
+    public ResponseEntity<Category> deleteCategory(@PathVariable long id) throws ResourceExistsException{
+        categoryService.deleteCategory(id);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponse> findCategoryById(@PathVariable long id) {

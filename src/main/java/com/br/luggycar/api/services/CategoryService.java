@@ -8,6 +8,8 @@ import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.entities.Rent;
 import com.br.luggycar.api.entities.Vehicle;
+import com.br.luggycar.api.enums.rent.RentStatus;
+import com.br.luggycar.api.exceptions.ResourceClientHasActiveRentalsException;
 import com.br.luggycar.api.exceptions.ResourceDatabaseException;
 import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
@@ -19,6 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,18 +40,20 @@ public class CategoryService {
 
     public CategoryResponse createCategory(CategoryRequest categoryRequest) {
 
-        Optional<Category> existingCategory = categoryRepository.findByName(categoryRequest.name());
-
-        if (existingCategory.isPresent()) {
-            throw new ResourceExistsException("Categoria já existe!");
-        }
+//        Optional<Category> existingCategory = categoryRepository.findByName(categoryRequest.name());
+//
+//        if (existingCategory.isPresent()) {
+//            throw new ResourceExistsException("Categoria já existe!");
+//        }
 
         try {
             Category category = new Category();
 
             BeanUtils.copyProperties(categoryRequest, category);
 
-             Category savedCategory = categoryRepository.save(category);
+            category.setRegistration(LocalDate.now());
+
+            Category savedCategory = categoryRepository.save(category);
 
             return new CategoryResponse(savedCategory);
 
@@ -76,23 +81,14 @@ public class CategoryService {
     public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest)  {
 
         try {
-            Optional<Category> category = categoryRepository.findById(id);
+                Category categoryUpdate = categoryRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada"));
 
-            List<Vehicle> vehicles = vehicleRepository.findByCategoryId(id);
+                BeanUtils.copyProperties(categoryRequest, categoryUpdate);
 
-            if (category.isPresent()) {
+                categoryRepository.save(categoryUpdate);
 
-                Category categoryToUpdate = category.get();
-
-                BeanUtils.copyProperties(categoryRequest, categoryToUpdate);
-
-                categoryRepository.save(categoryToUpdate);
-
-                return new CategoryResponse(categoryToUpdate);
-
-            } else {
-                throw new ResourceExistsException("Categoria não encontrada!");
-            }
+                return new CategoryResponse(categoryUpdate);
 
         } catch (ResourceDatabaseException e) {
             throw new ResourceDatabaseException("Erro ao atualizar a categoria no banco de dados", e);
@@ -101,26 +97,19 @@ public class CategoryService {
 
     }
 
-    public boolean deleteCategory(long id) {
+    public void deleteCategory(long id) {
 
         try {
-            Optional<Category> category = categoryRepository.findById(id);
+            Category category = categoryRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Sem registros de categoria com o ID: " + id
+                    ));
 
-            List<Vehicle> vehicles = vehicleRepository.findByCategoryId(id);
-
-            for (Vehicle vehicle : vehicles) {
-                List<Rent> activeRents = rentRepository.findByVehicleIdAndActive(vehicle.getId(), true);
-                if (!activeRents.isEmpty()) {
-                    throw new ResourceExistsException("Não é possível excluir a categoria pois existe locação ativa.");
-                }
+            if (this.hasActiveRentals(id)) {
+                throw new ResourceClientHasActiveRentalsException("Não é possível remover a categoria com ID " + id + " porque ele possui aluguéis ativos.");
             }
 
-            if (category.isPresent()) {
-                categoryRepository.delete(category.get());
-                return true;
-            } else {
-                throw new ResourceNotFoundException("Categoria não encontrada!");
-            }
+            categoryRepository.delete(category);
 
         } catch (ResourceDatabaseException e) {
             throw new ResourceDatabaseException("Erro ao deletar a categoria no banco de dados", e);
@@ -133,6 +122,10 @@ public class CategoryService {
 //        return categoryRepository.findByName(name)
 //                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada com o nome: " + name));
 //    }
+
+    public boolean hasActiveRentals(Long clientId) {
+        return rentRepository.existsActiveRentByClientId(clientId, RentStatus.ATIVO);
+    }
 
     public CategoryResponse findCategoryById(long id) {
 //        return categoryRepository.findById(id).get();

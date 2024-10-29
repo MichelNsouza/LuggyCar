@@ -27,5 +27,5 @@ public class Category {
 
     private String image;
 
-//    private LocalDate registration;
+    private LocalDate registration;
 }
