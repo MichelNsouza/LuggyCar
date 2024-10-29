@@ -1,6 +1,5 @@
 package com.br.luggycar.api.services;
 
-import com.br.luggycar.api.dtos.response.ClientResponse;
 import com.br.luggycar.api.dtos.response.RentResponse;
 import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.entities.Category;
@@ -41,13 +40,15 @@ public class RentService {
         BeanUtils.copyProperties(rentRequest, rent);
 
         rent.setRegistration(LocalDate.now());
-        rent.setStatus(RentStatus.IN_PROGRESS);
 
-        ClientResponse clientResponse = clientService.findClientById(rentRequest.client().getId());
+//        Optional <Client> client = clientService.findClientById(rentRequest.client().getId());
+//        rent.setClient(client.get());
 
-        Client client = new Client();
-        BeanUtils.copyProperties(clientResponse, client);
-
+        Optional<Client> clientOptional = clientService.findClientEntityById(rentRequest.client().getId());
+        if (clientOptional.isEmpty()) {
+            throw new ResourceNotFoundException("Cliente não encontrado");
+        }
+        Client client = clientOptional.get();
         rent.setClient(client);
 
         Optional <VehicleResponse> vehicleResponseOpt = vehicleService.findVehicleById(rentRequest.vehicle().getId());
