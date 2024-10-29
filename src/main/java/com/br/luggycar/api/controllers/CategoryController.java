@@ -27,7 +27,9 @@ public class CategoryController {
 
         CategoryResponse savedCategory = categoryService.createCategory(categoryRequest);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedCategory);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(savedCategory);
 
     }
 
@@ -38,10 +40,11 @@ public class CategoryController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody CategoryRequest categoryRequest)
-            throws ResourceExistsException {
+    public ResponseEntity<CategoryResponse> updateCategory(
+            @PathVariable Long id, @RequestBody CategoryRequest categoryRequest) throws ResourceExistsException {
         CategoryResponse updatedCategoryResponse = categoryService.updateCategory(id, categoryRequest);
-        return ResponseEntity.ok(updatedCategoryResponse);
+        return ResponseEntity
+                .ok(updatedCategoryResponse);
 
     }
 
@@ -55,7 +58,8 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponse> findCategoryById(@PathVariable long id) {
-        return ResponseEntity.ok(categoryService.findCategoryById(id));
+        return ResponseEntity
+                .ok(categoryService.findCategoryById(id));
     }
 
 //    @GetMapping("/{name}")

@@ -124,7 +124,7 @@ public class CategoryService {
 //    }
 
     public boolean hasActiveRentals(Long clientId) {
-        return rentRepository.existsActiveRentByClientId(clientId, RentStatus.ATIVO);
+        return rentRepository.existsActiveRentByClientId(clientId, RentStatus.IN_PROGRESS);
     }
 
     public CategoryResponse findCategoryById(long id) {
