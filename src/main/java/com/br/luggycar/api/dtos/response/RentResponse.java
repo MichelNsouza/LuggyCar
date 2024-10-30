@@ -14,7 +14,8 @@ public record RentResponse(
         BigDecimal deposit,
         BigDecimal kmInitial,
         BigDecimal kmFinal,
-        LocalDate registration,
+        LocalDate create_at,
+        LocalDate update_at,
         String user,
         Long clientId,
         Long vehicleId
@@ -28,7 +29,8 @@ public record RentResponse(
                 rent.getDeposit(),
                 rent.getKmInitial(),
                 rent.getKmFinal(),
-                rent.getRegistration(),
+                rent.getCreate_at(),
+                rent.getUpdate_at(),
                 rent.getUser(),
                 rent.getClient() != null ? rent.getClient().getId() : null,
                 rent.getVehicle() != null ? rent.getVehicle().getId() : null

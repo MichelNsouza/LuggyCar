@@ -1,5 +1,6 @@
 package com.br.luggycar.api.services;
 
+import com.br.luggycar.api.dtos.requests.RentStatusRequest;
 import com.br.luggycar.api.dtos.response.ClientResponse;
 import com.br.luggycar.api.dtos.response.RentResponse;
 import com.br.luggycar.api.dtos.response.VehicleResponse;
@@ -43,7 +44,7 @@ public class RentService {
         BeanUtils.copyProperties(rentRequest, rent);
 
         rent.setStatus(IN_PROGRESS);
-        rent.setRegistration(LocalDate.now());
+        rent.setCreate_at(LocalDate.now());
 
         ClientResponse clientResponse = clientService.findClientById(rentRequest.client().getId());
         Client client = new Client();
@@ -86,6 +87,7 @@ public class RentService {
         if (rentOpt.isPresent()) {
             Rent updatedRent = rentOpt.get();
             BeanUtils.copyProperties(rentRequest, updatedRent, "id", "registration");
+            updatedRent.setUpdate_at(LocalDate.now());
 
             Rent savedRent = rentRepository.save(updatedRent);
             return new RentResponse(savedRent);
@@ -103,6 +105,25 @@ public class RentService {
     public Optional<RentResponse>findRentById(Long id){
         return rentRepository.findById(id)
                 .map(RentResponse::new);
+
+    }
+
+    public RentResponse lowRent(Long id, RentStatusRequest rentStatusRequest){
+
+        Optional<Rent> rentOpt = rentRepository.findById(id);
+
+        if (rentOpt.isPresent()) {
+            Rent rent = rentOpt.get();
+
+            rent.setStatus(rentStatusRequest.status());
+            rent.setUpdate_at(LocalDate.now());
+            rentRepository.save(rent);
+
+            return new RentResponse(rent);
+
+        } else {
+            throw new ResourceNotFoundException("Locação não encontrada.");
+        }
 
     }
 
