@@ -28,4 +28,8 @@ public record VehicleRequest(
         double dailyRate
 
 ) {
+
+    public String getLicensePlate() {
+        return plate;
+    }
 }

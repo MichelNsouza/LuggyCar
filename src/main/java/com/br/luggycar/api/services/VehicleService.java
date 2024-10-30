@@ -4,6 +4,7 @@ import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.entities.Vehicle;
+import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.CategoryRepository;
 import com.br.luggycar.api.repositories.VehicleRepository;
@@ -27,8 +28,10 @@ public class VehicleService {
 
     public VehicleResponse createVehicle(VehicleRequest vehicleRequest) {
 
-//        Category category = categoryRepository.findById(vehicleRequest.categoryId())
-//                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+        Optional<Vehicle> existingVehicle = vehicleRepository.findByLicensePlate(vehicleRequest.getLicensePlate());
+        if (existingVehicle.isPresent()) {
+            throw new ResourceExistsException("Já existe um veículo cadastrado com essa placa.");
+        }
 
         Category category = categoryRepository.findByName(vehicleRequest.categoryName())
                 .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
@@ -41,6 +44,7 @@ public class VehicleService {
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
 
         return new VehicleResponse(savedVehicle);
+
 
     }
 
@@ -72,6 +76,13 @@ public class VehicleService {
     public Optional<VehicleResponse> findVehicleById(Long id) {
         return vehicleRepository.findById(id)
                 .map(VehicleResponse::new);
+    }
+
+    public VehicleResponse getByLicensePlate(String licensePlate) {
+        Vehicle vehicle = vehicleRepository.findByLicensePlate(licensePlate)
+                .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado com a placa: " + licensePlate));
+
+        return new VehicleResponse(vehicle);
     }
 
 
