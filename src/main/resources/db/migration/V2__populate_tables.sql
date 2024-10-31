@@ -44,10 +44,7 @@ INSERT INTO rent (daily_rate, total_days, deposit, km_initial, km_final, create_
 (180, 10, 800, 14000, 14500, '2024-04-12', '2024-04-12', 'usuario4', 4, 4, 'COMPLETED'),
 (160, 12, 500, 15000, 15600, '2024-05-08', '2024-05-08', 'usuario5', 1, 5, 'CANCELED');
 
-ALTER TABLE rent MODIFY COLUMN daily_rate DECIMAL(38,2);
-ALTER TABLE rent MODIFY COLUMN deposit DECIMAL(38,2);
-ALTER TABLE rent MODIFY COLUMN km_initial DECIMAL(38,2);
-ALTER TABLE rent MODIFY COLUMN km_final DECIMAL(38,2);
+
 
 
 

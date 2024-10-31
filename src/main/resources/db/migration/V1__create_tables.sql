@@ -25,28 +25,25 @@ CREATE TABLE category (
 
 ALTER TABLE category ADD CONSTRAINT uc_category_name UNIQUE (name);
 
-CREATE TABLE vehicle
-(
-    id BIGINT AUTO_INCREMENT NOT NULL,
-    name VARCHAR(255)          NULL,
-    manufacturer VARCHAR(255) NULL,
-    version VARCHAR(255) NULL,
-    category_id BIGINT NOT NULL,
-    url_fipe VARCHAR(255) NULL,
-    plate  VARCHAR(255) UNIQUE NULL,
-    color VARCHAR(255) NULL,
-    transmission VARCHAR(255) NULL,
-    current_km VARCHAR(255) NULL,
-    passanger_capacity VARCHAR(255) NULL,
-    trunk_capacity VARCHAR(255) NULL,
-    daily_rate DOUBLE NOT NULL,
-    registration_date  date NULL,
-    CONSTRAINT pk_vehicle PRIMARY KEY (id)
+CREATE TABLE vehicle (
+  id BIGINT AUTO_INCREMENT NOT NULL,
+   name VARCHAR(255) NULL,
+   manufacturer VARCHAR(255) NULL,
+   version VARCHAR(255) NULL,
+   category_id BIGINT NOT NULL,
+   url_fipe VARCHAR(255) NULL,
+   plate VARCHAR(255) NULL,
+   color VARCHAR(255) NULL,
+   transmission VARCHAR(255) NULL,
+   current_km VARCHAR(255) NULL,
+   passanger_capacity VARCHAR(255) NULL,
+   trunk_capacity VARCHAR(255) NULL,
+   daily_rate DOUBLE NOT NULL,
+   registration_date date NULL,
+   CONSTRAINT pk_vehicle PRIMARY KEY (id)
 );
 
-ALTER TABLE vehicle
-    ADD CONSTRAINT FK_VEHICLE_ON_CATEGORY FOREIGN KEY (category_id) REFERENCES category (id);
-
+ALTER TABLE vehicle ADD CONSTRAINT FK_VEHICLE_ON_CATEGORY FOREIGN KEY (category_id) REFERENCES category (id);
 
 CREATE TABLE client (
   id BIGINT AUTO_INCREMENT NOT NULL,
@@ -80,7 +77,9 @@ CREATE TABLE rent (
 );
 
 ALTER TABLE rent ADD CONSTRAINT uc_rent_vehicle UNIQUE (vehicle_id);
-
 ALTER TABLE rent ADD CONSTRAINT FK_RENT_ON_CLIENT FOREIGN KEY (client_id) REFERENCES client (id);
-
 ALTER TABLE rent ADD CONSTRAINT FK_RENT_ON_VEHICLE FOREIGN KEY (vehicle_id) REFERENCES vehicle (id);
+ALTER TABLE rent MODIFY COLUMN daily_rate DECIMAL(38,2);
+ALTER TABLE rent MODIFY COLUMN deposit DECIMAL(38,2);
+ALTER TABLE rent MODIFY COLUMN km_initial DECIMAL(38,2);
+ALTER TABLE rent MODIFY COLUMN km_final DECIMAL(38,2);
