@@ -107,21 +107,20 @@ public class ClientService {
 
     public void deleteClient(Long id) {
 
-        Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Sem registros de cliente com o ID: " + id
-                ));
+        ClientResponse clientResponse = findClientById(id);
 
-        //não esta funcionando
         if (hasActiveRentals(id)) {
             throw new ResourceClientHasActiveRentalsException("Não é possível remover o cliente com ID " + id + " porque ele possui aluguéis ativos.");
         }
+
+        Client client = new Client();
+        BeanUtils.copyProperties(clientResponse, client);
 
         try {
             if (client.getPersonType() == PersonType.PF) {
                 client.setNaturalPersonName(JWTUtils.generateToken(client.getNaturalPersonName()));
                 client.setCpf(JWTUtils.generateToken(client.getCpf()));
-            }else {
+            } else {
                 client.setCompanyName(JWTUtils.generateToken(client.getCompanyName()));
                 client.setCnpj(JWTUtils.generateToken(client.getCnpj()));
             }
@@ -137,8 +136,10 @@ public class ClientService {
         }
     }
 
+
     public boolean hasActiveRentals(Long clientId) {
-        return rentRepository.existsActiveRentByClientId(clientId, RentStatus.IN_PROGRESS);
+        List<RentStatus> activeStatuses = List.of(RentStatus.PENDING, RentStatus.IN_PROGRESS);
+        return rentRepository.existsActiveRentByClientId(clientId, activeStatuses);
     }
 
     public ClientResponse findClientById(Long id) throws ResourceNotFoundException {

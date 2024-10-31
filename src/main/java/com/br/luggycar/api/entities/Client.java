@@ -23,7 +23,6 @@ public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull(message = "Defina um tipo de cliente: Pessoa Juridica ou Pessoa Fisica")
     @Enumerated(EnumType.STRING)
     private PersonType personType;
     private Date dateBirth;

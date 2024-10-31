@@ -11,7 +11,7 @@ import java.util.List;
 public interface RentRepository extends JpaRepository<Rent, Long> {
     List<Rent> findByVehicleIdAndStatus(Long vehicleId, RentStatus status);
 
-    @Query("SELECT COUNT(r) > 0 FROM Rent r WHERE r.client.id = :clientId AND r.status = :status")
-    boolean existsActiveRentByClientId(@Param("clientId") Long clientId, @Param("status") RentStatus status);
+    @Query("SELECT COUNT(r) > 0 FROM Rent r WHERE r.client.id = :clientId AND r.status IN :statuses")
+    boolean existsActiveRentByClientId(@Param("clientId") Long clientId, @Param("statuses") List<RentStatus> statuses);
 
 }

@@ -105,9 +105,9 @@ public class CategoryService {
                             "Sem registros de categoria com o ID: " + id
                     ));
 
-            if (this.hasActiveRentals(id)) {
-                throw new ResourceClientHasActiveRentalsException("Não é possível remover a categoria com ID " + id + " porque ele possui aluguéis ativos.");
-            }
+//            if (this.hasActiveRentals(id)) {
+//                throw new ResourceClientHasActiveRentalsException("Não é possível remover a categoria com ID " + id + " porque ele possui aluguéis ativos.");
+//            }
 
             categoryRepository.delete(category);
 
@@ -123,9 +123,10 @@ public class CategoryService {
 //                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada com o nome: " + name));
 //    }
 
-    public boolean hasActiveRentals(Long clientId) {
-        return rentRepository.existsActiveRentByClientId(clientId, RentStatus.IN_PROGRESS);
-    }
+    //mudar para buscar se tem veiculo com a categoria lembrar da linha 107 daqui
+//    public boolean hasActiveRentals(Long clientId) {
+//        return rentRepository.existsActiveRentByClientId(clientId, RentStatus.IN_PROGRESS);
+//    }
 
     public CategoryResponse findCategoryById(long id) {
 //        return categoryRepository.findById(id).get();

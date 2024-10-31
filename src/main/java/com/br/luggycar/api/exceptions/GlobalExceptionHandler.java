@@ -25,47 +25,36 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMessage);
     }
 
-//    @ExceptionHandler(ResourceExistsException.class)
-//    public ResponseEntity<Map<String, String>> handleException(ResourceExistsException ex) {
-//        Map<String, String> responseMessage = new HashMap<>();
-//        responseMessage.put("message", ex.getMessage());
-//
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
-//    }
-//
-//    @ExceptionHandler(ResourceNullException.class)
-//    public ResponseEntity<Map<String, String>> handleException(ResourceNullException ex) {
-//        Map<String, String> responseMessage = new HashMap<>();
-//        responseMessage.put("message", ex.getMessage());
-//
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
-//    }
+    @ExceptionHandler(ResourceExistsException.class)
+    public ResponseEntity<Map<String, String>> handleException(ResourceExistsException ex) {
+        Map<String, String> responseMessage = new HashMap<>();
+        responseMessage.put("message", ex.getMessage());
 
-    @ExceptionHandler({ResourceExistsException.class, ResourceNullException.class})
-    public ResponseEntity<Map<String, Object>> handleResourceExceptions(RuntimeException ex) {
-        Map<String, Object> responseMessage = new HashMap<>();
-        List<String> errorMessages = new ArrayList<>();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+    }
 
-        // Se a exceção for ResourceNullException, adicione suas mensagens
-        if (ex instanceof ResourceNullException) {
-            errorMessages.add(ex.getMessage()); // Adiciona a mensagem da exceção
-        } else {
-            // Adiciona a mensagem da exceção à lista de erros para ResourceExistsException
-            errorMessages.add(ex.getMessage());
-        }
-        responseMessage.put("messages", errorMessages);
+    @ExceptionHandler(ResourceNullException.class)
+    public ResponseEntity<Map<String, String>> handleException(ResourceNullException ex) {
+        Map<String, String> responseMessage = new HashMap<>();
+        responseMessage.put("message", ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
     }
 
     @ExceptionHandler(ResourceDatabaseException.class)
-    public ResponseEntity<String> handleDatabaseException(ResourceDatabaseException ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    public ResponseEntity<Map<String, String>> handleDatabaseException(ResourceDatabaseException ex) {
+        Map<String, String> responseMessage = new HashMap<>();
+        responseMessage.put("message", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
     }
 
     @ExceptionHandler(ResourceClientHasActiveRentalsException.class)
-    public ResponseEntity<String> handleClientHasActiveRentalsException(ResourceClientHasActiveRentalsException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    public ResponseEntity<Map<String, String>> handleClientHasActiveRentalsException(ResourceClientHasActiveRentalsException ex) {
+        Map<String, String> responseMessage = new HashMap<>();
+        responseMessage.put("message", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
