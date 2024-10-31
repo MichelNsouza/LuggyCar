@@ -14,17 +14,16 @@ CREATE TABLE optional_item (
    CONSTRAINT pk_optionalitem PRIMARY KEY (id)
 );
 
-CREATE TABLE category
-(
-    id BIGINT AUTO_INCREMENT NOT NULL,
-    name VARCHAR(255) NULL,
-    description VARCHAR(255) NULL,
-    image VARCHAR(255) NULL,
-    CONSTRAINT pk_category PRIMARY KEY (id)
+CREATE TABLE category (
+  id BIGINT AUTO_INCREMENT NOT NULL,
+   name VARCHAR(255) NOT NULL,
+   description VARCHAR(255) NULL,
+   image VARCHAR(255) NULL,
+   registration date NULL,
+   CONSTRAINT pk_category PRIMARY KEY (id)
 );
 
-ALTER TABLE category
-    ADD CONSTRAINT uc_category_name UNIQUE (name);
+ALTER TABLE category ADD CONSTRAINT uc_category_name UNIQUE (name);
 
 CREATE TABLE vehicle
 (
@@ -71,7 +70,8 @@ CREATE TABLE rent (
    deposit DECIMAL NULL,
    km_initial DECIMAL NULL,
    km_final DECIMAL NULL,
-   registration date NULL,
+   create_at date NULL,
+   update_at date NULL,
    user VARCHAR(255) NULL,
    client_id BIGINT NULL,
    vehicle_id BIGINT NULL,
