@@ -117,7 +117,8 @@ Para criar ou atualizar uma Categoria, utilize o seguinte modelo JSON:
 
 ```json
 {
-  Em Construção
+  "name": "Sedan",
+  "description": "Carro como um sedan"
 }
 ```
 
