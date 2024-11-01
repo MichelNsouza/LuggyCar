@@ -213,22 +213,32 @@ O CEP é validado pela API dos correios.
 
 ### Estrutura Json do cliente
 Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
-
+Pessoa fisica
 ```json
    {
-   "personType": "PF",
-   "naturalPersonName": "João Silva",
-   "cpf": "123.456.455-10",
-   "cnpj": null,
-   "companyName": null,
-   "email": "joao.silva@example.com",
-   "gender": "MASCULINO",
-   "dateBirth": "1990-05-15",
-   "cep": "40000-000",
-   "endereco": "Rua das Flores, 123, Bairro Centro"
-   } 
+   	"personType": "PJ",
+   	"cnpj": "{cnpj valido}",
+   	"companyName": "company xyz",
+   	"email": "xyz@example.com",
+   	"dateBirth": "1998-12-30",
+   	"cep": "41200100",
+   	"endereco": "rua xyz",
+   	"registration": "2024-11-01"
+}
 ```
-
+Pessoa Juridica
+```json
+{
+	"personType": "PF",
+	"naturalPersonName": "joao silva",
+	"cpf": "{cpf valido}",
+	"email": "joao@example.com",
+	"gender": "MASCULINO",
+	"dateBirth": "1998-12-31",
+	"cep": "41200100",
+	"endereco": "rua xyz"
+}
+```
 ## Sinistros
 
 
