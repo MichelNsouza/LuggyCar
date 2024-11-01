@@ -265,7 +265,8 @@ Para criar ou atualizar um sinistro, utilize o seguinte modelo JSON:
 
 ```json
 {
-Em construção
+   "severity": "LOW",
+   "description": "Accidente leve, sem feridos.",
 }
 ```
 
@@ -305,7 +306,9 @@ Para criar ou atualizar um opcional, utilize o seguinte modelo JSON:
 
 ```json
 {
-Em construção
+   "name": "Cadeira De Bebê",
+   "rentalValue": 15.5,
+   "quantityAvailable": 10.0
 }
 ```
 

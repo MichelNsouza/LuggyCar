@@ -101,7 +101,6 @@ public class RentService {
         rentRepository.deleteById(id);
     }
 
-
     public Optional<RentResponse>findRentById(Long id){
         return rentRepository.findById(id)
                 .map(RentResponse::new);
