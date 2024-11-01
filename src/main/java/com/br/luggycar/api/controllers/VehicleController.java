@@ -68,11 +68,9 @@ public class VehicleController {
 
     }
 
-
-//Definir endpoint para o getByLicensePlate (sem ideias no momento)
-    @GetMapping("/")
-    public ResponseEntity<VehicleResponse> getVehicleByLicensePlate(@PathVariable String licensePlate) {
-        VehicleResponse response = vehicleService.getByLicensePlate(licensePlate);
+    @GetMapping("/plate")
+    public ResponseEntity<VehicleResponse> getVehicleByLicensePlate(@PathVariable String plate) {
+        VehicleResponse response = vehicleService.getByPlate(plate);
         return ResponseEntity.ok(response);
     }
 

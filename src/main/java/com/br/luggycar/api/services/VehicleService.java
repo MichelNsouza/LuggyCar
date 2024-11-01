@@ -28,7 +28,7 @@ public class VehicleService {
 
     public VehicleResponse createVehicle(VehicleRequest vehicleRequest) {
 
-        Optional<Vehicle> existingVehicle = vehicleRepository.findByLicensePlate(vehicleRequest.getLicensePlate());
+        Optional<Vehicle> existingVehicle = vehicleRepository.findByPlate(vehicleRequest.getPlate());
         if (existingVehicle.isPresent()) {
             throw new ResourceExistsException("Já existe um veículo cadastrado com essa placa.");
         }
@@ -78,9 +78,9 @@ public class VehicleService {
                 .map(VehicleResponse::new);
     }
 
-    public VehicleResponse getByLicensePlate(String licensePlate) {
-        Vehicle vehicle = vehicleRepository.findByLicensePlate(licensePlate)
-                .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado com a placa: " + licensePlate));
+    public VehicleResponse getByPlate(String plate) {
+        Vehicle vehicle = vehicleRepository.findByPlate(plate)
+                .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado com a placa: " + plate));
 
         return new VehicleResponse(vehicle);
     }
