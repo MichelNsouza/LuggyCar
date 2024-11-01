@@ -2,7 +2,9 @@ package com.br.luggycar.api.dtos.requests;
 
 import com.br.luggycar.api.enums.client.Gender;
 import com.br.luggycar.api.enums.client.PersonType;
+import com.br.luggycar.api.validators.annotation.LegalAge;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
@@ -28,6 +30,9 @@ public record ClientRequest(
         String email,
 
         Gender gender,
+
+        @LegalAge
+        @Past(message = "A data de nascimento deve estar no passado.")
         Date dateBirth,
         String cep,
         @Size(min = 5, max = 300, message = "O endereço deve ter entre 3 e 300 caracteres.")
