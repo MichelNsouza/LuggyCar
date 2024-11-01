@@ -69,4 +69,11 @@ public class VehicleController {
     }
 
 
+    @GetMapping("/available")
+    public ResponseEntity<List<VehicleResponse>> findAllVehicleAvailable() throws ResourceNotFoundException {
+
+        List<VehicleResponse> vehicleResponses = vehicleService.getAvailableVehicles();
+        return ResponseEntity.ok(vehicleResponses);
+
+    }
 }

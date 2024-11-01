@@ -82,4 +82,14 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
+
+
+    @ExceptionHandler(ResourceCategoryHasActiveVehicleException.class)
+    public ResponseEntity<Map<String, String>> handleCategoryHasActiveVehicleException(ResourceCategoryHasActiveVehicleException ex) {
+        Map<String, String> responseMessage = new HashMap<>();
+        responseMessage.put("message", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+    }
+
 }

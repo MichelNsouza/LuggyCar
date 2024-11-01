@@ -7,6 +7,7 @@ import com.br.luggycar.api.enums.vehicle.Vehicletransmission;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,6 +39,7 @@ public class Vehicle {
 
     private String urlFipe;
 
+    @Pattern(regexp = "^[A-Za-z]{3}[0-9]{1}[A-Za-z0-9]{1}[0-9]{2}$|^[A-Za-z]{3}-[0-9]{4}$", message = "O formato da placa deve ser: ABC1234 ou ABC1D23")
     private String plate;
 
     @Enumerated(EnumType.STRING)
