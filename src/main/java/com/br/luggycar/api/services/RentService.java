@@ -56,7 +56,7 @@ public class RentService {
         Vehicle vehicle = new Vehicle();
         vehicle.setId(vehicleResponse.id());
 
-        List<OptionalItem> OptionalItems = new ArrayList<>();
+        List<Optional<OptionalItem>> OptionalItems = new ArrayList<>();
 
         for (Long idOptional : rentRequest.optionalItemIds()) {
             OptionalItems.add(optionalItemService.findOptionalItemById(idOptional));
