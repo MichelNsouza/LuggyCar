@@ -1,10 +1,12 @@
 package com.br.luggycar.api.dtos.response;
 
+import com.br.luggycar.api.entities.OptionalItem;
 import com.br.luggycar.api.entities.Rent;
 import com.br.luggycar.api.enums.rent.RentStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 public record RentResponse(
         Long id,
@@ -19,7 +21,8 @@ public record RentResponse(
         String user,
         Long clientId,
         Long vehicleId
-) {
+
+        ) {
     public RentResponse(Rent rent) {
         this(
                 rent.getId(),

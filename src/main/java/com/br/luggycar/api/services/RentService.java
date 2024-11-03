@@ -1,15 +1,14 @@
 package com.br.luggycar.api.services;
 
-import com.br.luggycar.api.dtos.requests.RentStatusRequest;
+import com.br.luggycar.api.dtos.requests.CloseRentalRequest;
 import com.br.luggycar.api.dtos.response.ClientResponse;
+import com.br.luggycar.api.dtos.response.CloseRentalResponse;
 import com.br.luggycar.api.dtos.response.RentResponse;
 import com.br.luggycar.api.dtos.response.VehicleResponse;
-import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.entities.Client;
+import com.br.luggycar.api.entities.OptionalItem;
 import com.br.luggycar.api.entities.Rent;
 import com.br.luggycar.api.entities.Vehicle;
-import com.br.luggycar.api.enums.rent.RentStatus;
-import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.RentRepository;
 import com.br.luggycar.api.dtos.requests.RentRequest;
 import com.br.luggycar.api.utils.AuthUtil;
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,39 +36,39 @@ public class RentService {
     private VehicleService vehicleService;
     @Autowired
     private AuthUtil authUtil;
+    @Autowired
+    OptionalItemService optionalItemService;
 
 
     public RentResponse createRent(RentRequest rentRequest) {
 
+        String usuario = authUtil.getAuthenticatedUsername();
+        ClientResponse clientResponse = clientService.findClientById(rentRequest.clientId());
+        Optional <VehicleResponse> vehicleResponseOpt = vehicleService.findVehicleById(rentRequest.vehicleId());
+
         Rent rent = new Rent();
         BeanUtils.copyProperties(rentRequest, rent);
 
-        rent.setStatus(IN_PROGRESS);
-        rent.setCreate_at(LocalDate.now());
-
-        ClientResponse clientResponse = clientService.findClientById(rentRequest.client().getId());
         Client client = new Client();
         BeanUtils.copyProperties(clientResponse, client);
-        rent.setClient(client);
 
-        Optional <VehicleResponse> vehicleResponseOpt = vehicleService.findVehicleById(rentRequest.vehicle().getId());
+        VehicleResponse vehicleResponse = vehicleResponseOpt.get();
+        Vehicle vehicle = new Vehicle();
+        vehicle.setId(vehicleResponse.id());
 
-        if (vehicleResponseOpt.isPresent()) {
-            VehicleResponse vehicleResponse = vehicleResponseOpt.get();
+        List<OptionalItem> OptionalItems = new ArrayList<>();
 
-            Vehicle vehicle = new Vehicle();
-            vehicle.setId(vehicleResponse.id());
-
-            rent.setVehicle(vehicle);
+        for (Long idOptional : rentRequest.optionalItemIds()) {
+            OptionalItems.add(optionalItemService.findOptionalItemById(idOptional));
+            // fazer soma opt aqui
         }
 
-        String usuario = authUtil.getAuthenticatedUsername();
+        rent.setVehicle(vehicle);
         rent.setUser(usuario);
+        rent.setClient(client);
 
         Rent savedRent = rentRepository.save(rent);
-
         return new RentResponse(savedRent);
-
     }
 
     public List<RentResponse> readAllRent() {
@@ -107,23 +107,18 @@ public class RentService {
 
     }
 
-    public RentResponse lowRent(Long id, RentStatusRequest rentStatusRequest){
+    public CloseRentalResponse closeRental(CloseRentalRequest closeRentalRequest){
 
-        Optional<Rent> rentOpt = rentRepository.findById(id);
+        Optional<RentResponse> rentOpt = findRentById(closeRentalRequest.id());
 
-        if (rentOpt.isPresent()) {
-            Rent rent = rentOpt.get();
 
-            rent.setStatus(rentStatusRequest.status());
-            rent.setUpdate_at(LocalDate.now());
-            rentRepository.save(rent);
 
-            return new RentResponse(rent);
 
-        } else {
-            throw new ResourceNotFoundException("Locação não encontrada.");
-        }
+
+
+        return new CloseRentalResponse();
+
+
 
     }
-
 }
