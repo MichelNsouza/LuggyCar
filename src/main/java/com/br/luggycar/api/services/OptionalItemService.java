@@ -19,7 +19,6 @@ public class OptionalItemService {
 
     public OptionalItem createOptionalItem(OptionalItemRequest optionalItemRequest) {
 
-
         if (optionalItemRepository.findByName(optionalItemRequest.name()).isPresent()) {
             throw new ResourceNotFoundException("Opcional já cadastrado!");
         }
@@ -28,7 +27,6 @@ public class OptionalItemService {
         BeanUtils.copyProperties(optionalItemRequest, optionalItem);
         return optionalItemRepository.save(optionalItem);
     }
-
 
     public List<OptionalItem> readAllOptionalItem() {
         return optionalItemRepository.findAll();

@@ -5,6 +5,7 @@ import com.br.luggycar.api.enums.rent.RentStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public record RentRequest(
 
@@ -21,7 +22,8 @@ public record RentRequest(
         Long userId,
         Long clientId,
         Long vehicleId,
-        List<Long> optionalItemIds,
+//        List<Long> optionalItemIds,
+        Map<Long, Integer> optionalItems,
 
 
         LocalDate create_at,

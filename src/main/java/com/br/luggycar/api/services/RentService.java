@@ -9,6 +9,8 @@ import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.entities.OptionalItem;
 import com.br.luggycar.api.entities.Rent;
 import com.br.luggycar.api.entities.Vehicle;
+import com.br.luggycar.api.exceptions.ResourceNotFoundException;
+import com.br.luggycar.api.repositories.OptionalItemRepository;
 import com.br.luggycar.api.repositories.RentRepository;
 import com.br.luggycar.api.dtos.requests.RentRequest;
 import com.br.luggycar.api.utils.AuthUtil;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -38,6 +41,8 @@ public class RentService {
     private AuthUtil authUtil;
     @Autowired
     OptionalItemService optionalItemService;
+    @Autowired
+    private OptionalItemRepository optionalItemRepository;
 
 
     public RentResponse createRent(RentRequest rentRequest) {
@@ -45,6 +50,16 @@ public class RentService {
         String usuario = authUtil.getAuthenticatedUsername();
         ClientResponse clientResponse = clientService.findClientById(rentRequest.clientId());
         Optional <VehicleResponse> vehicleResponseOpt = vehicleService.findVehicleById(rentRequest.vehicleId());
+
+
+        if (clientResponse == null) {
+            throw new ResourceNotFoundException("Client ID " + rentRequest.clientId() + " not found.");
+        }
+
+
+        if (vehicleResponseOpt.isEmpty()) {
+            throw new ResourceNotFoundException("Vehicle ID " + rentRequest.vehicleId() + " not found.");
+        }
 
         Rent rent = new Rent();
         BeanUtils.copyProperties(rentRequest, rent);
@@ -56,11 +71,30 @@ public class RentService {
         Vehicle vehicle = new Vehicle();
         vehicle.setId(vehicleResponse.id());
 
-        List<Optional<OptionalItem>> OptionalItems = new ArrayList<>();
+        List<OptionalItem> optionalItems = new ArrayList<>();
 
-        for (Long idOptional : rentRequest.optionalItemIds()) {
-            OptionalItems.add(optionalItemService.findOptionalItemById(idOptional));
-            // fazer soma opt aqui
+        // Iteração chave-valor do map de opcionais contido no rentRequest
+        // Long -> ID do item opcional
+        // Integer -> quantidade que deseja solicitar
+        for (Map.Entry<Long, Integer> entry : rentRequest.optionalItems().entrySet()) {
+            Long idOptional = entry.getKey(); // id do item opcional
+            Integer quantityRequested = entry.getValue(); // Quantidade solicitada
+
+            Optional<OptionalItem> optionalItemOpt = optionalItemService.findOptionalItemById(idOptional);
+
+            if (optionalItemOpt.isPresent()) {
+                OptionalItem optionalItem = optionalItemOpt.get();
+
+                if (optionalItem.getQuantityAvailable() >= quantityRequested) {
+                    optionalItem.setQuantityAvailable(optionalItem.getQuantityAvailable() - quantityRequested);
+                    optionalItemRepository.save(optionalItem);
+                    optionalItems.add(optionalItem);
+                } else {
+                    throw new ResourceNotFoundException("Optional item ID " + idOptional + " não tem quantidade suficiente disponível");
+                }
+            } else {
+                throw new ResourceNotFoundException("Optional item ID " + idOptional + " not found.");
+            }
         }
 
         rent.setVehicle(vehicle);

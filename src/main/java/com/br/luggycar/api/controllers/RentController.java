@@ -1,6 +1,8 @@
 package com.br.luggycar.api.controllers;
 
+import com.br.luggycar.api.dtos.requests.CloseRentalRequest;
 import com.br.luggycar.api.dtos.requests.RentStatusRequest;
+import com.br.luggycar.api.dtos.response.CloseRentalResponse;
 import com.br.luggycar.api.dtos.response.RentResponse;
 import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.entities.Rent;
@@ -52,9 +54,9 @@ public class RentController {
     }
 
     @PatchMapping("/status/{id}")
-    public ResponseEntity<RentResponse> updateRentStatus( @PathVariable Long id, @RequestBody RentStatusRequest rentStatusRequest) {
-        RentResponse rentResponse = rentService.lowRent(id, rentStatusRequest);
-        return ResponseEntity.ok().body(rentResponse);
+    public ResponseEntity<CloseRentalResponse> updateRentStatus( @PathVariable Long id, @RequestBody CloseRentalRequest closeRentalRequest) {
+        CloseRentalResponse closeRentalResponse = rentService.closeRental(closeRentalRequest);
+        return ResponseEntity.ok().body(closeRentalResponse);
 
     }
 
