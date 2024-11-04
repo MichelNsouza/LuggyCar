@@ -51,4 +51,5 @@ public class Rent {
     private LocalDate create_at;
     private LocalDate update_at;
 
+
 }

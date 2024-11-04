@@ -5,15 +5,14 @@ import com.br.luggycar.api.dtos.response.ClientResponse;
 import com.br.luggycar.api.dtos.response.CloseRentalResponse;
 import com.br.luggycar.api.dtos.response.RentResponse;
 import com.br.luggycar.api.dtos.response.VehicleResponse;
-import com.br.luggycar.api.entities.Client;
-import com.br.luggycar.api.entities.OptionalItem;
-import com.br.luggycar.api.entities.Rent;
-import com.br.luggycar.api.entities.Vehicle;
+import com.br.luggycar.api.entities.*;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.OptionalItemRepository;
+import com.br.luggycar.api.repositories.RentOptionalRepository;
 import com.br.luggycar.api.repositories.RentRepository;
 import com.br.luggycar.api.dtos.requests.RentRequest;
 import com.br.luggycar.api.utils.AuthUtil;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +36,10 @@ public class RentService {
     private ClientService clientService;
     @Autowired
     private VehicleService vehicleService;
+
+    @Autowired
+    private RentOptionalRepository rentOptionalRepository;
+
     @Autowired
     private AuthUtil authUtil;
     @Autowired
@@ -44,7 +47,7 @@ public class RentService {
     @Autowired
     private OptionalItemRepository optionalItemRepository;
 
-
+    @Transactional
     public RentResponse createRent(RentRequest rentRequest) {
 
         String usuario = authUtil.getAuthenticatedUsername();
@@ -71,7 +74,7 @@ public class RentService {
         Vehicle vehicle = new Vehicle();
         vehicle.setId(vehicleResponse.id());
 
-        List<OptionalItem> optionalItems = new ArrayList<>();
+        List<RentOptionalItem> rentOptionalItems = new ArrayList<>();
 
         // Iteração chave-valor do map de opcionais contido no rentRequest
         // Long -> ID do item opcional
@@ -88,7 +91,18 @@ public class RentService {
                 if (optionalItem.getQuantityAvailable() >= quantityRequested) {
                     optionalItem.setQuantityAvailable(optionalItem.getQuantityAvailable() - quantityRequested);
                     optionalItemRepository.save(optionalItem);
-                    optionalItems.add(optionalItem);
+
+//                    optionalItems.add(optionalItem);
+                    // Criar a associação na tabela intermediária
+                    RentOptionalItem rentOptionalItem = new RentOptionalItem();
+                    rentOptionalItem.setRent(rent);
+                    rentOptionalItem.setOptionalItem(optionalItem);
+                    rentOptionalItem.setQuantity(quantityRequested);
+                    rentOptionalRepository.save(rentOptionalItem);
+
+                    rentOptionalItems.add(rentOptionalItem);
+
+
                 } else {
                     throw new ResourceNotFoundException("Optional item ID " + idOptional + " não tem quantidade suficiente disponível");
                 }
@@ -140,6 +154,7 @@ public class RentService {
                 .map(RentResponse::new);
 
     }
+
 
     public CloseRentalResponse closeRental(CloseRentalRequest closeRentalRequest){
 
