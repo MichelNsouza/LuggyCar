@@ -1,6 +1,8 @@
 package com.br.luggycar.api.services;
 
 import com.br.luggycar.api.dtos.requests.CloseRentalRequest;
+import com.br.luggycar.api.dtos.requests.Optional.OptionalItemRequest;
+import com.br.luggycar.api.dtos.requests.Optional.OptionalQuantityRequest;
 import com.br.luggycar.api.dtos.response.ClientResponse;
 import com.br.luggycar.api.dtos.response.CloseRentalResponse;
 import com.br.luggycar.api.dtos.response.RentResponse;
@@ -112,12 +114,12 @@ public class RentService {
 
     }
 
-    private List<RentOptionalItem> processOptionalItems(Map<Long, Integer> optionalItemsMap, Rent rent) {
+    private List<RentOptionalItem> processOptionalItems(List<OptionalQuantityRequest> optionalItems, Rent rent) {
         List<RentOptionalItem> rentOptionalItems = new ArrayList<>();
 
-        for (Map.Entry<Long, Integer> entry : optionalItemsMap.entrySet()) {
-            Long idOptional = entry.getKey();
-            Integer quantityRequested = entry.getValue();
+        for (OptionalQuantityRequest optionalQuantityRequest : optionalItems) {
+            Long idOptional = optionalQuantityRequest.id();
+            Integer quantityRequested = optionalQuantityRequest.reservedQuantity();
 
             Optional<OptionalItem> optionalItemOpt = optionalItemService.findOptionalItemById(idOptional);
 

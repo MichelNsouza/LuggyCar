@@ -1,5 +1,6 @@
 package com.br.luggycar.api.dtos.requests;
 
+import com.br.luggycar.api.dtos.requests.Optional.OptionalQuantityRequest;
 import com.br.luggycar.api.enums.rent.RentStatus;
 
 import java.math.BigDecimal;
@@ -23,7 +24,8 @@ public record RentRequest(
         Long clientId,
         Long vehicleId,
 //        List<Long> optionalItemIds,
-        Map<Long, Integer> optionalItems,
+//        Map<Long, Integer> optionalItems,
+         List<OptionalQuantityRequest> optionalItems,
 
 
         LocalDate create_at,
