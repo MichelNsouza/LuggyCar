@@ -38,7 +38,6 @@ public class CategoryController {
         return categoryService.readAllCategories();
     }
 
-
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponse> updateCategory(
             @PathVariable Long id, @RequestBody CategoryRequest categoryRequest) throws ResourceExistsException {
@@ -62,9 +61,9 @@ public class CategoryController {
                 .ok(categoryService.findCategoryById(id));
     }
 
-//    @GetMapping("/{name}")
-//    public ResponseEntity<Category> findCategoryByName(@PathVariable String name) {
-//        return ResponseEntity.ok(categoryService.findCategoryByName(name));
-//    }
+    @GetMapping("/name/{name}")
+    public ResponseEntity<Category> findCategoryByName(@PathVariable String name) {
+        return ResponseEntity.ok(categoryService.findCategoryByName(name));
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.br.luggycar.api.services;
 
 import com.br.luggycar.api.entities.Accident;
+import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.AccidentRepository;
 import com.br.luggycar.api.dtos.requests.AccidentRequest;
 import org.springframework.beans.BeanUtils;
@@ -18,6 +19,10 @@ public class AccidentService {
     private AccidentRepository accidentRepository;
 
     public Accident createAccident(AccidentRequest accidentRequest) {
+
+        if (accidentRepository.findByDescription(accidentRequest.description()).isPresent()) {
+            throw new ResourceNotFoundException("sinistro já cadastrado!");
+        }
 
         Accident accident = new Accident();
 

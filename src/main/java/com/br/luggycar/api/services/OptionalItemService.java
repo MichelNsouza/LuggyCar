@@ -1,6 +1,7 @@
 package com.br.luggycar.api.services;
 
 import com.br.luggycar.api.entities.OptionalItem;
+import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.OptionalItemRepository;
 import com.br.luggycar.api.dtos.requests.OptionalItemRequest;
 import org.springframework.beans.BeanUtils;
@@ -17,10 +18,17 @@ public class OptionalItemService {
     private OptionalItemRepository optionalItemRepository;
 
     public OptionalItem createOptionalItem(OptionalItemRequest optionalItemRequest) {
+
+
+        if (optionalItemRepository.findByName(optionalItemRequest.name()).isPresent()) {
+            throw new ResourceNotFoundException("Opcional já cadastrado!");
+        }
+
         OptionalItem optionalItem = new OptionalItem();
         BeanUtils.copyProperties(optionalItemRequest, optionalItem);
         return optionalItemRepository.save(optionalItem);
     }
+
 
     public List<OptionalItem> readAllOptionalItem() {
         return optionalItemRepository.findAll();

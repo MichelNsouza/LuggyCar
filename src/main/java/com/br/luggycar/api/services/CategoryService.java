@@ -9,10 +9,7 @@ import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.entities.Rent;
 import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.enums.rent.RentStatus;
-import com.br.luggycar.api.exceptions.ResourceClientHasActiveRentalsException;
-import com.br.luggycar.api.exceptions.ResourceDatabaseException;
-import com.br.luggycar.api.exceptions.ResourceExistsException;
-import com.br.luggycar.api.exceptions.ResourceNotFoundException;
+import com.br.luggycar.api.exceptions.*;
 import com.br.luggycar.api.repositories.CategoryRepository;
 import com.br.luggycar.api.dtos.requests.CategoryRequest;
 import com.br.luggycar.api.repositories.RentRepository;
@@ -40,11 +37,11 @@ public class CategoryService {
 
     public CategoryResponse createCategory(CategoryRequest categoryRequest) {
 
-//        Optional<Category> existingCategory = categoryRepository.findByName(categoryRequest.name());
-//
-//        if (existingCategory.isPresent()) {
-//            throw new ResourceExistsException("Categoria já existe!");
-//        }
+        Optional<Category> existingCategory = categoryRepository.findByName(categoryRequest.name());
+
+        if (existingCategory.isPresent()) {
+            throw new ResourceExistsException("Categoria já existe!");
+        }
 
         try {
             Category category = new Category();
@@ -105,8 +102,10 @@ public class CategoryService {
                             "Sem registros de categoria com o ID: " + id
                     ));
 
-            if (this.hasActiveRentals(id)) {
-                throw new ResourceClientHasActiveRentalsException("Não é possível remover a categoria com ID " + id + " porque ele possui aluguéis ativos.");
+            List<Vehicle> vehicles = vehicleRepository.findByCategoryId(id);
+
+            if (!vehicles.isEmpty()) {
+                throw new ResourceCategoryHasActiveVehicleException("Não é possível remover a categoria com ID " + id + " porque ele possui veiculo associado.");
             }
 
             categoryRepository.delete(category);
@@ -117,18 +116,12 @@ public class CategoryService {
 
     }
 
-//    public Category findCategoryByName(String name) {
-////        return (Category) categoryRepository.findByName(name).get();
-//        return categoryRepository.findByName(name)
-//                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada com o nome: " + name));
-//    }
-
-    public boolean hasActiveRentals(Long clientId) {
-        return rentRepository.existsActiveRentByClientId(clientId, RentStatus.IN_PROGRESS);
+    public Category findCategoryByName(String name) {
+        return categoryRepository.findByName(name)
+                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada com o nome: " + name));
     }
 
     public CategoryResponse findCategoryById(long id) {
-//        return categoryRepository.findById(id).get();
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category não encontrado"));
         return new CategoryResponse(category);

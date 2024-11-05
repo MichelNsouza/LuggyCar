@@ -5,6 +5,7 @@ import com.br.luggycar.api.dtos.response.ClientResponse;
 import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.services.ClientService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class ClientController {
     private ClientService clientService;
 
     @PostMapping
-    public ResponseEntity<ClientResponse> createClient(@RequestBody ClientRequest clientRequest) {
+    public ResponseEntity<ClientResponse> createClient(@RequestBody  @Valid ClientRequest clientRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(clientService.createClient(clientRequest));
     }
 

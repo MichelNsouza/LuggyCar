@@ -25,7 +25,8 @@ public class Rent {
     private BigDecimal deposit;
     private BigDecimal kmInitial;
     private BigDecimal kmFinal;
-    private LocalDate registration;
+    private LocalDate create_at;
+    private LocalDate update_at;
 
     private String user;
 
