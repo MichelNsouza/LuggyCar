@@ -1,6 +1,7 @@
 package com.br.luggycar.api.controllers;
 
 import com.br.luggycar.api.dtos.requests.rent.CloseRentalRequest;
+import com.br.luggycar.api.dtos.requests.rent.RentRequestUpdate;
 import com.br.luggycar.api.dtos.response.CloseRentalResponse;
 import com.br.luggycar.api.dtos.response.RentResponse;
 import com.br.luggycar.api.entities.Rent;
@@ -38,7 +39,7 @@ public class RentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RentResponse> updateClient(@PathVariable Long id, @RequestBody RentRequest rentRequest) throws ResourceNotFoundException {
+    public ResponseEntity<RentResponse> updateClient(@PathVariable Long id, @RequestBody RentRequestUpdate rentRequest) throws ResourceNotFoundException {
          Optional<RentResponse> rentOpt = rentService.findRentById(id);
 
         if (rentOpt.isEmpty()) {
@@ -75,6 +76,19 @@ public class RentController {
         return ResponseEntity.ok().body(rent.get());
     }
 
+    @PutMapping("/close")
+    public ResponseEntity<CloseRentalResponse> closeRental(@RequestBody CloseRentalRequest closeRentalRequest) throws ResourceNotFoundException {
 
+        Optional<RentResponse> rentOpt = rentService.findRentById(closeRentalRequest.id());
+
+        if (rentOpt.isEmpty()) {
+            throw new ResourceNotFoundException("Locação não encontrada!");
+        }
+
+        CloseRentalResponse closeRentalResponse = rentService.closeRental(closeRentalRequest);
+
+        return ResponseEntity.ok().body(closeRentalResponse);
+
+    }
 
 }

@@ -2,5 +2,6 @@ package com.br.luggycar.api.dtos.requests.Optional;
 
 public record OptionalQuantityRequest(
         Long id,
-        Integer reservedQuantity
-) { }
+        int quantity
+) {
+}

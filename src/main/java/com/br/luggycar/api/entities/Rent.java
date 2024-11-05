@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -40,17 +40,27 @@ public class Rent {
     @Enumerated(EnumType.STRING)
     private RentStatus status;
 
-//    @ManyToMany
-//    @JoinTable(
-//            name = "rent_optional_items",
-//            joinColumns = @JoinColumn(name = "rent_id"),
-//            inverseJoinColumns = @JoinColumn(name = "optional_item_id")
-//    )
-    @OneToMany(mappedBy = "rent", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<RentOptionalItem> rentOptionalItems = new HashSet<>();
+    @ManyToMany
+    @JoinTable(
+            name = "rent_optional_items",
+            joinColumns = @JoinColumn(name = "rent_id"),
+            inverseJoinColumns = @JoinColumn(name = "optional_item_id")
+    )
+    private List<OptionalItem> optionalItems = new ArrayList<>();
+
+    @OneToMany(mappedBy = "rent")
+    private List<RentOptionalItem> rentOptionalItems = new ArrayList<>();
 
     private LocalDate create_at;
     private LocalDate update_at;
 
 
+    public BigDecimal calculateTotalOptionalItemsValue() {
+        return optionalItems.stream()
+                .map(OptionalItem::getRentalValue)
+                .map(BigDecimal::valueOf)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
 }
+

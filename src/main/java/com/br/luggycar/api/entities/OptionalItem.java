@@ -26,10 +26,6 @@ public class OptionalItem {
     private double rentalValue;
     private double quantityAvailable;
 
-//    @ManyToMany(mappedBy = "optionalItems")
-//    private Set<Rent> rents = new HashSet<>();
-
-    @OneToMany(mappedBy = "optionalItem", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<RentOptionalItem> rentOptionalItems = new HashSet<>();
-
+    @ManyToMany(mappedBy = "optionalItems")
+    private Set<Rent> rent = new HashSet<>();
 }

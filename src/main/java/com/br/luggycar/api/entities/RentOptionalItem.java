@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "rent_optional_item")
 public class RentOptionalItem {
 
     @Id
@@ -24,6 +23,6 @@ public class RentOptionalItem {
     @JoinColumn(name = "optional_item_id")
     private OptionalItem optionalItem;
 
-    private Integer reservedQuantity;
-
+    private int quantity;
 }
+

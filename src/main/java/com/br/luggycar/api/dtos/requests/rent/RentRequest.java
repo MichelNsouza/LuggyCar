@@ -11,6 +11,8 @@ public record RentRequest(
 
         RentStatus status,
 
+        String user,
+
         BigDecimal dailyRate,
         int totalDays,
         BigDecimal deposit,
@@ -19,13 +21,9 @@ public record RentRequest(
         BigDecimal kmFinal,
 
 
-        Long userId,
         Long clientId,
         Long vehicleId,
-//        List<Long> optionalItemIds,
-//        Map<Long, Integer> optionalItems,
-         List<OptionalQuantityRequest> optionalItems,
-
+        List<OptionalQuantityRequest> optionalItems,
 
         LocalDate create_at,
         LocalDate update_at
