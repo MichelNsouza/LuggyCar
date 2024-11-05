@@ -54,15 +54,7 @@ public class RentService {
         ClientResponse clientResponse = clientService.findClientById(rentRequest.clientId());
         Optional <VehicleResponse> vehicleResponseOpt = vehicleService.findVehicleById(rentRequest.vehicleId());
 
-
-        if (clientResponse == null) {
-            throw new ResourceNotFoundException("Client ID " + rentRequest.clientId() + " not found.");
-        }
-
-
-        if (vehicleResponseOpt.isEmpty()) {
-            throw new ResourceNotFoundException("Vehicle ID " + rentRequest.vehicleId() + " not found.");
-        }
+        // Falta implementar exceptions
 
         Rent rent = new Rent();
         BeanUtils.copyProperties(rentRequest, rent);
@@ -74,42 +66,7 @@ public class RentService {
         Vehicle vehicle = new Vehicle();
         vehicle.setId(vehicleResponse.id());
 
-        List<RentOptionalItem> rentOptionalItems = new ArrayList<>();
-
-        // Iteração chave-valor do map de opcionais contido no rentRequest
-        // Long -> ID do item opcional
-        // Integer -> quantidade que deseja solicitar
-        for (Map.Entry<Long, Integer> entry : rentRequest.optionalItems().entrySet()) {
-            Long idOptional = entry.getKey(); // id do item opcional
-            Integer quantityRequested = entry.getValue(); // Quantidade solicitada
-
-            Optional<OptionalItem> optionalItemOpt = optionalItemService.findOptionalItemById(idOptional);
-
-            if (optionalItemOpt.isPresent()) {
-                OptionalItem optionalItem = optionalItemOpt.get();
-
-                if (optionalItem.getQuantityAvailable() >= quantityRequested) {
-                    optionalItem.setQuantityAvailable(optionalItem.getQuantityAvailable() - quantityRequested);
-                    optionalItemRepository.save(optionalItem);
-
-//                    optionalItems.add(optionalItem);
-                    // Criar a associação na tabela intermediária
-                    RentOptionalItem rentOptionalItem = new RentOptionalItem();
-                    rentOptionalItem.setRent(rent);
-                    rentOptionalItem.setOptionalItem(optionalItem);
-                    rentOptionalItem.setQuantity(quantityRequested);
-                    rentOptionalRepository.save(rentOptionalItem);
-
-                    rentOptionalItems.add(rentOptionalItem);
-
-
-                } else {
-                    throw new ResourceNotFoundException("Optional item ID " + idOptional + " não tem quantidade suficiente disponível");
-                }
-            } else {
-                throw new ResourceNotFoundException("Optional item ID " + idOptional + " not found.");
-            }
-        }
+        processOptionalItems(rentRequest.optionalItems(), rent); // Utilzando método de RentOptionalItems
 
         rent.setVehicle(vehicle);
         rent.setUser(usuario);
@@ -153,6 +110,41 @@ public class RentService {
         return rentRepository.findById(id)
                 .map(RentResponse::new);
 
+    }
+
+    private List<RentOptionalItem> processOptionalItems(Map<Long, Integer> optionalItemsMap, Rent rent) {
+        List<RentOptionalItem> rentOptionalItems = new ArrayList<>();
+
+        for (Map.Entry<Long, Integer> entry : optionalItemsMap.entrySet()) {
+            Long idOptional = entry.getKey();
+            Integer quantityRequested = entry.getValue();
+
+            Optional<OptionalItem> optionalItemOpt = optionalItemService.findOptionalItemById(idOptional);
+
+            if (optionalItemOpt.isPresent()) {
+                OptionalItem optionalItem = optionalItemOpt.get();
+
+                if (optionalItem.getQuantityAvailable() >= quantityRequested) {
+                    optionalItem.setQuantityAvailable(optionalItem.getQuantityAvailable() - quantityRequested);
+                    optionalItemRepository.save(optionalItem);
+
+                    // Criar a associação na tabela intermediária
+                    RentOptionalItem rentOptionalItem = new RentOptionalItem();
+                    rentOptionalItem.setRent(rent);
+                    rentOptionalItem.setOptionalItem(optionalItem);
+                    rentOptionalItem.setReservedQuantity(quantityRequested);
+                    rentOptionalRepository.save(rentOptionalItem);
+
+                    rentOptionalItems.add(rentOptionalItem);
+                } else {
+                    throw new ResourceNotFoundException("Optional item ID " + idOptional + " não tem quantidade suficiente disponível");
+                }
+            } else {
+                throw new ResourceNotFoundException("Optional item ID " + idOptional + " não encontrada.");
+            }
+        }
+
+        return rentOptionalItems;
     }
 
 

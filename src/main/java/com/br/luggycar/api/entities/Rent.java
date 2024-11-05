@@ -40,13 +40,14 @@ public class Rent {
     @Enumerated(EnumType.STRING)
     private RentStatus status;
 
-    @ManyToMany
-    @JoinTable(
-            name = "rent_optional_items",
-            joinColumns = @JoinColumn(name = "rent_id"),
-            inverseJoinColumns = @JoinColumn(name = "optional_item_id")
-    )
-    private Set<OptionalItem> optionalItems = new HashSet<>();
+//    @ManyToMany
+//    @JoinTable(
+//            name = "rent_optional_items",
+//            joinColumns = @JoinColumn(name = "rent_id"),
+//            inverseJoinColumns = @JoinColumn(name = "optional_item_id")
+//    )
+    @OneToMany(mappedBy = "rent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<RentOptionalItem> rentOptionalItems = new HashSet<>();
 
     private LocalDate create_at;
     private LocalDate update_at;

@@ -24,6 +24,6 @@ public class RentOptionalItem {
     @JoinColumn(name = "optional_item_id")
     private OptionalItem optionalItem;
 
-    private Integer quantity;
+    private Integer reservedQuantity;
 
 }
