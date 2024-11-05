@@ -1,4 +1,4 @@
-package com.br.luggycar.api.dtos.requests;
+package com.br.luggycar.api.dtos.requests.rent;
 
 import com.br.luggycar.api.dtos.requests.Optional.OptionalQuantityRequest;
 import com.br.luggycar.api.enums.rent.RentStatus;
@@ -6,7 +6,6 @@ import com.br.luggycar.api.enums.rent.RentStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 public record RentRequest(
 

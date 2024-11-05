@@ -1,4 +1,4 @@
-package com.br.luggycar.api.dtos.requests;
+package com.br.luggycar.api.dtos.requests.rent;
 
 public record CloseRentalRequest(
 

@@ -1,7 +1,6 @@
 package com.br.luggycar.api.services;
 
-import com.br.luggycar.api.dtos.requests.CloseRentalRequest;
-import com.br.luggycar.api.dtos.requests.Optional.OptionalItemRequest;
+import com.br.luggycar.api.dtos.requests.rent.CloseRentalRequest;
 import com.br.luggycar.api.dtos.requests.Optional.OptionalQuantityRequest;
 import com.br.luggycar.api.dtos.response.ClientResponse;
 import com.br.luggycar.api.dtos.response.CloseRentalResponse;
@@ -12,7 +11,7 @@ import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.OptionalItemRepository;
 import com.br.luggycar.api.repositories.RentOptionalRepository;
 import com.br.luggycar.api.repositories.RentRepository;
-import com.br.luggycar.api.dtos.requests.RentRequest;
+import com.br.luggycar.api.dtos.requests.rent.RentRequest;
 import com.br.luggycar.api.utils.AuthUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
@@ -22,11 +21,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static com.br.luggycar.api.enums.rent.RentStatus.IN_PROGRESS;
 
 
 @Service

@@ -1,7 +1,7 @@
 package com.br.luggycar.api.controllers;
 
 
-import com.br.luggycar.api.dtos.requests.CloseRentalRequest;
+import com.br.luggycar.api.dtos.requests.rent.CloseRentalRequest;
 import com.br.luggycar.api.dtos.response.CategoryResponse;
 import com.br.luggycar.api.dtos.response.CloseRentalResponse;
 import com.br.luggycar.api.entities.Category;
