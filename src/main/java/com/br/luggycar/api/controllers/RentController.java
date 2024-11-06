@@ -2,8 +2,8 @@ package com.br.luggycar.api.controllers;
 
 import com.br.luggycar.api.dtos.requests.rent.CloseRentalRequest;
 import com.br.luggycar.api.dtos.requests.rent.RentRequestUpdate;
-import com.br.luggycar.api.dtos.response.CloseRentalResponse;
-import com.br.luggycar.api.dtos.response.RentResponse;
+import com.br.luggycar.api.dtos.response.rent.CloseRentalResponse;
+import com.br.luggycar.api.dtos.response.rent.RentResponse;
 import com.br.luggycar.api.entities.Rent;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.dtos.requests.rent.RentRequest;

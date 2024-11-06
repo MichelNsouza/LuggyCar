@@ -4,11 +4,12 @@ import com.br.luggycar.api.dtos.requests.rent.CloseRentalRequest;
 import com.br.luggycar.api.dtos.requests.Optional.OptionalQuantityRequest;
 import com.br.luggycar.api.dtos.requests.rent.RentRequestUpdate;
 import com.br.luggycar.api.dtos.response.ClientResponse;
-import com.br.luggycar.api.dtos.response.CloseRentalResponse;
-import com.br.luggycar.api.dtos.response.RentResponse;
+import com.br.luggycar.api.dtos.response.rent.CloseRentalResponse;
+import com.br.luggycar.api.dtos.response.rent.RentResponse;
 import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.entities.*;
 import com.br.luggycar.api.enums.rent.RentStatus;
+import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.OptionalItemRepository;
 import com.br.luggycar.api.repositories.RentOptionalRepository;
@@ -20,9 +21,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -55,6 +56,13 @@ public class RentService {
         // user, client e veiculo
         String usuario = authUtil.getAuthenticatedUsername();
         ClientResponse clientResponse = clientService.findClientById(rentRequest.clientId());
+
+        List<RentStatus> activeStatuses = Arrays.asList(RentStatus.IN_PROGRESS, RentStatus.PENDING);
+
+        if (vehicleService.isVehicleAvailable(rentRequest.vehicleId(), activeStatuses)){
+            throw new ResourceExistsException("O veiculo com ID: "+ rentRequest.vehicleId() + " possui locação Em andamento, ou pendente");
+        }
+
         Optional<VehicleResponse> vehicleResponseOpt = vehicleService.findVehicleById(rentRequest.vehicleId());
 
         // Criando as entidades
@@ -66,7 +74,7 @@ public class RentService {
         vehicle.setId(vehicleResponseOpt.get().id());
 
         // Processando os itens opcionais
-        processOptionalItems(rentRequest.optionalItems(), rent);
+        processAddOptionalItems(rentRequest.optionalItems(), rent);
 
         rent.setVehicle(vehicle);
         rent.setUser(usuario);
@@ -104,7 +112,35 @@ public class RentService {
         return rentRepository.findById(id).map(RentResponse::new);
     }
 
-    private List<RentOptionalItem> processOptionalItems(List<OptionalQuantityRequest> optionalItems, Rent rent) {
+    public CloseRentalResponse closeRental(CloseRentalRequest closeRentalRequest) {
+
+        Rent rent = rentRepository.findById(closeRentalRequest.id())
+                .orElseThrow(() -> new ResourceNotFoundException("Alugel não encontrado!"));
+
+        if (rent.getStatus() != RentStatus.COMPLETED) {
+            for (RentOptionalItem rentOptionalItem : rent.getRentOptionalItems()) {
+                OptionalItem item = rentOptionalItem.getOptionalItem();
+                item.setQuantityAvailable(item.getQuantityAvailable() + rentOptionalItem.getQuantity());
+                optionalItemRepository.save(item);
+            }
+
+            // Aqui adicionar lógica para calcular o valor total, etc.
+
+            RentRequestUpdate rentRequestUpdate = new RentRequestUpdate();
+
+            rentRequestUpdate.setStatus(RentStatus.COMPLETED);
+            // rentRequestUpdate.getKmFinal() receber do close rent
+            // e mais coisas de rent
+
+
+            updateRent(rent.getId(), rentRequestUpdate);
+
+            return new CloseRentalResponse("Teste, rent fechado");
+        }
+        throw new RuntimeException("Não é possivel finalizar um aluguel ja concluido");
+    }
+
+    private List<RentOptionalItem> processAddOptionalItems(List<OptionalQuantityRequest> optionalItems, Rent rent) {
 
         List<RentOptionalItem> rentOptionalItems = new ArrayList<>();
 
@@ -148,36 +184,10 @@ public class RentService {
         return rentOptionalItems;
     }
 
-    public CloseRentalResponse closeRental(CloseRentalRequest closeRentalRequest) {
-
-        Optional<RentResponse> rentOpt = findRentById(closeRentalRequest.id());
-
-        if (rentOpt.isPresent()) {
-
-            Rent rent = rentRepository.findById(closeRentalRequest.id())
-                    .orElseThrow(() -> new ResourceNotFoundException("Alugel não encontrado!"));
+//passar logica de remover para ca
+//    private List<RentOptionalItem> processRemoveOptionalItems(List<OptionalQuantityRequest> optionalItems, Rent rent){
+//
+//    }
 
 
-            for (RentOptionalItem rentOptionalItem : rent.getRentOptionalItems()) {
-                OptionalItem item = rentOptionalItem.getOptionalItem();
-                item.setQuantityAvailable(item.getQuantityAvailable() + rentOptionalItem.getQuantity());
-                optionalItemRepository.save(item);
-            }
-
-            // Aqui você pode adicionar lógica para calcular o valor total, etc.
-
-            RentRequestUpdate rentRequestUpdate = new RentRequestUpdate();
-
-            rentRequestUpdate.setStatus(RentStatus.COMPLETED);
-           // rentRequestUpdate.getKmFinal() receber do close rent
-            // e mais coisas de rent
-
-
-            updateRent(rent.getId(), rentRequestUpdate);
-
-            return new CloseRentalResponse("Teste, rent fechado");
-        }
-
-        throw new ResourceNotFoundException("Rent com o ID: " + closeRentalRequest.id() + "Não encontrado");
-    }
 }

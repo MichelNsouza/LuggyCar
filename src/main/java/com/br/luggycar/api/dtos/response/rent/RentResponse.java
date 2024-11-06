@@ -1,15 +1,16 @@
-package com.br.luggycar.api.dtos.response;
+package com.br.luggycar.api.dtos.response.rent;
 
 import com.br.luggycar.api.entities.OptionalItem;
 import com.br.luggycar.api.entities.Rent;
 import com.br.luggycar.api.enums.rent.RentStatus;
-import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-
-@NoArgsConstructor
+@Data
+@AllArgsConstructor
 public class RentResponse {
 
     private Long id;

@@ -16,4 +16,12 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
     @Query("SELECT v FROM Vehicle v WHERE v NOT IN (SELECT r.vehicle FROM Rent r WHERE r.status = :activeStatus)")
     List<Vehicle> findAvailableVehicles(@Param("activeStatus") RentStatus activeStatus);
 
+    @Query("SELECT CASE WHEN COUNT(v) > 0 THEN true ELSE false END " +
+            "FROM Vehicle v " +
+            "WHERE v.id = :vehicleId AND v NOT IN " +
+            "(SELECT r.vehicle FROM Rent r WHERE r.status IN :activeStatuses)")
+    boolean isVehicleAvailable(@Param("vehicleId") Long vehicleId,
+                               @Param("activeStatuses") List<RentStatus> activeStatuses);
+
+
 }

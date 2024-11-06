@@ -55,7 +55,6 @@ public class OptionalItemService {
         return false;
     }
 
-
     public Optional<OptionalItem> findOptionalItemById(Long id) {
         return optionalItemRepository.findById(id);
     }

@@ -18,7 +18,7 @@ public class RentRequestUpdate {
     private RentStatus status;
     private String user;
     private BigDecimal dailyRate;
-    private Integer totalDays;
+    private int totalDays;
     private BigDecimal deposit;
     private BigDecimal kmInitial;
     private BigDecimal kmFinal;

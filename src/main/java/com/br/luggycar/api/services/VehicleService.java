@@ -108,4 +108,8 @@ public class VehicleService {
             throw new ResourceDatabaseException("Erro ao buscar os veiculos diponiveis para aluguel no banco de dados", e);
         }
     }
+
+    public boolean isVehicleAvailable(Long id, List<RentStatus> activeStatuses) {
+            return  vehicleRepository.isVehicleAvailable(id, activeStatuses);
+    }
 }
