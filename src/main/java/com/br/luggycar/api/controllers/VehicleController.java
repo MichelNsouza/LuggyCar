@@ -68,6 +68,12 @@ public class VehicleController {
 
     }
 
+    @GetMapping("/plate")
+    public ResponseEntity<VehicleResponse> getVehicleByLicensePlate(@PathVariable String plate) {
+        VehicleResponse response = vehicleService.getByPlate(plate);
+        return ResponseEntity.ok(response);
+    }
+
 
     @GetMapping("/available")
     public ResponseEntity<List<VehicleResponse>> findAllVehicleAvailable() throws ResourceNotFoundException {

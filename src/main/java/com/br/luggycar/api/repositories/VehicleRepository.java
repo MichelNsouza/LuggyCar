@@ -12,6 +12,8 @@ import java.util.Optional;
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
     List<Vehicle> findByCategoryId(Long categoryId);
+    Optional<Vehicle> findByPlate(String plate);
+
 
     @Query("SELECT v FROM Vehicle v WHERE v NOT IN (SELECT r.vehicle FROM Rent r WHERE r.status = :activeStatus)")
     List<Vehicle> findAvailableVehicles(@Param("activeStatus") RentStatus activeStatus);

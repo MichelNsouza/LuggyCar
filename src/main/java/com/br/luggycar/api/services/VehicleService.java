@@ -35,6 +35,11 @@ public class VehicleService {
 
     public VehicleResponse createVehicle(VehicleRequest vehicleRequest) {
 
+        Optional<Vehicle> existingVehicle = vehicleRepository.findByPlate(vehicleRequest.getPlate());
+        if (existingVehicle.isPresent()) {
+            throw new ResourceExistsException("Já existe um veículo cadastrado com essa placa.");
+        }
+
         Category category = categoryRepository.findByName(vehicleRequest.categoryName())
                 .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
 
@@ -89,6 +94,13 @@ public class VehicleService {
     public Optional<VehicleResponse> findVehicleById(Long id) {
         return vehicleRepository.findById(id)
                 .map(VehicleResponse::new);
+    }
+
+    public VehicleResponse getByPlate(String plate) {
+        Vehicle vehicle = vehicleRepository.findByPlate(plate)
+                .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado com a placa: " + plate));
+
+        return new VehicleResponse(vehicle);
     }
 
     public List <VehicleResponse>getAvailableVehicles() {
