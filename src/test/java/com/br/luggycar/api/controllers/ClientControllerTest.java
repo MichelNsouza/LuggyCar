@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
-public class CategoryControllerTest {
+public class ClientControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -31,8 +31,8 @@ public class CategoryControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    public void testReadAllCategory () throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/category")
+    public void testReadAllClient() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/client")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
