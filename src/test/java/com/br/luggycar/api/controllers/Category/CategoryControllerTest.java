@@ -1,4 +1,4 @@
-package com.br.luggycar.api.controllers;
+package com.br.luggycar.api.controllers.Category;
 
 import com.br.luggycar.api.dtos.requests.CategoryRequest;
 import com.br.luggycar.api.dtos.response.CategoryResponse;
@@ -17,7 +17,6 @@ import static java.time.LocalDate.now;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -32,16 +31,31 @@ public class CategoryControllerTest {
     @MockBean
     private CategoryService categoryService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
 
     @Test
     public void testCreateCategory() throws Exception {
-        CategoryResponse response = new CategoryResponse(1L, "Hatch", "Um carro pequeno");
+
+        CategoryRequest categoryRequest = new CategoryRequest(
+                "Hatch",
+                "Um carro pequeno",
+                "link_para_imagem.jpg",
+                now()
+        );
+
+        CategoryResponse response = new CategoryResponse(
+                1L,
+                "Hatch",
+                "Um carro pequeno"
+        );
 
         Mockito.when(categoryService.createCategory(any(CategoryRequest.class))).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/category")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\": \"Hatch\", \"description\": \"Um carro pequeno\"}"))
+                        .content(objectMapper.writeValueAsString(categoryRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Hatch"))
@@ -58,13 +72,25 @@ public class CategoryControllerTest {
     @Test
     public void testUpdateCategory() throws Exception {
         Long id = 1L;
-        CategoryResponse response = new CategoryResponse(id, "Hatch2", "Um carro legalzão");
+
+        CategoryRequest categoryRequest = new CategoryRequest(
+                "Hatch",
+                "Um carro legalzão",
+                "link_para_imagem.jpg",
+                now()
+        );
+
+        CategoryResponse response = new CategoryResponse(
+                id,
+                "Hatch2",
+                "Um carro legalzão"
+        );
 
         Mockito.when(categoryService.updateCategory(eq(id), any(CategoryRequest.class))).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/category/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\": \"Hatch2\", \"description\": \"Um carro legalzão\"}"))
+                        .content(objectMapper.writeValueAsString(categoryRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Hatch2"))
@@ -82,7 +108,12 @@ public class CategoryControllerTest {
     @Test
     public void testFindCategoryById() throws Exception {
         Long id = 1L;
-        CategoryResponse response = new CategoryResponse(id, "Hatch", "Um carro pequeno");
+
+        CategoryResponse response = new CategoryResponse(
+                id,
+                "Hatch",
+                "Um carro pequeno"
+        );
 
         Mockito.when(categoryService.findCategoryById(id)).thenReturn(response);
 
