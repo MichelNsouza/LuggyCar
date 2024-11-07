@@ -17,7 +17,7 @@ public class RentRequestUpdate {
 
     private RentStatus status;
     private String user;
-    private BigDecimal dailyRate;
+    private BigDecimal totalValue;
     private int totalDays;
     private BigDecimal deposit;
     private BigDecimal kmInitial;
@@ -26,5 +26,6 @@ public class RentRequestUpdate {
     private Long vehicleId;
     private List<OptionalQuantityRequest> optionalItems;
     private LocalDate update_at;
+
 
 }

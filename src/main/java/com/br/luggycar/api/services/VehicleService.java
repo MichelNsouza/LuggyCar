@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -121,7 +122,18 @@ public class VehicleService {
         }
     }
 
-    public boolean isVehicleAvailable(Long id, List<RentStatus> activeStatuses) {
-            return  vehicleRepository.isVehicleAvailable(id, activeStatuses);
+    public boolean isVehicleAvailableById(Long id) {
+        try {
+            // Defina quais status de locação indicam que o veículo não está disponível
+            List<RentStatus> activeStatuses = Arrays.asList(RentStatus.IN_PROGRESS, RentStatus.PENDING);
+
+            // Chame o repositório para verificar se existe locação ativa com o veículo
+            return vehicleRepository.isVehicleAvailable(id, activeStatuses);
+        } catch (Exception e) {
+            // Se ocorrer algum erro ao verificar, lance uma exceção adequada
+            throw new ResourceExistsException("O veículo com ID: " + id + " possui locação em andamento, ou pendente");
+        }
     }
+
+
 }

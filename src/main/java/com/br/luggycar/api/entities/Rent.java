@@ -33,8 +33,8 @@ public class Rent {
     @JoinColumn(name = "client_id")
     private Client client;
 
-    @OneToOne
-    @JoinColumn(name = "vehicle_id")
+    @ManyToOne
+    @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle vehicle;
 
     @Enumerated(EnumType.STRING)
@@ -48,8 +48,8 @@ public class Rent {
     )
     private List<OptionalItem> optionalItems = new ArrayList<>();
 
-    @OneToMany(mappedBy = "rent")
-    private List<RentOptionalItem> rentOptionalItems = new ArrayList<>();
+    @OneToMany(mappedBy = "rent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RentOptionalItem> rentOptionalItems;
 
     private LocalDate create_at;
     private LocalDate update_at;

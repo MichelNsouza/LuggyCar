@@ -20,4 +20,8 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
 
     @Query("SELECT r.vehicle FROM Rent r WHERE r.status IN :statuses")
     List<Vehicle> findRentedVehiclesByStatusIn(@Param("statuses") List<RentStatus> statuses);
+
+    @Query("SELECT COUNT(r) > 0 FROM Rent r WHERE r.vehicle.id = :vehicleId AND r.status IN :activeStatuses")
+    boolean isVehicleAvailable(@Param("vehicleId") Long vehicleId, @Param("activeStatuses") List<RentStatus> activeStatuses);
+
 }

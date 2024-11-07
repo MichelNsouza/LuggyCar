@@ -1,8 +1,9 @@
 package com.br.luggycar.api.dtos.requests.rent;
 
+import java.math.BigDecimal;
+
 public record CloseRentalRequest(
         Long id,
-        String obs
-
+        BigDecimal kmFinal
 ) {
 }

@@ -14,7 +14,6 @@ public record VehicleRequest(
         String name,
         VehicleManufacturer manufacturer,
         String version,
-//        Long categoryId,
         String categoryName,
         String urlFipe,
         String plate,

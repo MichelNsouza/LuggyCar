@@ -151,5 +151,8 @@ public class ClientService {
             throw new ResourceDatabaseException("Erro ao buscar o cliente no banco de dados", e);
         }
     }
+    public boolean clientAvailable(Long id){
+        return true;
+    }
 
 }

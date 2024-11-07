@@ -13,20 +13,15 @@ public record RentRequest(
 
         String user,
 
-        BigDecimal dailyRate,
         int totalDays,
         BigDecimal deposit,
-
         BigDecimal kmInitial,
-        BigDecimal kmFinal,
-
 
         Long clientId,
         Long vehicleId,
         List<OptionalQuantityRequest> optionalItems,
 
-        LocalDate create_at,
-        LocalDate update_at
+        LocalDate create_at
 ) {
     public RentRequest {
         status = RentStatus.IN_PROGRESS;

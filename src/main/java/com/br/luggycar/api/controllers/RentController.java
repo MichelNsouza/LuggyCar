@@ -5,6 +5,7 @@ import com.br.luggycar.api.dtos.requests.rent.RentRequestUpdate;
 import com.br.luggycar.api.dtos.response.rent.CloseRentalResponse;
 import com.br.luggycar.api.dtos.response.rent.RentResponse;
 import com.br.luggycar.api.entities.Rent;
+import com.br.luggycar.api.exceptions.ResourceBadRequestException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.dtos.requests.rent.RentRequest;
 import com.br.luggycar.api.services.RentService;
@@ -24,71 +25,44 @@ public class RentController {
     RentService rentService;
 
     @PostMapping
-    public ResponseEntity<RentResponse> createRent(@RequestBody RentRequest rentRequest) {
-
-        RentResponse rentResponse = rentService.createRent(rentRequest);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(rentResponse);
+    public ResponseEntity<RentResponse> createRent(@RequestBody RentRequest rentRequest) throws ResourceBadRequestException {
+        if (rentService.isVehicleAvailable(rentRequest.vehicleId())) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(rentService.createRent(rentRequest));
+        } else {
+            throw new ResourceNotFoundException("Deu uruim");
+        }
 
     }
 
     @GetMapping
-    public ResponseEntity<List<RentResponse>> readAllRent() {
-        List<RentResponse> rentResponses = rentService.readAllRent();
-        return ResponseEntity.ok(rentResponses);
+    public ResponseEntity<List<RentResponse>> readAllRent() throws ResourceNotFoundException{
+        return ResponseEntity.ok(rentService.readAllRent());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RentResponse> updateClient(@PathVariable Long id, @RequestBody RentRequestUpdate rentRequest) throws ResourceNotFoundException {
-         Optional<RentResponse> rentOpt = rentService.findRentById(id);
-
-        if (rentOpt.isEmpty()) {
-            throw new ResourceNotFoundException("Locação não encontrada!");
-        }
-
-        RentResponse rentResponse = rentService.updateRent(id, rentRequest);
-
-        return ResponseEntity.ok().body(rentResponse);
-
+    public ResponseEntity<RentResponse> updateClient(@PathVariable Long id, @RequestBody RentRequestUpdate rentRequest) throws ResourceBadRequestException {
+        return ResponseEntity.ok().body(rentService.updateRent(id, rentRequest));
     }
 
-    @PatchMapping("/status/{id}")
-    public ResponseEntity<CloseRentalResponse> updateRentStatus( @PathVariable Long id, @RequestBody CloseRentalRequest closeRentalRequest) {
-        CloseRentalResponse closeRentalResponse = rentService.closeRental(closeRentalRequest);
-        return ResponseEntity.ok().body(closeRentalResponse);
-
+    @PatchMapping("/status")
+    public ResponseEntity<CloseRentalResponse> updateRentStatus(@RequestBody CloseRentalRequest closeRentalRequest) throws ResourceBadRequestException {
+        return ResponseEntity.ok().body(rentService.closeRental(closeRentalRequest));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Rent> deleteClient(@PathVariable Long id) {
+    public ResponseEntity<Rent> deleteClient(@PathVariable Long id) throws ResourceNotFoundException {
         rentService.deleteRent(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RentResponse> findRentById(@PathVariable Long id) throws ResourceNotFoundException {
-        Optional<RentResponse> rent = rentService.findRentById(id);
-
-        if (rent.isEmpty()) {
-            throw new ResourceNotFoundException("Locação não encontrada!");
-        }
-
-        return ResponseEntity.ok().body(rent.get());
+    public ResponseEntity<Optional<RentResponse>> findRentById(@PathVariable Long id) throws ResourceNotFoundException {
+        return ResponseEntity.ok().body(rentService.findRentById(id));
     }
 
     @PutMapping("/close")
-    public ResponseEntity<CloseRentalResponse> closeRental(@RequestBody CloseRentalRequest closeRentalRequest) throws ResourceNotFoundException {
-
-        Optional<RentResponse> rentOpt = rentService.findRentById(closeRentalRequest.id());
-
-        if (rentOpt.isEmpty()) {
-            throw new ResourceNotFoundException("Locação não encontrada!");
-        }
-
-        CloseRentalResponse closeRentalResponse = rentService.closeRental(closeRentalRequest);
-
-        return ResponseEntity.ok().body(closeRentalResponse);
-
+    public ResponseEntity<CloseRentalResponse> closeRental(@RequestBody CloseRentalRequest closeRentalRequest) throws ResourceBadRequestException {
+        return ResponseEntity.ok().body(rentService.closeRental(closeRentalRequest));
     }
 
 }
