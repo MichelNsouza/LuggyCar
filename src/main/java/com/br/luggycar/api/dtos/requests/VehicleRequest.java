@@ -1,10 +1,7 @@
 package com.br.luggycar.api.dtos.requests;
 
 
-import com.br.luggycar.api.enums.vehicle.VehicleAccessorie;
-import com.br.luggycar.api.enums.vehicle.VehicleColor;
-import com.br.luggycar.api.enums.vehicle.VehicleManufacturer;
-import com.br.luggycar.api.enums.vehicle.Vehicletransmission;
+import com.br.luggycar.api.enums.vehicle.*;
 import jakarta.validation.constraints.Pattern;
 
 import java.util.Set;
@@ -24,7 +21,6 @@ public record VehicleRequest(
         String trunkCapacity,
         Set<VehicleAccessorie> accessories,
         double dailyRate
-
 ) {
 
     public String getPlate() {

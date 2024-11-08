@@ -18,7 +18,6 @@ public class RentOptionalItem {
     @ManyToOne
     @JoinColumn(name = "rent_id")
     private Rent rent;
-
     @ManyToOne
     @JoinColumn(name = "optional_item_id")
     private OptionalItem optionalItem;

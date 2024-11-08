@@ -26,16 +26,11 @@ public class RentController {
 
     @PostMapping
     public ResponseEntity<RentResponse> createRent(@RequestBody RentRequest rentRequest) throws ResourceBadRequestException {
-        if (rentService.isVehicleAvailable(rentRequest.vehicleId())) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(rentService.createRent(rentRequest));
-        } else {
-            throw new ResourceNotFoundException("Deu uruim");
-        }
-
+        return ResponseEntity.status(HttpStatus.CREATED).body(rentService.createRent(rentRequest));
     }
 
     @GetMapping
-    public ResponseEntity<List<RentResponse>> readAllRent() throws ResourceNotFoundException{
+    public ResponseEntity<List<RentResponse>> readAllRent(){
         return ResponseEntity.ok(rentService.readAllRent());
     }
 

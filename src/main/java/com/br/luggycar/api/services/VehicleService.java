@@ -6,6 +6,7 @@ import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.enums.rent.RentStatus;
+import com.br.luggycar.api.enums.vehicle.StatusVehicle;
 import com.br.luggycar.api.exceptions.ResourceDatabaseException;
 import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
@@ -48,6 +49,7 @@ public class VehicleService {
         BeanUtils.copyProperties(vehicleRequest, vehicle);
         vehicle.setCategory(category);
         vehicle.setRegistrationDate(LocalDate.now());
+        vehicle.setStatusVehicle(StatusVehicle.AVAILABLE);
 
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
 
@@ -104,23 +106,20 @@ public class VehicleService {
         return new VehicleResponse(vehicle);
     }
 
-    public List <VehicleResponse>getAvailableVehicles() {
-
+    public List<VehicleResponse> getAvailableVehicles() {
         try {
-            List<Vehicle> allVehicles = vehicleRepository.findAll();
             List<RentStatus> activeStatuses = List.of(RentStatus.PENDING, RentStatus.IN_PROGRESS);
-            List<Vehicle> rentedVehicles = rentRepository.findRentedVehiclesByStatusIn(activeStatuses);
-            allVehicles.removeAll(rentedVehicles);
+            List<Vehicle> availableVehicles = rentRepository.findRentedVehiclesByStatusInAndStatusVehicleAvailable(activeStatuses);
 
-            return allVehicles.stream()
+            return availableVehicles.stream()
                     .map(VehicleResponse::new)
                     .collect(Collectors.toList());
 
-        } catch (
-                ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao buscar os veiculos diponiveis para aluguel no banco de dados", e);
+        } catch (ResourceDatabaseException e) {
+            throw new ResourceDatabaseException("Erro ao buscar os veículos disponíveis para aluguel no banco de dados", e);
         }
     }
+
 
     public boolean isVehicleAvailableById(Long id) {
         try {

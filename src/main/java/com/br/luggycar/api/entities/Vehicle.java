@@ -1,9 +1,6 @@
 package com.br.luggycar.api.entities;
 
-import com.br.luggycar.api.enums.vehicle.VehicleAccessorie;
-import com.br.luggycar.api.enums.vehicle.VehicleColor;
-import com.br.luggycar.api.enums.vehicle.VehicleManufacturer;
-import com.br.luggycar.api.enums.vehicle.Vehicletransmission;
+import com.br.luggycar.api.enums.vehicle.*;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -12,8 +9,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -48,7 +48,7 @@ public class Vehicle {
     @Enumerated(EnumType.STRING)
     private Vehicletransmission transmission;
 
-    private String currentKm;
+    private double currentKm;
 
     private String passangerCapacity;
 
@@ -60,5 +60,14 @@ public class Vehicle {
 
     private double dailyRate;
 
+    @ManyToMany
+    @JoinTable(
+            name = "vehicle_accident",
+            joinColumns = @JoinColumn(name = "vehicle_id"),
+            inverseJoinColumns = @JoinColumn(name = "accident_id")
+    )
+    private List<Accident> accidents = new ArrayList<>();
+
+    private StatusVehicle statusVehicle;
     private LocalDate registrationDate;
 }

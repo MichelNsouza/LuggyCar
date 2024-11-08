@@ -1,5 +1,6 @@
 package com.br.luggycar.api.services;
 
+import com.br.luggycar.api.dtos.requests.VehicleRequest;
 import com.br.luggycar.api.dtos.requests.rent.CloseRentalRequest;
 import com.br.luggycar.api.dtos.requests.rent.RentRequestUpdate;
 import com.br.luggycar.api.dtos.response.ClientResponse;
@@ -7,7 +8,9 @@ import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.dtos.response.rent.CloseRentalResponse;
 import com.br.luggycar.api.dtos.response.rent.RentResponse;
 import com.br.luggycar.api.entities.*;
+import com.br.luggycar.api.enums.accident.Severity;
 import com.br.luggycar.api.enums.rent.RentStatus;
+import com.br.luggycar.api.enums.vehicle.StatusVehicle;
 import com.br.luggycar.api.exceptions.ResourceBadRequestException;
 import com.br.luggycar.api.exceptions.ResourceDatabaseException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
@@ -41,6 +44,8 @@ public class RentService {
     private OptionalItemService optionalItemService;
     @Autowired
     private OptionalItemRepository optionalItemRepository;
+    @Autowired
+    private VehicleRepository vehicleRepository;
 
 
     @Transactional
@@ -57,7 +62,13 @@ public class RentService {
             BeanUtils.copyProperties(clientResponse, client);
             Vehicle vehicle = new Vehicle();
             BeanUtils.copyProperties(vehicleResponse.get(), vehicle);
+
             Rent rent = new Rent();
+
+            rent.setKmInitial(vehicle.getCurrentKm());
+
+            rent.setDailyRate(vehicle.getDailyRate() * (rent.getTotalDays()));
+
             BeanUtils.copyProperties(rentRequest, rent);
 
             rent.setUser(usuario);
@@ -81,16 +92,11 @@ public class RentService {
 
     @Transactional
     public List<RentResponse> readAllRent() {
-        try {
             List<Rent> rents = rentRepository.findAll();
             return rents
                     .stream()
                     .map(RentResponse::new)
                     .collect(Collectors.toList());
-
-        }catch (ResourceNotFoundException e){
-            throw new ResourceNotFoundException("Algo deu errado! " + e.getMessage());
-        }
     }
 
     @Transactional
@@ -134,7 +140,7 @@ public class RentService {
 
     @Transactional
     public List<RentResponse> findAllRentByClientId(Long id) {
-        // Verifique se o cliente existe (ou lance a exceção, se necessário)
+
         clientService.findClientById(id);
 
         try {
@@ -155,60 +161,67 @@ public class RentService {
         }
     }
 
+
     @Transactional
     public CloseRentalResponse closeRental(CloseRentalRequest closeRentalRequest) {
 
         Rent rent = rentRepository.findById(closeRentalRequest.id())
-                .orElseThrow(() -> new ResourceNotFoundException("Alugel não encontrado!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Aluguel não encontrado!"));
 
         if (rent.getStatus() == RentStatus.COMPLETED) {
             throw new RuntimeException("Não é possível finalizar um aluguel já concluído");
         }
 
-        // Atualiza a quantidade de itens opcionais
         for (RentOptionalItem rentOptionalItem : rent.getRentOptionalItems()) {
             OptionalItem item = rentOptionalItem.getOptionalItem();
             item.setQuantityAvailable(item.getQuantityAvailable() + rentOptionalItem.getQuantity());
             optionalItemRepository.save(item);
         }
 
-        // Calcular o valor total do aluguel (base + itens opcionais)
-        BigDecimal valorTotal = calcularValorFinal(rent);
+        Double valorTotal = calculateFinalValue(rent);
 
-        // Atualiza os detalhes do aluguel
+        // Calcule a multa, caso haja atraso (implementar a lógica de multa)
+        // calculateFine(valorTotal);
+
         RentRequestUpdate rentRequestUpdate = new RentRequestUpdate();
         rentRequestUpdate.setStatus(RentStatus.COMPLETED);
-        rentRequestUpdate.setKmFinal(closeRentalRequest.kmFinal()); // Atualiza o km final
-        rentRequestUpdate.setTotalValue(valorTotal); // Atualiza o valor total
+        rentRequestUpdate.setKmFinal(closeRentalRequest.kmFinal());
+
+
+        if (closeRentalRequest.accident() != null) {
+            if (closeRentalRequest.accident().getSeverity() == Severity.HIGH
+                    || closeRentalRequest.accident().getSeverity() == Severity.MEDIUM ) {
+                Vehicle vehicle = rent.getVehicle();
+                vehicle.setStatusVehicle(StatusVehicle.UNAVAILABLE);
+                vehicleRepository.save(vehicle);
+            }
+        }
+
+        rentRequestUpdate.setTotalValue(valorTotal);
 
         updateRent(rent.getId(), rentRequestUpdate);
 
         return new CloseRentalResponse("Aluguel finalizado com sucesso!");
     }
 
-    private BigDecimal calcularValorFinal(Rent rent) {
-        // Certifique-se de que rent.getDailyRate() é BigDecimal, e converta totalDays para BigDecimal
-        BigDecimal valorBase = rent.getDailyRate().multiply(BigDecimal.valueOf(rent.getTotalDays()));
 
-        // Calcular o valor dos itens extras, garantindo que os valores sejam BigDecimal
-        BigDecimal valorExtras = rent.getRentOptionalItems().stream()
-                .map(item -> {
-                    // Garantir que quantity e rentalValue sejam BigDecimal
-                    BigDecimal quantity = new BigDecimal(item.getQuantity());
-                    BigDecimal rentalValue = new BigDecimal(item.getOptionalItem().getRentalValue());
-                    return quantity.multiply(rentalValue);
-                })
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    private double calculateFinalValue(Rent rent) {
+        double valorBase = rent.getDailyRate();
 
-        // Somar o valor base e o valor dos itens extras
-        return valorBase.add(valorExtras);
+        double valorExtras = rent.getRentOptionalItems().stream()
+                .mapToDouble(item -> item.getQuantity() * item.getOptionalItem().getRentalValue())
+                .sum();
+
+        double finalValue = valorBase + valorExtras;
+
+        return finalValue;
     }
 
-    public boolean isVehicleAvailable(Long vehicleId) {
-        List<RentStatus> activeStatuses = Arrays.asList(RentStatus.IN_PROGRESS, RentStatus.PENDING);
-
-        // Verifica se o veículo está disponível, ou seja, sem locações ativas
-        return !rentRepository.isVehicleAvailable(vehicleId, activeStatuses);
+    private double calculateFine(int atraso, Double finalValue) {
+        //fazer logica para cada tipo de atraso
+        double valorComMulta = finalValue * atraso;
+        return valorComMulta;
     }
+
 
 }

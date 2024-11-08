@@ -17,11 +17,11 @@ public class RentRequestUpdate {
 
     private RentStatus status;
     private String user;
-    private BigDecimal totalValue;
+    private Double totalValue;
     private int totalDays;
-    private BigDecimal deposit;
-    private BigDecimal kmInitial;
-    private BigDecimal kmFinal;
+    private Double deposit;
+    private Double kmInitial;
+    private Double kmFinal;
     private Long clientId;
     private Long vehicleId;
     private List<OptionalQuantityRequest> optionalItems;

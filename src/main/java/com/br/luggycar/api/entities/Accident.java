@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
@@ -26,5 +28,9 @@ public class Accident {
     @NotNull
     @Column(unique = true)
     private String description;
+
+    @ManyToMany(mappedBy = "accidents")
+    private Set<Vehicle> vehicle = new HashSet<>();
+
     private Date registrationDate;
 }

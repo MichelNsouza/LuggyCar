@@ -137,12 +137,6 @@ public class ClientService {
         }
     }
 
-
-    public boolean hasActiveRentals(Long clientId) {
-        List<RentStatus> activeStatuses = List.of(RentStatus.PENDING, RentStatus.IN_PROGRESS);
-        return rentRepository.existsActiveRentByClientId(clientId, activeStatuses);
-    }
-
     public ClientResponse findClientById(Long id) throws ResourceNotFoundException {
         try {
         Client client = clientRepository.findById(id)
@@ -152,19 +146,30 @@ public class ClientService {
             throw new ResourceDatabaseException("Erro ao buscar o cliente no banco de dados", e);
         }
     }
+// se colocar em rentService esta dando loop
+    public boolean hasActiveRentals(Long clientId) {
+        List<RentStatus> activeStatuses = List.of(RentStatus.PENDING, RentStatus.IN_PROGRESS);
+        return rentRepository.existsActiveRentByClientId(clientId, activeStatuses);
+    }
+
     public boolean clientAvailable(Long id) {
 
         ClientResponse client = findClientById(id);
 
-        Date currentDate = new Date();
+        if (client.personType() == PersonType.PF) {
 
-        if (client.drivers_license_validity().before(currentDate)) {
-            return true;
-        } else {
-            throw new ResourceBadRequestException("A CNH do cliente esta vencida!");
+            Date currentDate = new Date();
+
+            if (client.drivers_license_validity().before(currentDate)) {
+                throw new ResourceBadRequestException("A CNH do cliente está vencida!");
+            }
+            if (hasActiveRentals(client.id())){
+                throw new ResourceBadRequestException("O cliente possui aluguel pendente!");
+            }
+
         }
 
+        return true;
+
     }
-
-
 }

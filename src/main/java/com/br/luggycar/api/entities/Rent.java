@@ -23,11 +23,11 @@ public class Rent {
     private String user;
 
     private int totalDays;
-    private BigDecimal deposit;
-    private BigDecimal dailyRate;
+    private double deposit;
+    private double dailyRate;
 
-    private BigDecimal kmInitial;
-    private BigDecimal kmFinal;
+    private double kmInitial;
+    private double kmFinal;
 
     @ManyToOne
     @JoinColumn(name = "client_id")
@@ -53,14 +53,6 @@ public class Rent {
 
     private LocalDate create_at;
     private LocalDate update_at;
-
-
-    public BigDecimal calculateTotalOptionalItemsValue() {
-        return optionalItems.stream()
-                .map(OptionalItem::getRentalValue)
-                .map(BigDecimal::valueOf)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
 
 }
 
