@@ -9,6 +9,7 @@ import com.br.luggycar.api.dtos.response.rent.RentResponse;
 import com.br.luggycar.api.entities.*;
 import com.br.luggycar.api.enums.rent.RentStatus;
 import com.br.luggycar.api.exceptions.ResourceBadRequestException;
+import com.br.luggycar.api.exceptions.ResourceDatabaseException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.*;
 import com.br.luggycar.api.dtos.requests.rent.RentRequest;
@@ -35,92 +36,101 @@ public class RentService {
     @Autowired
     private VehicleService vehicleService;
     @Autowired
-    private RentOptionalRepository rentOptionalRepository;
-    @Autowired
     private AuthUtil authUtil;
     @Autowired
     private OptionalItemService optionalItemService;
     @Autowired
     private OptionalItemRepository optionalItemRepository;
-    @Autowired
-    private ClientRepository clientRepository;
-    @Autowired
-    private VehicleRepository vehicleRepository;
+
 
     @Transactional
     public RentResponse createRent(RentRequest rentRequest) {
+        try {
+            clientService.clientAvailable(rentRequest.clientId());
+            vehicleService.isVehicleAvailableById(rentRequest.vehicleId());
 
+            String usuario = authUtil.getAuthenticatedUsername();
+            ClientResponse clientResponse = clientService.findClientById(rentRequest.clientId());
+            Optional<VehicleResponse> vehicleResponse = vehicleService.findVehicleById(rentRequest.vehicleId());
 
-if (clientService.clientAvailable(rentRequest.clientId()) && vehicleService.isVehicleAvailableById(rentRequest.vehicleId())) {
+            Client client = new Client();
+            BeanUtils.copyProperties(clientResponse, client);
+            Vehicle vehicle = new Vehicle();
+            BeanUtils.copyProperties(vehicleResponse.get(), vehicle);
+            Rent rent = new Rent();
+            BeanUtils.copyProperties(rentRequest, rent);
 
+            rent.setUser(usuario);
+            rent.setClient(client);
+            rent.setVehicle(vehicle);
 
-    // Verificar disponibilidade de cliente e veículo
+            rent = rentRepository.save(rent);
 
+            List<RentOptionalItem> rentOptionalItems = optionalItemService.processAddOptionalItems(rentRequest.optionalItems(), rent);
+            rent.setRentOptionalItems(rentOptionalItems);
 
-    // Obter detalhes do usuário autenticado e cliente/veículo
-    String usuario = authUtil.getAuthenticatedUsername();
+            rentRepository.save(rent);
 
-    ClientResponse clientResponse = clientService.findClientById(rentRequest.clientId());
-    Optional<VehicleResponse> vehicleResponse = vehicleService.findVehicleById(rentRequest.vehicleId());
+            return new RentResponse(rent);
 
-    Client client = new Client();
-    BeanUtils.copyProperties(clientResponse, client);
-    Vehicle vehicle = new Vehicle();
-    BeanUtils.copyProperties(vehicleResponse.get(), vehicle);
-    Rent rent = new Rent();
-    BeanUtils.copyProperties(rentRequest, rent);
+        }catch (ResourceBadRequestException e){
+            throw new ResourceBadRequestException("Algo deu errado! " + e.getMessage());
+        }
 
-    rent.setUser(usuario);
-    rent.setClient(client);
-    rent.setVehicle(vehicle);
-
-    // Salvar o Rent para gerar um ID e evitar erro de transiente
-    rent = rentRepository.save(rent);
-
-    // Processar e associar itens opcionais (necessita do Rent já salvo)
-    List<RentOptionalItem> rentOptionalItems = optionalItemService.processAddOptionalItems(rentRequest.optionalItems(), rent);
-    rent.setRentOptionalItems(rentOptionalItems);
-
-    // Atualizar o Rent com os itens opcionais
-    rentRepository.save(rent);
-
-    // Retornar a resposta com os dados do Rent
-    return new RentResponse(rent);
-}
-throw new ResourceBadRequestException("deu ruim");
     }
 
     @Transactional
     public List<RentResponse> readAllRent() {
-        List<Rent> rents = rentRepository.findAll();
-        return rents.stream().map(RentResponse::new).collect(Collectors.toList());
+        try {
+            List<Rent> rents = rentRepository.findAll();
+            return rents
+                    .stream()
+                    .map(RentResponse::new)
+                    .collect(Collectors.toList());
+
+        }catch (ResourceNotFoundException e){
+            throw new ResourceNotFoundException("Algo deu errado! " + e.getMessage());
+        }
     }
 
     @Transactional
     public RentResponse updateRent(Long id, RentRequestUpdate rentRequest) {
         Optional<Rent> rentOpt = rentRepository.findById(id);
+        try {
 
-        if (rentOpt.isPresent()) {
             Rent updatedRent = rentOpt.get();
-            BeanUtils.copyProperties(rentRequest, updatedRent, "id");
-            updatedRent.setUpdate_at(LocalDate.now());
-            Rent savedRent = rentRepository.save(updatedRent);
-            return new RentResponse(savedRent);
-        }
 
-        throw new ResourceNotFoundException("Rent not found with ID: " + id);
+            BeanUtils.copyProperties(rentRequest, updatedRent, "id");
+
+            updatedRent.setUpdate_at(LocalDate.now());
+
+            Rent savedRent = rentRepository.save(updatedRent);
+
+            return new RentResponse(savedRent);
+
+        }catch (ResourceBadRequestException e){
+            throw new ResourceBadRequestException("Algo deu errado! " + e.getMessage());
+        }
     }
 
     @Transactional
     public void deleteRent(Long id) {
-        rentRepository.deleteById(id);
+        try {
+            rentRepository.deleteById(id);
+        }catch (ResourceDatabaseException e){
+            throw new ResourceDatabaseException("Algo deu errado!", e);
+        }
     }
 
     @Transactional
     public Optional<RentResponse> findRentById(Long id) {
-        return rentRepository.findById(id).map(RentResponse::new);
+        try {
+            return rentRepository.findById(id)
+                    .map(RentResponse::new);
+        }catch (ResourceNotFoundException e){
+        throw new ResourceNotFoundException("Aluguel não encontrado! " + e.getMessage());
+        }
     }
-
 
     @Transactional
     public CloseRentalResponse closeRental(CloseRentalRequest closeRentalRequest) {

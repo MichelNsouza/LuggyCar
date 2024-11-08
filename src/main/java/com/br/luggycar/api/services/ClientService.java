@@ -152,6 +152,11 @@ public class ClientService {
         }
     }
     public boolean clientAvailable(Long id){
+
+        ClientResponse client = findClientById(id);
+
+
+
         return true;
     }
 

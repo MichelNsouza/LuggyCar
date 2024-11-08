@@ -34,7 +34,7 @@ public class Rent {
     private Client client;
 
     @ManyToOne
-    @JoinColumn(name = "vehicle_id", nullable = false)
+    @JoinColumn(name = "vehicle_id", nullable = false ,unique = false)
     private Vehicle vehicle;
 
     @Enumerated(EnumType.STRING)
