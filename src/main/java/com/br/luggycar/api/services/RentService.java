@@ -133,6 +133,29 @@ public class RentService {
     }
 
     @Transactional
+    public List<RentResponse> findAllRentByClientId(Long id) {
+        // Verifique se o cliente existe (ou lance a exceção, se necessário)
+        clientService.findClientById(id);
+
+        try {
+
+            List<Rent> rents = rentRepository.findByClientId(id);
+
+            List<RentResponse> rentResponses = rents.stream()
+                    .map(rent -> {
+                        RentResponse rentResponse = new RentResponse(rent);
+                        return rentResponse;
+                    })
+                    .collect(Collectors.toList());
+
+            return rentResponses;
+
+        } catch (ResourceNotFoundException e) {
+            throw new ResourceNotFoundException("O Cliente não possui locações cadastradas! " + e.getMessage());
+        }
+    }
+
+    @Transactional
     public CloseRentalResponse closeRental(CloseRentalRequest closeRentalRequest) {
 
         Rent rent = rentRepository.findById(closeRentalRequest.id())
@@ -188,49 +211,4 @@ public class RentService {
         return !rentRepository.isVehicleAvailable(vehicleId, activeStatuses);
     }
 
-//    @Transactional
-//    public CloseRentalResponse closeRental(CloseRentalRequest closeRentalRequest) {
-//
-//        Rent rent = rentRepository.findById(closeRentalRequest.id())
-//                .orElseThrow(() -> new ResourceNotFoundException("Alugel não encontrado!"));
-//
-//        if (rent.getStatus() != RentStatus.COMPLETED) {
-//            for (RentOptionalItem rentOptionalItem : rent.getRentOptionalItems()) {
-//                OptionalItem item = rentOptionalItem.getOptionalItem();
-//                item.setQuantityAvailable(item.getQuantityAvailable() + rentOptionalItem.getQuantity());
-//                optionalItemRepository.save(item);
-//            }
-//
-//            // Aqui adicionar lógica para calcular o valor total, etc.
-//
-//            RentRequestUpdate rentRequestUpdate = new RentRequestUpdate();
-//
-//            rentRequestUpdate.setStatus(RentStatus.COMPLETED);
-//            // rentRequestUpdate.getKmFinal() receber do close rent
-//            // e mais coisas de rent
-//
-//
-//            updateRent(rent.getId(), rentRequestUpdate);
-//
-//            return new CloseRentalResponse("Teste, rent fechado");
-//        }
-//        throw new RuntimeException("Não é possivel finalizar um aluguel ja concluido");
-//    }
-
-
-//passar logica de remover para ca
-    // @Transactional
-//    private List<RentOptionalItem> processRemoveOptionalItems(List<OptionalQuantityRequest> optionalItems, Rent rent){
-//
-//    }
-
-    // @Transactional
-//    private Double calcularValorFinal(Rent rent) {
-//        double valorBase = rent.getVehicle().getPricePerDay() * rent.getDaysRented();
-//        double valorExtras = rent.getRentOptionalItems().stream()
-//                .mapToDouble(item -> item.getQuantity() * item.getOptionalItem().getPrice())
-//                .sum();
-//
-//        return valorBase + valorExtras;
-//    }
 }

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -151,13 +152,19 @@ public class ClientService {
             throw new ResourceDatabaseException("Erro ao buscar o cliente no banco de dados", e);
         }
     }
-    public boolean clientAvailable(Long id){
+    public boolean clientAvailable(Long id) {
 
         ClientResponse client = findClientById(id);
 
+        Date currentDate = new Date();
 
+        if (client.drivers_license_validity().before(currentDate)) {
+            return true;
+        } else {
+            throw new ResourceBadRequestException("A CNH do cliente esta vencida!");
+        }
 
-        return true;
     }
+
 
 }

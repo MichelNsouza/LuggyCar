@@ -44,11 +44,6 @@ public class RentController {
         return ResponseEntity.ok().body(rentService.updateRent(id, rentRequest));
     }
 
-    @PatchMapping("/status")
-    public ResponseEntity<CloseRentalResponse> updateRentStatus(@RequestBody CloseRentalRequest closeRentalRequest) throws ResourceBadRequestException {
-        return ResponseEntity.ok().body(rentService.closeRental(closeRentalRequest));
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Rent> deleteClient(@PathVariable Long id) throws ResourceNotFoundException {
         rentService.deleteRent(id);
@@ -63,6 +58,11 @@ public class RentController {
     @PutMapping("/close")
     public ResponseEntity<CloseRentalResponse> closeRental(@RequestBody CloseRentalRequest closeRentalRequest) throws ResourceBadRequestException {
         return ResponseEntity.ok().body(rentService.closeRental(closeRentalRequest));
+    }
+
+    @GetMapping("/client/{id}")
+    public  ResponseEntity<List<RentResponse>> findAllRentByClientId(@PathVariable Long id) throws ResourceNotFoundException {
+        return ResponseEntity.ok().body(rentService.findAllRentByClientId(id));
     }
 
 }

@@ -15,6 +15,8 @@
 
     public interface RentRepository extends JpaRepository<Rent, Long> {
 
+        List<Rent> findByClientId(Long clientId);
+
         List<Rent> findByVehicleIdAndStatus(Long vehicleId, RentStatus status);
 
         @Query("SELECT COUNT(r) > 0 FROM Rent r WHERE r.client.id = :clientId AND r.status IN :statuses")
