@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
-public class RentResponse {
+public class RentResponseUpdate {
 
     private Long id;
     private RentStatus status;
@@ -21,41 +21,44 @@ public class RentResponse {
     private Long clientId;
     private Long vehicleId;
 
-    private Double deposit;
     private LocalDate startDate;
     private int totalDays;
     private LocalDate expectedCompletionDate;
     private LocalDate finishedDate;
 
-    private List<OptionalItemResponse> optionalItems;
-
+    private Double deposit;
     private Double dailyRate;
+
     private Double totalValueOptionalItems;
     private Double totalValue;
 
     private Double kmInitial;
     private Double kmFinal;
 
-    private LocalDate create_at;
+    private List<OptionalItemResponse> optionalItems;
+
     private LocalDate update_at;
 
-    public RentResponse(Rent rent) {
+    public RentResponseUpdate(Rent rent) {
         this.id = rent.getId();
         this.status = rent.getStatus();
         this.user = rent.getUser();
         this.clientId = rent.getClient().getId();
         this.vehicleId = rent.getVehicle().getId();
         this.startDate = rent.getStartDate();
+        this.finishedDate = rent.getFinishedDate();
         this.dailyRate = rent.getDailyRate();
         this.totalDays = rent.getTotalDays();
         this.expectedCompletionDate = rent.getExpectedCompletionDate();
-        this.finishedDate = rent.getFinishedDate();
         this.deposit = rent.getSecurityDeposit();
         this.kmInitial = rent.getKmInitial();
         this.kmFinal = rent.getKmFinal();
         this.totalValue = rent.getTotalValue();
-        this.create_at = rent.getCreate_at();
+        this.totalValueOptionalItems = rent.getTotalValueOptionalItems();
+
         this.update_at = rent.getUpdate_at();
+
+
         this.optionalItems = rent.getRentOptionalItems().stream()
                 .map(item -> new OptionalItemResponse(
                         item.getOptionalItem().getName(),
@@ -63,7 +66,6 @@ public class RentResponse {
                         item.getQuantity()
                 ))
                 .collect(Collectors.toList());
-        this.totalValueOptionalItems = rent.getTotalValueOptionalItems();
     }
 
 

@@ -1,7 +1,7 @@
 package com.br.luggycar.api.dtos.response.rent;
 
 import com.br.luggycar.api.dtos.response.OptionalItemResponse;
-import com.br.luggycar.api.entities.Rent;
+import com.br.luggycar.api.entities.rent.Rent;
 import com.br.luggycar.api.enums.rent.RentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;

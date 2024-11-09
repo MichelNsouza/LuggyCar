@@ -1,5 +1,6 @@
-package com.br.luggycar.api.entities;
+package com.br.luggycar.api.entities.rent;
 
+import com.br.luggycar.api.entities.OptionalItem;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

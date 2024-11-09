@@ -1,16 +1,12 @@
     package com.br.luggycar.api.repositories;
 
-    import com.br.luggycar.api.entities.Rent;
+    import com.br.luggycar.api.entities.rent.Rent;
     import com.br.luggycar.api.entities.Vehicle;
     import com.br.luggycar.api.enums.rent.RentStatus;
     import org.springframework.data.jpa.repository.JpaRepository;
-    import org.springframework.data.jpa.repository.Modifying;
     import org.springframework.data.jpa.repository.Query;
     import org.springframework.data.repository.query.Param;
 
-    import java.math.BigDecimal;
-    import java.time.LocalDate;
-    import java.time.LocalDateTime;
     import java.util.List;
 
     public interface RentRepository extends JpaRepository<Rent, Long> {

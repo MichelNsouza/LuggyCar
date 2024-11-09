@@ -2,8 +2,8 @@ package com.br.luggycar.api.services;
 
 import com.br.luggycar.api.dtos.requests.Optional.OptionalQuantityRequest;
 import com.br.luggycar.api.entities.OptionalItem;
-import com.br.luggycar.api.entities.Rent;
-import com.br.luggycar.api.entities.RentOptionalItem;
+import com.br.luggycar.api.entities.rent.Rent;
+import com.br.luggycar.api.entities.rent.RentOptionalItem;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.OptionalItemRepository;
 import com.br.luggycar.api.dtos.requests.Optional.OptionalItemRequest;

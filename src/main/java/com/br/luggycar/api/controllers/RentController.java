@@ -1,7 +1,11 @@
 package com.br.luggycar.api.controllers;
 
+import com.br.luggycar.api.dtos.requests.rent.RentRequestUpdate;
+import com.br.luggycar.api.dtos.requests.rent.RentalRequestClose;
+import com.br.luggycar.api.dtos.response.rent.CloseRentalResponse;
 import com.br.luggycar.api.dtos.response.rent.RentCreateResponse;
 import com.br.luggycar.api.dtos.response.rent.RentResponse;
+import com.br.luggycar.api.dtos.response.rent.RentResponseUpdate;
 import com.br.luggycar.api.exceptions.ResourceBadRequestException;
 import com.br.luggycar.api.dtos.requests.rent.RentRequestCreate;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
@@ -31,30 +35,29 @@ public class RentController {
         return ResponseEntity.ok(rentService.readAllRent());
     }
 
-//    @PutMapping("/{id}")
-//    public ResponseEntity<RentResponse> updateClient(@PathVariable Long id, @RequestBody RentRequestUpdate rentRequest) throws ResourceBadRequestException {
-//        return ResponseEntity.ok().body(rentService.updateRent(id, rentRequest));
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Rent> deleteClient(@PathVariable Long id) throws ResourceNotFoundException {
-//        rentService.deleteRent(id);
-//        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-//    }
+    @PutMapping("/{id}")
+    public ResponseEntity<RentResponseUpdate> updateClient(@PathVariable Long id, @RequestBody RentRequestUpdate rentRequestUpdate) throws ResourceBadRequestException {
+        return ResponseEntity.ok().body(rentService.updateRent(id, rentRequestUpdate));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity deleteClient(@PathVariable Long id) throws ResourceNotFoundException {
+        rentService.deleteRent(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Optional<RentResponse>> findRentById(@PathVariable Long id) throws ResourceNotFoundException {
         return ResponseEntity.ok().body(rentService.findRentById(id));
     }
-//
-//    @PutMapping("/close")
-//    public ResponseEntity<CloseRentalResponse> closeRental(@RequestBody RentalRequestClose rentalRequestClose) throws ResourceBadRequestException {
-//        return ResponseEntity.ok().body(rentService.closeRental(rentalRequestClose));
-//    }
-//
-//    @GetMapping("/client/{id}")
-//    public  ResponseEntity<List<RentResponse>> findAllRentByClientId(@PathVariable Long id) throws ResourceNotFoundException {
-//        return ResponseEntity.ok().body(rentService.findAllRentByClientId(id));
-//    }
 
+    @GetMapping("/{id}/client")
+    public  ResponseEntity<List<RentResponse>> findAllRentByClientId(@PathVariable Long id) throws ResourceNotFoundException {
+        return ResponseEntity.ok().body(rentService.findAllRentByClientId(id));
+    }
+
+    @PutMapping("/{id}/close")
+    public ResponseEntity<CloseRentalResponse> closeRental(@PathVariable Long id, @RequestBody RentalRequestClose rentalRequestClose) throws ResourceBadRequestException {
+        return ResponseEntity.ok().body(rentService.closeRental(id, rentalRequestClose));
+    }
 }

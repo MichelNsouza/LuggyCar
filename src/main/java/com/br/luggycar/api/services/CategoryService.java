@@ -2,13 +2,8 @@ package com.br.luggycar.api.services;
 
 
 import com.br.luggycar.api.dtos.response.CategoryResponse;
-import com.br.luggycar.api.dtos.response.ClientResponse;
-import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.entities.Category;
-import com.br.luggycar.api.entities.Client;
-import com.br.luggycar.api.entities.Rent;
 import com.br.luggycar.api.entities.Vehicle;
-import com.br.luggycar.api.enums.rent.RentStatus;
 import com.br.luggycar.api.exceptions.*;
 import com.br.luggycar.api.repositories.CategoryRepository;
 import com.br.luggycar.api.dtos.requests.CategoryRequest;

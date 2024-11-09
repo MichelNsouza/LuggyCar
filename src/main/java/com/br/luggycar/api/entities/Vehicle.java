@@ -60,14 +60,11 @@ public class Vehicle {
 
     private double dailyRate;
 
-    @ManyToMany
-    @JoinTable(
-            name = "vehicle_accident",
-            joinColumns = @JoinColumn(name = "vehicle_id"),
-            inverseJoinColumns = @JoinColumn(name = "accident_id")
-    )
+    @OneToMany(mappedBy = "vehicle")
+    @JsonManagedReference
     private List<Accident> accidents = new ArrayList<>();
 
     private StatusVehicle statusVehicle;
+
     private LocalDate registrationDate;
 }

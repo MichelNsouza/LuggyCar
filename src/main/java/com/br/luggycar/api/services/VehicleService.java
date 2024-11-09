@@ -126,7 +126,7 @@ public class VehicleService {
 
             List<RentStatus> activeStatuses = Arrays.asList(RentStatus.IN_PROGRESS, RentStatus.PENDING);
 
-            return vehicleRepository.isVehicleAvailable(id, activeStatuses);
+            return vehicleRepository.isVehicleAvailable(id, activeStatuses, StatusVehicle.AVAILABLE);
         } catch (Exception e) {
             throw new ResourceExistsException("O veículo com ID: " + id + " possui locação em andamento, ou pendente");
         }

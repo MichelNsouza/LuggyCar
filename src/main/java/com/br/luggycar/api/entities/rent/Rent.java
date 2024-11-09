@@ -1,14 +1,15 @@
-package com.br.luggycar.api.entities;
+package com.br.luggycar.api.entities.rent;
 
+import com.br.luggycar.api.entities.Accident;
+import com.br.luggycar.api.entities.Client;
+import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.enums.rent.RentStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -39,9 +40,17 @@ public class Rent {
     private Double kmInitial;
     private Double kmFinal;
 
+    @ManyToOne
+    @JoinColumn(name = "accident_id")
+    private Accident accident;
 
     @OneToMany(mappedBy = "rent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RentOptionalItem> rentOptionalItems;
+
+
+    @OneToMany(mappedBy = "rent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RestrictionRental> restrictions;
+
 
 
     private LocalDate create_at;

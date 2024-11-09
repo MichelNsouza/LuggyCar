@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,7 +26,8 @@ public class Category {
 
     private String description;
 
-    private String image;
+    @OneToMany(mappedBy = "category")
+    private List<DelayPenalty> delayPenalties; // Penalidades associadas a esta categoria
 
     private LocalDate registration;
 

@@ -1,6 +1,7 @@
 package com.br.luggycar.api.entities;
 
 import com.br.luggycar.api.enums.accident.Severity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -29,8 +30,10 @@ public class Accident {
     @Column(unique = true)
     private String description;
 
-    @ManyToMany(mappedBy = "accidents")
-    private Set<Vehicle> vehicle = new HashSet<>();
+    @ManyToOne
+    @JoinColumn(name = "vehicle_id")  // Nome da coluna que será a chave estrangeira
+    @JsonBackReference  // Evita o loop infinito de serialização JSON
+    private Vehicle vehicle;
 
     private Date registrationDate;
 }

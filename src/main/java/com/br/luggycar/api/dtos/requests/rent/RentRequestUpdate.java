@@ -2,7 +2,7 @@ package com.br.luggycar.api.dtos.requests.rent;
 
 import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.entities.OptionalItem;
-import com.br.luggycar.api.entities.RentOptionalItem;
+import com.br.luggycar.api.entities.rent.RentOptionalItem;
 import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.enums.rent.RentStatus;
 
