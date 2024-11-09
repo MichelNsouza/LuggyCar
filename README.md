@@ -4,9 +4,15 @@
 
 - [Sobre o Projeto](#Sobre-o-Projeto)
 - [Endpoints](#Endpoints)
+   - [Usuarios](#Usuarios)
+   - [Categorias](#Categorias)
+   - [Veiculos](#Veiculos)
+   - [Clientes](#Clientes)
+   - [Sinistros](#Sinistros)
+   - [Itens Opcionais](#Opcionais)
+   - [Locações](#Locações)
 - [Configuração do Projeto](#Configuração-do-Projeto)
 - [Contribuição](#Contribuição)
-
 
 ## Sobre o Projeto
 
@@ -23,7 +29,6 @@ Este projeto foi orientado pelo professor Paulo Reis e detalhado em um levantame
 
 ### Tecnologias Utilizadas
 - Java
-
 - Spring framework
 - Maven
 - MySQL
@@ -37,7 +42,7 @@ Este projeto foi orientado pelo professor Paulo Reis e detalhado em um levantame
 
 # Endpoints
 
-## Usuario
+## Usuarios
 Existem dois tipos de usuarios no sistema: 
 - ADMIN
 
@@ -73,8 +78,49 @@ Tem autorização de acessar todas as rotas mas somente com os metodos HTTP GET.
 ```
 **OBS**: Ao logar no sistema, recebe um token para fazer requisições com validade de 2 horas.
 
-## Veiculos
 
+## Categorias
+
+## Rotas para Categorias
+
+1. **Listar todas as Categorias**
+   - **Método HTTP:** `GET`
+   - **Rota:** `/api/category`
+   - **Descrição:** Recupera uma lista de registro de todas as Categoria.
+
+2. **Criar uma nova Categoria**
+   - **Método HTTP:** `POST`
+   - **Rota:** `/api/category`
+   - **Descrição:** Cria um novo registro de Categoria. 
+   É necessário enviar os dados da Categoria no corpo da requisição (modelo json mais a baixo).
+
+3. **Mostrar uma Categoria específico por id**
+   - **Método HTTP:** `GET`
+   - **Rota:** `/api/category/{id}`
+   - **Descrição:** Recupera as informações de uma Categoria baseado no `id`.
+
+4. **Atualizar uma Categoria em específico**
+   - **Método HTTP:** `PUT`
+   - **Rota:** `/api/category/{id}`
+   - **Descrição:** Atualiza uma Categoria específico baseado no `id`. Os dados atualizados devem ser enviados no corpo da requisição. (modelo json mais a baixo).
+
+5. **Excluir uma Categoria específica**
+   - **Método HTTP:** `DELETE`
+   - **Rota:** `/api/category/{id}`
+   - **Descrição:** Remove uma Categoria em específico baseado no `id`.
+
+
+### Estrutura Json da Categoria
+Para criar ou atualizar uma Categoria, utilize o seguinte modelo JSON:
+
+```json
+{
+  "name": "Sedan",
+  "description": "Carro como um sedan"
+}
+```
+
+## Veiculos
 
 ### Rotas para Veiculos
 1. **Listar todos os veiculos**
@@ -126,6 +172,7 @@ Para criar ou atualizar um veiculo, utilize o seguinte modelo JSON:
 ```
 
 ## Clientes
+
 Para diferenciar os clientes juridicos das pessoas fisicas, utilizamos o "personType" como "PF" ou "PJ".
 No caso de PF os campos específicos para pessoa jurídica (cnpj, companyName) devem ser nulos, e vice-versa para pessoa jurídica. Essa estrutura permite flexibilidade, adaptando-se às necessidades de identificação e armazenamento de dados para ambos os tipos de pessoa.
 O CEP é validado pela API dos correios.
@@ -165,29 +212,124 @@ O CEP é validado pela API dos correios.
 
 ### Estrutura Json do cliente
 Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
-
+Pessoa fisica
 ```json
    {
-   "personType": "PF",
-   "naturalPersonName": "João Silva",
-   "cpf": "123.456.455-10",
-   "cnpj": null,
-   "companyName": null,
-   "email": "joao.silva@example.com",
-   "gender": "MASCULINO",
-   "dateBirth": "1990-05-15",
-   "cep": "40000-000",
-   "endereco": "Rua das Flores, 123, Bairro Centro"
-   } 
+   	"personType": "PJ",
+   	"cnpj": "{cnpj valido}",
+   	"companyName": "company xyz",
+   	"email": "xyz@example.com",
+   	"dateBirth": "1998-12-30",
+   	"cep": "41200100",
+   	"endereco": "rua xyz",
+   	"registration": "2024-11-01"
+}
+```
+Pessoa Juridica
+```json
+{
+	"personType": "PF",
+	"naturalPersonName": "joao silva",
+	"cpf": "{cpf valido}",
+	"email": "joao@example.com",
+	"gender": "MASCULINO",
+	"dateBirth": "1998-12-31",
+	"cep": "41200100",
+	"endereco": "rua xyz"
+}
+```
+## Sinistros
+
+
+### Rotas para Sinistro
+1. **Listar todos os sinistros**
+   - **Método HTTP:** `GET`
+   - **Rota:** `/api/accident`
+   - **Descrição:** Recupera uma lista de sinistros de todos os veiculos.
+
+2. **Registra um novo sinistro**
+   - **Método HTTP:** `POST`
+   - **Rota:** `/api/accident`
+   - **Descrição:** Cria um novo registro de sinistro. 
+   É necessário enviar os dados do sinistro no corpo da requisição (modelo json mais a baixo).
+
+3. **Mostrar um sinistroespecífico por id**
+   - **Método HTTP:** `GET`
+   - **Rota:** `/api/sinistro/{id}`
+   - **Descrição:** Recupera as informações de um sinistro baseado no `id`.
+
+4. **Atualizar um sinistro em específico**
+   - **Método HTTP:** `PUT`
+   - **Rota:** `/api/accident/{id}`
+   - **Descrição:** Atualiza um sinistro específico baseado no `id`. Os dados atualizados devem ser enviados no corpo da requisição. (modelo json mais a baixo).
+
+5. **Excluir um sinistro específico**
+   - **Método HTTP:** `DELETE`
+   - **Rota:** `/api/accident/{id}`
+   - **Descrição:** Remove um sinistro específico baseado no `id`.
+
+
+### Estrutura Json do Sinistro
+Para criar ou atualizar um sinistro, utilize o seguinte modelo JSON:
+
+```json
+{
+   "severity": "LOW",
+   "description": "Accidente leve, sem feridos.",
+}
+```
+
+## Opcionais
+
+
+### Rotas para Itens Opcionais
+1. **Listar todos os Opcionais**
+   - **Método HTTP:** `GET`
+   - **Rota:** `/api/optionalitem`
+   - **Descrição:** Recupera uma lista de registro de todos os Opcionais.
+
+2. **Criar um novo opcional**
+   - **Método HTTP:** `POST`
+   - **Rota:** `/api/optionalitem`
+   - **Descrição:** Cria um novo registro de opcional. 
+   É necessário enviar os dados do opcional no corpo da requisição (modelo json mais a baixo).
+
+3. **Mostrar um opcional específico por id**
+   - **Método HTTP:** `GET`
+   - **Rota:** `/api/optionalitem/{id}`
+   - **Descrição:** Recupera as informações de um opcional baseado no `id`.
+
+4. **Atualizar um opcional em específico**
+   - **Método HTTP:** `PUT`
+   - **Rota:** `/api/optionalitem/{id}`
+   - **Descrição:** Atualiza um opcional específico baseado no `id`. Os dados atualizados devem ser enviados no corpo da requisição. (modelo json mais a baixo).
+
+5. **Excluir um opcional específico**
+   - **Método HTTP:** `DELETE`
+   - **Rota:** `/api/optionalitem/{id}`
+   - **Descrição:** Remove um opcional específico baseado no `id`.
+
+
+### Estrutura Json do opcional
+Para criar ou atualizar um opcional, utilize o seguinte modelo JSON:
+
+```json
+{
+   "name": "Cadeira De Bebê",
+   "rentalValue": 15.5,
+   "quantityAvailable": 10.0
+}
 ```
 
 
+## Locações
+
 ## Rotas para Locações
 
-1. **Listar todoa as locações**
+1. **Listar todas as locações**
    - **Método HTTP:** `GET`
    - **Rota:** `/api/rent`
-   - **Descrição:** Recupera uma lista de registro de todos os locações.
+   - **Descrição:** Recupera uma lista de registro de todas as locações.
 
 2. **Criar uma nova locação**
    - **Método HTTP:** `POST`
@@ -235,87 +377,8 @@ Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
 }
 ```
 
-## Veiculos
 
-
-### Rotas para Sinistro
-1. **Listar todos os veiculos**
-   - **Método HTTP:** `GET`
-   - **Rota:** `/api/accident`
-   - **Descrição:** Recupera uma lista de sinistros de todos os veiculos.
-
-2. **Registra um novo sinistro**
-   - **Método HTTP:** `POST`
-   - **Rota:** `/api/accident`
-   - **Descrição:** Cria um novo registro de sinistro. 
-   É necessário enviar os dados do sinistro no corpo da requisição (modelo json mais a baixo).
-
-3. **Mostrar um sinistroespecífico por id**
-   - **Método HTTP:** `GET`
-   - **Rota:** `/api/sinistro/{id}`
-   - **Descrição:** Recupera as informações de um sinistro baseado no `id`.
-
-4. **Atualizar um sinistro em específico**
-   - **Método HTTP:** `PUT`
-   - **Rota:** `/api/accident/{id}`
-   - **Descrição:** Atualiza um sinistro específico baseado no `id`. Os dados atualizados devem ser enviados no corpo da requisição. (modelo json mais a baixo).
-
-5. **Excluir um sinistro específico**
-   - **Método HTTP:** `DELETE`
-   - **Rota:** `/api/accident/{id}`
-   - **Descrição:** Remove um sinistro específico baseado no `id`.
-
-
-### Estrutura Json do Sinistro
-Para criar ou atualizar um sinistro, utilize o seguinte modelo JSON:
-
-```json
-{
-
-}
-```
-
-## Opcionais
-
-
-### Rotas para Itens Opcionais
-1. **Listar todos os Opcionais**
-   - **Método HTTP:** `GET`
-   - **Rota:** `/api/optionalitem`
-   - **Descrição:** Recupera uma lista de registro de todos os Opcionais.
-
-2. **Criar um novo opcional**
-   - **Método HTTP:** `POST`
-   - **Rota:** `/api/optionalitem`
-   - **Descrição:** Cria um novo registro de opcional. 
-   É necessário enviar os dados do opcional no corpo da requisição (modelo json mais a baixo).
-
-3. **Mostrar um opcional específico por id**
-   - **Método HTTP:** `GET`
-   - **Rota:** `/api/optionalitem/{id}`
-   - **Descrição:** Recupera as informações de um opcional baseado no `id`.
-
-4. **Atualizar um opcional em específico**
-   - **Método HTTP:** `PUT`
-   - **Rota:** `/api/optionalitem/{id}`
-   - **Descrição:** Atualiza um opcional específico baseado no `id`. Os dados atualizados devem ser enviados no corpo da requisição. (modelo json mais a baixo).
-
-5. **Excluir um opcional específico**
-   - **Método HTTP:** `DELETE`
-   - **Rota:** `/api/optionalitem/{id}`
-   - **Descrição:** Remove um opcional específico baseado no `id`.
-
-
-### Estrutura Json do veiculo
-Para criar ou atualizar um veiculo, utilize o seguinte modelo JSON:
-
-```json
-{
-
-}
-```
-
-### Passo a passo para executar o projeto
+## Passo a passo para executar o projeto
 
 #### Recomendamos 
 * O uso de IntelliJ IDEA 
@@ -345,7 +408,7 @@ Para criar ou atualizar um veiculo, utilize o seguinte modelo JSON:
    - Isso iniciará o servidor embutido (geralmente Tomcat) e a aplicação ficará disponível na porta padrão (geralmente `http://localhost:8080`).
 
 #### 5. **Conclusão**
-   - Acesse a aplicação pelo navegador ou use ferramentas como `curl` ou Postman para fazer requisições à API (exemplo: `http://localhost:8080/`).
+   - Acesse a aplicação pelo navegador ou use ferramentas como `curl` ou Postman para fazer requisições à API (exemplo: `http://localhost:8080/auth/register`).
 
 
 ## Contribuição

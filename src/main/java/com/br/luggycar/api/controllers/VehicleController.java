@@ -1,5 +1,6 @@
 package com.br.luggycar.api.controllers;
 
+import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.dtos.requests.VehicleRequest;
@@ -26,34 +27,27 @@ public class VehicleController {
 
 
     @PostMapping
-    public ResponseEntity<Vehicle> createVehicle(@RequestBody Vehicle vehicle) {
+    public ResponseEntity<VehicleResponse> createVehicle(@RequestBody VehicleRequest vehicleRequest) {
 
-        Category category = categoryService.findCategoryById(vehicle.getCategory().getId());
+        VehicleResponse savedVehicle = vehicleService.createVehicle(vehicleRequest);
 
-        vehicle.setCategory(category);
-
-        Vehicle savedVehicle = vehicleService.createVehicle(vehicle);
-
-        return ResponseEntity.ok(savedVehicle);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedVehicle);
 
     }
 
     @GetMapping
-    public ResponseEntity<List<Vehicle>> readAllVehicles() {
-        return ResponseEntity.ok(vehicleService.readAllVehicle());
+    public ResponseEntity<List<VehicleResponse>> readAllVehicles() {
+        List<VehicleResponse> vehicleResponses = vehicleService.readAllVehicle();
+        return ResponseEntity.ok(vehicleResponses);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Vehicle> updateVehicle(@PathVariable Long id, @RequestBody VehicleRequest vehicleRequest) throws ResourceNotFoundException {
-        Optional<Vehicle> vehicle = vehicleService.findVehicleById(id);
+    public ResponseEntity<VehicleResponse> updateVehicle(@PathVariable Long id, @RequestBody VehicleRequest vehicleRequest)
+            throws ResourceNotFoundException {
 
-        if (vehicle.isEmpty()) {
-            throw new ResourceNotFoundException("Veículo não encontrado");
-        }
+        VehicleResponse updatedVehicleResponse = vehicleService.updateVehicle(id, vehicleRequest);
+        return ResponseEntity.ok(updatedVehicleResponse);
 
-        Vehicle vehicleResponse = vehicleService.updateVehicle(id, vehicleRequest);
-
-        return ResponseEntity.ok().body(vehicleResponse);
     }
 
     @DeleteMapping("/{id}")
@@ -64,15 +58,28 @@ public class VehicleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Vehicle> findVehicleById(@PathVariable Long id) throws ResourceNotFoundException {
-        Optional<Vehicle> vehicle = vehicleService.findVehicleById(id);
+    public ResponseEntity<VehicleResponse> findVehicleById(@PathVariable Long id) throws ResourceNotFoundException {
+        Optional<VehicleResponse> vehicleResponse = vehicleService.findVehicleById(id);
 
-        if (vehicle.isEmpty()) {
+        if (vehicleResponse.isEmpty()) {
             throw new ResourceNotFoundException("Veículo não encontrado!");
         }
-        return ResponseEntity.ok().body(vehicle.get());
+        return ResponseEntity.ok().body(vehicleResponse.get());
 
     }
 
+    @GetMapping("/plate")
+    public ResponseEntity<VehicleResponse> getVehicleByLicensePlate(@PathVariable String plate) {
+        VehicleResponse response = vehicleService.getByPlate(plate);
+        return ResponseEntity.ok(response);
+    }
 
+
+    @GetMapping("/available")
+    public ResponseEntity<List<VehicleResponse>> findAllVehicleAvailable() throws ResourceNotFoundException {
+
+        List<VehicleResponse> vehicleResponses = vehicleService.getAvailableVehicles();
+        return ResponseEntity.ok(vehicleResponses);
+
+    }
 }

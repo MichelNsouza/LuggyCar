@@ -1,4 +1,4 @@
-package com.br.luggycar.api.dtos.requests;
+package com.br.luggycar.api.dtos.requests.Optional;
 
 public record OptionalItemRequest(
         String name,

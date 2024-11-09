@@ -1,18 +1,19 @@
 package com.br.luggycar.api.entities;
 
-import com.br.luggycar.api.enums.vehicle.VehicleAccessorie;
-import com.br.luggycar.api.enums.vehicle.VehicleColor;
-import com.br.luggycar.api.enums.vehicle.VehicleManufacturer;
-import com.br.luggycar.api.enums.vehicle.Vehicletransmission;
+import com.br.luggycar.api.enums.vehicle.*;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -38,6 +39,7 @@ public class Vehicle {
 
     private String urlFipe;
 
+    @Pattern(regexp = "^[A-Za-z]{3}[0-9]{1}[A-Za-z0-9]{1}[0-9]{2}$|^[A-Za-z]{3}-[0-9]{4}$", message = "O formato da placa deve ser: ABC1234 ou ABC1D23")
     private String plate;
 
     @Enumerated(EnumType.STRING)
@@ -46,7 +48,7 @@ public class Vehicle {
     @Enumerated(EnumType.STRING)
     private Vehicletransmission transmission;
 
-    private String currentKm;
+    private double currentKm;
 
     private String passangerCapacity;
 
@@ -57,6 +59,12 @@ public class Vehicle {
     private Set<VehicleAccessorie> accessories;
 
     private double dailyRate;
+
+    @OneToMany(mappedBy = "vehicle")
+    @JsonManagedReference
+    private List<Accident> accidents = new ArrayList<>();
+
+    private StatusVehicle statusVehicle;
 
     private LocalDate registrationDate;
 }
