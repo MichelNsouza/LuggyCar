@@ -1,15 +1,9 @@
 package com.br.luggycar.api.services;
 
-import com.br.luggycar.api.dtos.requests.rent.RentalRequestClose;
-import com.br.luggycar.api.dtos.requests.rent.RentRequestUpdate;
-import com.br.luggycar.api.dtos.response.ClientResponse;
-import com.br.luggycar.api.dtos.response.VehicleResponse;
-import com.br.luggycar.api.dtos.response.rent.CloseRentalResponse;
+import com.br.luggycar.api.dtos.response.rent.RentCreateResponse;
 import com.br.luggycar.api.dtos.response.rent.RentResponse;
 import com.br.luggycar.api.entities.*;
-import com.br.luggycar.api.enums.accident.Severity;
 import com.br.luggycar.api.enums.rent.RentStatus;
-import com.br.luggycar.api.enums.vehicle.StatusVehicle;
 import com.br.luggycar.api.exceptions.ResourceBadRequestException;
 import com.br.luggycar.api.exceptions.ResourceDatabaseException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
@@ -21,7 +15,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,7 +38,7 @@ public class RentService {
     private OptionalItemService optionalItemService;
 
 
-    public RentResponse createRent(RentRequestCreate rentRequestCreate) {
+    public RentCreateResponse createRent(RentRequestCreate rentRequestCreate) {
         try {
 
             validaVehicleAndClient(rentRequestCreate);
@@ -82,22 +75,28 @@ public class RentService {
             );
             rentRepository.save(rent);
 
-            return new RentResponse(rent);
+            return new RentCreateResponse(rent);
 
         }catch (ResourceBadRequestException e){
-            throw new ResourceBadRequestException("Algo deu errado! " + e.getMessage());
+            throw new ResourceBadRequestException("Algo errado na requisição! " + e.getMessage());
         }
     }
 
-//    @Transactional
-//    public List<RentResponse> readAllRent() {
-//            List<Rent> rents = rentRepository.findAll();
-//            return rents
-//                    .stream()
-//                    .map(RentResponse::new)
-//                    .collect(Collectors.toList());
-//    }
-//
+    @Transactional
+    public List<RentResponse> readAllRent() {
+        try {
+            List<Rent> rents = rentRepository.findAll();
+            return rents
+                    .stream()
+                    .map(RentResponse::new)
+                    .collect(Collectors.toList());
+
+        }catch (ResourceBadRequestException e){
+            throw new ResourceDatabaseException("Erro ao buscar no banco de dados", e);
+        }
+
+    }
+
 //    @Transactional
 //    public RentResponse updateRent(Long id, RentRequestUpdate rentRequest) {
 //        Optional<Rent> rentOpt = rentRepository.findById(id);
@@ -126,17 +125,17 @@ public class RentService {
 //            throw new ResourceDatabaseException("Algo deu errado!", e);
 //        }
 //    }
-//
-//    @Transactional
-//    public Optional<RentResponse> findRentById(Long id) {
-//        try {
-//            return rentRepository.findById(id)
-//                    .map(RentResponse::new);
-//        }catch (ResourceNotFoundException e){
-//        throw new ResourceNotFoundException("Aluguel não encontrado! " + e.getMessage());
-//        }
-//    }
-//
+
+    @Transactional
+    public Optional<RentResponse> findRentById(Long id) {
+        try {
+            return rentRepository.findById(id)
+                    .map(RentResponse::new);
+        }catch (ResourceNotFoundException e){
+        throw new ResourceNotFoundException("Aluguel não encontrado! " + e.getMessage());
+        }
+    }
+
 //    @Transactional
 //    public List<RentResponse> findAllRentByClientId(Long id) {
 //
@@ -203,18 +202,6 @@ public class RentService {
 //        return new CloseRentalResponse("Aluguel finalizado com sucesso!");
 //    }
 //
-//
-//    private double calculateFinalValue(Rent rent) {
-//        double valorBase = rent.getDailyRate();
-//
-//        double valorExtras = rent.getRentOptionalItems().stream()
-//                .mapToDouble(item -> item.getQuantity() * item.getOptionalItem().getRentalValue())
-//                .sum();
-//
-//        double finalValue = valorBase + valorExtras;
-//
-//        return finalValue;
-//    }
 //
 //    private double calculateFine(int atraso, Double finalValue) {
 //        //fazer logica para cada tipo de atraso

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
-public class RentResponse {
+public class RentCreateResponse {
 
     private Long id;
     private RentStatus status;
@@ -22,25 +22,20 @@ public class RentResponse {
     private Long vehicleId;
 
     private Double deposit;
-    private LocalDate finishedDate;
-
     private LocalDate startDate;
     private int totalDays;
     private LocalDate expectedCompletionDate;
     private Double dailyRate;
     private List<OptionalItemResponse> optionalItems;
-
     private Double kmInitial;
-    private Double kmFinal;
 
     private Double totalValueOptionalItems;
 
     private Double totalValue;
 
     private LocalDate create_at;
-    private LocalDate update_at;
 
-    public RentResponse(Rent rent) {
+    public RentCreateResponse(Rent rent) {
         this.id = rent.getId();
         this.status = rent.getStatus();
         this.user = rent.getUser();
@@ -52,10 +47,9 @@ public class RentResponse {
         this.expectedCompletionDate = rent.getExpectedCompletionDate();
         this.deposit = rent.getSecurityDeposit();
         this.kmInitial = rent.getKmInitial();
-        this.kmFinal = rent.getKmFinal();
         this.totalValue = rent.getTotalValue();
         this.create_at = rent.getCreate_at();
-        this.update_at = rent.getUpdate_at();
+
         this.optionalItems = rent.getRentOptionalItems().stream()
                 .map(item -> new OptionalItemResponse(
                         item.getOptionalItem().getName(),
