@@ -1,5 +1,6 @@
 package com.br.luggycar.api.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,11 +18,15 @@ public class RentOptionalItem {
 
     @ManyToOne
     @JoinColumn(name = "rent_id")
+    @JsonIgnore
     private Rent rent;
     @ManyToOne
     @JoinColumn(name = "optional_item_id")
     private OptionalItem optionalItem;
 
     private int quantity;
-}
 
+    public Double calculateTotal(){
+        return this.optionalItem.getRentalValue() * this.quantity;
+    }
+}

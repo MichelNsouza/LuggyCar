@@ -16,43 +16,35 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Rent {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Enumerated(EnumType.STRING)
+    private RentStatus status;
     private String user;
-
-    private int totalDays;
-    private double deposit;
-    private double dailyRate;
-
-    private double kmInitial;
-    private double kmFinal;
-
     @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;
-
     @ManyToOne
     @JoinColumn(name = "vehicle_id", nullable = false ,unique = false)
     private Vehicle vehicle;
+    private int totalDays;
+    private Double securityDeposit;
+    private LocalDate startDate;
+    private LocalDate expectedCompletionDate;
+    private LocalDate finishedDate;
+    private Double dailyRate;
+    private Double totalValue;
+    private Double totalValueOptionalItems;
+    private Double kmInitial;
+    private Double kmFinal;
 
-    @Enumerated(EnumType.STRING)
-    private RentStatus status;
-
-    @ManyToMany
-    @JoinTable(
-            name = "rent_optional_items",
-            joinColumns = @JoinColumn(name = "rent_id"),
-            inverseJoinColumns = @JoinColumn(name = "optional_item_id")
-    )
-    private List<OptionalItem> optionalItems = new ArrayList<>();
 
     @OneToMany(mappedBy = "rent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RentOptionalItem> rentOptionalItems;
 
+
     private LocalDate create_at;
     private LocalDate update_at;
-
 }
 

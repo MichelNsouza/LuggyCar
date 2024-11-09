@@ -1,13 +1,12 @@
 package com.br.luggycar.api.services;
 
 import com.br.luggycar.api.dtos.requests.Optional.OptionalQuantityRequest;
-import com.br.luggycar.api.dtos.requests.rent.RentRequest;
 import com.br.luggycar.api.entities.OptionalItem;
 import com.br.luggycar.api.entities.Rent;
 import com.br.luggycar.api.entities.RentOptionalItem;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.OptionalItemRepository;
-import com.br.luggycar.api.dtos.requests.OptionalItemRequest;
+import com.br.luggycar.api.dtos.requests.Optional.OptionalItemRequest;
 import com.br.luggycar.api.repositories.RentOptionalRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
@@ -68,6 +67,7 @@ public class OptionalItemService {
         return optionalItemRepository.findById(id);
     }
 
+
     @Transactional
     public List<RentOptionalItem> processAddOptionalItems(List<OptionalQuantityRequest> optionalItems, Rent rent) {
 
@@ -107,4 +107,18 @@ public class OptionalItemService {
         return rentOptionalItems;
     }
 
+    @Transactional
+    public Double processTotalOptionalItems(List<RentOptionalItem> rentOptionalItems){
+
+        Double total = 0.0;
+
+        for (RentOptionalItem rentOptionalItem : rentOptionalItems) {
+
+            total = total + rentOptionalItem.calculateTotal();
+
+        }
+
+
+        return total;
+    }
 }

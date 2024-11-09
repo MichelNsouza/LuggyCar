@@ -24,8 +24,6 @@ public class OptionalItem {
     private String name;
 
     private double rentalValue;
-    private double quantityAvailable;
 
-    @ManyToMany(mappedBy = "optionalItems")
-    private Set<Rent> rent = new HashSet<>();
+    private double quantityAvailable;
 }

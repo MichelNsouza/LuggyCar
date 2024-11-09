@@ -1,7 +1,9 @@
 package com.br.luggycar.api.dtos.response.rent;
 
+import com.br.luggycar.api.dtos.response.OptionalItemResponse;
 import com.br.luggycar.api.entities.OptionalItem;
 import com.br.luggycar.api.entities.Rent;
+import com.br.luggycar.api.entities.RentOptionalItem;
 import com.br.luggycar.api.enums.rent.RentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +11,8 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @Data
 @AllArgsConstructor
 public class RentResponse {
@@ -20,31 +24,44 @@ public class RentResponse {
     private Long clientId;
     private Long vehicleId;
 
-    private BigDecimal deposit;
+    private Double deposit;
+    private LocalDate startDate;
     private int totalDays;
-    private BigDecimal dailyRate;
-    private List<OptionalItem> optionalItems;
+    private LocalDate expectedCompletionDate;
+    private Double dailyRate;
+    private List<OptionalItemResponse> optionalItems;
+    private Double kmInitial;
 
-    private BigDecimal kmInitial;
-    private BigDecimal kmFinal;
+    private Double totalValueOptionalItems;
+
+    private Double totalValue;
 
     private LocalDate create_at;
-    private LocalDate update_at;
 
-    // Construtor que aceita um objeto Rent
     public RentResponse(Rent rent) {
         this.id = rent.getId();
         this.status = rent.getStatus();
         this.user = rent.getUser();
-        this.clientId = rent.getClient() != null ? rent.getClient().getId() : null;
-        this.vehicleId = rent.getVehicle() != null ? rent.getVehicle().getId() : null;
+        this.clientId = rent.getClient().getId();
+        this.vehicleId = rent.getVehicle().getId();
+        this.startDate = rent.getStartDate();
         this.dailyRate = rent.getDailyRate();
         this.totalDays = rent.getTotalDays();
-        this.deposit = rent.getDeposit();
+        this.expectedCompletionDate = rent.getExpectedCompletionDate();
+        this.deposit = rent.getSecurityDeposit();
         this.kmInitial = rent.getKmInitial();
-        this.kmFinal = rent.getKmFinal();
+        this.totalValue = rent.getTotalValue();
         this.create_at = rent.getCreate_at();
-        this.update_at = rent.getUpdate_at();
+
+        this.optionalItems = rent.getRentOptionalItems().stream()
+                .map(item -> new OptionalItemResponse(
+                        item.getOptionalItem().getName(),
+                        item.getOptionalItem().getRentalValue(),
+                        item.getQuantity()
+                ))
+                .collect(Collectors.toList());
+        this.totalValueOptionalItems = rent.getTotalValueOptionalItems();
     }
+
 
 }

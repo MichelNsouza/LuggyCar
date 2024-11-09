@@ -1,7 +1,6 @@
 package com.br.luggycar.api.services;
 
-import com.br.luggycar.api.dtos.requests.VehicleRequest;
-import com.br.luggycar.api.dtos.requests.rent.CloseRentalRequest;
+import com.br.luggycar.api.dtos.requests.rent.RentalRequestClose;
 import com.br.luggycar.api.dtos.requests.rent.RentRequestUpdate;
 import com.br.luggycar.api.dtos.response.ClientResponse;
 import com.br.luggycar.api.dtos.response.VehicleResponse;
@@ -15,16 +14,14 @@ import com.br.luggycar.api.exceptions.ResourceBadRequestException;
 import com.br.luggycar.api.exceptions.ResourceDatabaseException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.*;
-import com.br.luggycar.api.dtos.requests.rent.RentRequest;
+import com.br.luggycar.api.dtos.requests.rent.RentRequestCreate;
 import com.br.luggycar.api.utils.AuthUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,53 +30,56 @@ import java.util.stream.Collectors;
 public class RentService {
 
     @Autowired
-    private RentRepository rentRepository;
+    ClientService clientService;
     @Autowired
-    private ClientService clientService;
-    @Autowired
-    private VehicleService vehicleService;
+    VehicleService vehicleService;
     @Autowired
     private AuthUtil authUtil;
     @Autowired
-    private OptionalItemService optionalItemService;
-    @Autowired
-    private OptionalItemRepository optionalItemRepository;
+    private ClientRepository clientRepository;
     @Autowired
     private VehicleRepository vehicleRepository;
+    @Autowired
+    private RentRepository rentRepository;
+    @Autowired
+    private OptionalItemService optionalItemService;
 
 
-    @Transactional
-    public RentResponse createRent(RentRequest rentRequest) {
+    public RentResponse createRent(RentRequestCreate rentRequestCreate) {
         try {
-            clientService.clientAvailable(rentRequest.clientId());
-            vehicleService.isVehicleAvailableById(rentRequest.vehicleId());
 
-            String usuario = authUtil.getAuthenticatedUsername();
-            ClientResponse clientResponse = clientService.findClientById(rentRequest.clientId());
-            Optional<VehicleResponse> vehicleResponse = vehicleService.findVehicleById(rentRequest.vehicleId());
+            validaVehicleAndClient(rentRequestCreate);
 
-            Client client = new Client();
-            BeanUtils.copyProperties(clientResponse, client);
-            Vehicle vehicle = new Vehicle();
-            BeanUtils.copyProperties(vehicleResponse.get(), vehicle);
+            String user = authUtil.getAuthenticatedUsername();
+            Client client = clientRepository.findById(rentRequestCreate.client_id())
+                    .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
+            Vehicle vehicle = vehicleRepository.findById(rentRequestCreate.vehicle_id())
+                    .orElseThrow(() -> new ResourceNotFoundException("Veiculo não encontrado"));
 
             Rent rent = new Rent();
+            BeanUtils.copyProperties(rentRequestCreate, rent);
 
-            rent.setKmInitial(vehicle.getCurrentKm());
-
-            rent.setDailyRate(vehicle.getDailyRate() * (rent.getTotalDays()));
-
-            BeanUtils.copyProperties(rentRequest, rent);
-
-            rent.setUser(usuario);
+            rent.setUser(user);
             rent.setClient(client);
             rent.setVehicle(vehicle);
 
+            rent.setKmInitial(vehicle.getCurrentKm());
+            rent.setDailyRate(vehicle.getDailyRate());
+            rent.setStatus(RentStatus.IN_PROGRESS);
+            rent.setExpectedCompletionDate(rent.getStartDate().plusDays(rent.getTotalDays()));
+
             rent = rentRepository.save(rent);
 
-            List<RentOptionalItem> rentOptionalItems = optionalItemService.processAddOptionalItems(rentRequest.optionalItems(), rent);
-            rent.setRentOptionalItems(rentOptionalItems);
-
+            rent.setRentOptionalItems(
+                    optionalItemService.processAddOptionalItems(rentRequestCreate.optionalItems(),rent)
+            );
+            rent.setTotalValueOptionalItems(
+                    optionalItemService.processTotalOptionalItems(rent.getRentOptionalItems())
+            );
+            rent.setTotalValue(
+                    (vehicle.getDailyRate() * (rent.getTotalDays()))
+                    + rent.getTotalValueOptionalItems()
+            );
             rentRepository.save(rent);
 
             return new RentResponse(rent);
@@ -87,141 +87,145 @@ public class RentService {
         }catch (ResourceBadRequestException e){
             throw new ResourceBadRequestException("Algo deu errado! " + e.getMessage());
         }
-
     }
 
-    @Transactional
-    public List<RentResponse> readAllRent() {
-            List<Rent> rents = rentRepository.findAll();
-            return rents
-                    .stream()
-                    .map(RentResponse::new)
-                    .collect(Collectors.toList());
+//    @Transactional
+//    public List<RentResponse> readAllRent() {
+//            List<Rent> rents = rentRepository.findAll();
+//            return rents
+//                    .stream()
+//                    .map(RentResponse::new)
+//                    .collect(Collectors.toList());
+//    }
+//
+//    @Transactional
+//    public RentResponse updateRent(Long id, RentRequestUpdate rentRequest) {
+//        Optional<Rent> rentOpt = rentRepository.findById(id);
+//        try {
+//
+//            Rent updatedRent = rentOpt.get();
+//
+//            BeanUtils.copyProperties(rentRequest, updatedRent, "id");
+//
+//            updatedRent.setUpdate_at(LocalDate.now());
+//
+//            Rent savedRent = rentRepository.save(updatedRent);
+//
+//            return new RentResponse(savedRent);
+//
+//        }catch (ResourceBadRequestException e){
+//            throw new ResourceBadRequestException("Algo deu errado! " + e.getMessage());
+//        }
+//    }
+//
+//    @Transactional
+//    public void deleteRent(Long id) {
+//        try {
+//            rentRepository.deleteById(id);
+//        }catch (ResourceDatabaseException e){
+//            throw new ResourceDatabaseException("Algo deu errado!", e);
+//        }
+//    }
+//
+//    @Transactional
+//    public Optional<RentResponse> findRentById(Long id) {
+//        try {
+//            return rentRepository.findById(id)
+//                    .map(RentResponse::new);
+//        }catch (ResourceNotFoundException e){
+//        throw new ResourceNotFoundException("Aluguel não encontrado! " + e.getMessage());
+//        }
+//    }
+//
+//    @Transactional
+//    public List<RentResponse> findAllRentByClientId(Long id) {
+//
+//        clientService.findClientById(id);
+//
+//        try {
+//
+//            List<Rent> rents = rentRepository.findByClientId(id);
+//
+//            List<RentResponse> rentResponses = rents.stream()
+//                    .map(rent -> {
+//                        RentResponse rentResponse = new RentResponse(rent);
+//                        return rentResponse;
+//                    })
+//                    .collect(Collectors.toList());
+//
+//            return rentResponses;
+//
+//        } catch (ResourceNotFoundException e) {
+//            throw new ResourceNotFoundException("O Cliente não possui locações cadastradas! " + e.getMessage());
+//        }
+//    }
+//
+//
+//    @Transactional
+//    public CloseRentalResponse closeRental(RentalRequestClose rentalRequestClose) {
+//
+//        Rent rent = rentRepository.findById(rentalRequestClose.id())
+//                .orElseThrow(() -> new ResourceNotFoundException("Aluguel não encontrado!"));
+//
+//        if (rent.getStatus() == RentStatus.COMPLETED) {
+//            throw new RuntimeException("Não é possível finalizar um aluguel já concluído");
+//        }
+//
+//        for (RentOptionalItem rentOptionalItem : rent.getRentOptionalItems()) {
+//            OptionalItem item = rentOptionalItem.getOptionalItem();
+//            item.setQuantityAvailable(item.getQuantityAvailable() + rentOptionalItem.getQuantity());
+//            optionalItemRepository.save(item);
+//        }
+//
+//        Double valorTotal = calculateFinalValue(rent);
+//
+//        // Calcule a multa, caso haja atraso (implementar a lógica de multa)
+//        // calculateFine(valorTotal);
+//
+//        RentRequestUpdate rentRequestUpdate = new RentRequestUpdate();
+//        rentRequestUpdate.setStatus(RentStatus.COMPLETED);
+//        rentRequestUpdate.setKmFinal(rentalRequestClose.kmFinal());
+//
+//
+//        if (rentalRequestClose.accident() != null) {
+//            if (rentalRequestClose.accident().getSeverity() == Severity.HIGH
+//                    || rentalRequestClose.accident().getSeverity() == Severity.MEDIUM ) {
+//                Vehicle vehicle = rent.getVehicle();
+//                vehicle.setStatusVehicle(StatusVehicle.UNAVAILABLE);
+//                vehicleRepository.save(vehicle);
+//            }
+//        }
+//
+//        rentRequestUpdate.setTotalValue(valorTotal);
+//
+//        updateRent(rent.getId(), rentRequestUpdate);
+//
+//        return new CloseRentalResponse("Aluguel finalizado com sucesso!");
+//    }
+//
+//
+//    private double calculateFinalValue(Rent rent) {
+//        double valorBase = rent.getDailyRate();
+//
+//        double valorExtras = rent.getRentOptionalItems().stream()
+//                .mapToDouble(item -> item.getQuantity() * item.getOptionalItem().getRentalValue())
+//                .sum();
+//
+//        double finalValue = valorBase + valorExtras;
+//
+//        return finalValue;
+//    }
+//
+//    private double calculateFine(int atraso, Double finalValue) {
+//        //fazer logica para cada tipo de atraso
+//        double valorComMulta = finalValue * atraso;
+//        return valorComMulta;
+//    }
+
+
+    public void validaVehicleAndClient(RentRequestCreate rentRequestCreate){
+        clientService.clientAvailable(rentRequestCreate.client_id());
+        vehicleService.isVehicleAvailableById(rentRequestCreate.vehicle_id());
     }
-
-    @Transactional
-    public RentResponse updateRent(Long id, RentRequestUpdate rentRequest) {
-        Optional<Rent> rentOpt = rentRepository.findById(id);
-        try {
-
-            Rent updatedRent = rentOpt.get();
-
-            BeanUtils.copyProperties(rentRequest, updatedRent, "id");
-
-            updatedRent.setUpdate_at(LocalDate.now());
-
-            Rent savedRent = rentRepository.save(updatedRent);
-
-            return new RentResponse(savedRent);
-
-        }catch (ResourceBadRequestException e){
-            throw new ResourceBadRequestException("Algo deu errado! " + e.getMessage());
-        }
-    }
-
-    @Transactional
-    public void deleteRent(Long id) {
-        try {
-            rentRepository.deleteById(id);
-        }catch (ResourceDatabaseException e){
-            throw new ResourceDatabaseException("Algo deu errado!", e);
-        }
-    }
-
-    @Transactional
-    public Optional<RentResponse> findRentById(Long id) {
-        try {
-            return rentRepository.findById(id)
-                    .map(RentResponse::new);
-        }catch (ResourceNotFoundException e){
-        throw new ResourceNotFoundException("Aluguel não encontrado! " + e.getMessage());
-        }
-    }
-
-    @Transactional
-    public List<RentResponse> findAllRentByClientId(Long id) {
-
-        clientService.findClientById(id);
-
-        try {
-
-            List<Rent> rents = rentRepository.findByClientId(id);
-
-            List<RentResponse> rentResponses = rents.stream()
-                    .map(rent -> {
-                        RentResponse rentResponse = new RentResponse(rent);
-                        return rentResponse;
-                    })
-                    .collect(Collectors.toList());
-
-            return rentResponses;
-
-        } catch (ResourceNotFoundException e) {
-            throw new ResourceNotFoundException("O Cliente não possui locações cadastradas! " + e.getMessage());
-        }
-    }
-
-
-    @Transactional
-    public CloseRentalResponse closeRental(CloseRentalRequest closeRentalRequest) {
-
-        Rent rent = rentRepository.findById(closeRentalRequest.id())
-                .orElseThrow(() -> new ResourceNotFoundException("Aluguel não encontrado!"));
-
-        if (rent.getStatus() == RentStatus.COMPLETED) {
-            throw new RuntimeException("Não é possível finalizar um aluguel já concluído");
-        }
-
-        for (RentOptionalItem rentOptionalItem : rent.getRentOptionalItems()) {
-            OptionalItem item = rentOptionalItem.getOptionalItem();
-            item.setQuantityAvailable(item.getQuantityAvailable() + rentOptionalItem.getQuantity());
-            optionalItemRepository.save(item);
-        }
-
-        Double valorTotal = calculateFinalValue(rent);
-
-        // Calcule a multa, caso haja atraso (implementar a lógica de multa)
-        // calculateFine(valorTotal);
-
-        RentRequestUpdate rentRequestUpdate = new RentRequestUpdate();
-        rentRequestUpdate.setStatus(RentStatus.COMPLETED);
-        rentRequestUpdate.setKmFinal(closeRentalRequest.kmFinal());
-
-
-        if (closeRentalRequest.accident() != null) {
-            if (closeRentalRequest.accident().getSeverity() == Severity.HIGH
-                    || closeRentalRequest.accident().getSeverity() == Severity.MEDIUM ) {
-                Vehicle vehicle = rent.getVehicle();
-                vehicle.setStatusVehicle(StatusVehicle.UNAVAILABLE);
-                vehicleRepository.save(vehicle);
-            }
-        }
-
-        rentRequestUpdate.setTotalValue(valorTotal);
-
-        updateRent(rent.getId(), rentRequestUpdate);
-
-        return new CloseRentalResponse("Aluguel finalizado com sucesso!");
-    }
-
-
-    private double calculateFinalValue(Rent rent) {
-        double valorBase = rent.getDailyRate();
-
-        double valorExtras = rent.getRentOptionalItems().stream()
-                .mapToDouble(item -> item.getQuantity() * item.getOptionalItem().getRentalValue())
-                .sum();
-
-        double finalValue = valorBase + valorExtras;
-
-        return finalValue;
-    }
-
-    private double calculateFine(int atraso, Double finalValue) {
-        //fazer logica para cada tipo de atraso
-        double valorComMulta = finalValue * atraso;
-        return valorComMulta;
-    }
-
 
 }

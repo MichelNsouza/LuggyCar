@@ -1,7 +1,7 @@
 package com.br.luggycar.api.controllers;
 
 
-import com.br.luggycar.api.dtos.requests.rent.CloseRentalRequest;
+import com.br.luggycar.api.dtos.requests.rent.RentalRequestClose;
 import com.br.luggycar.api.dtos.response.CategoryResponse;
 import com.br.luggycar.api.dtos.response.rent.CloseRentalResponse;
 import com.br.luggycar.api.entities.Category;
@@ -67,11 +67,6 @@ public class CategoryController {
     @GetMapping("/name/{name}")
     public ResponseEntity<Category> findCategoryByName(@PathVariable String name) {
         return ResponseEntity.ok(categoryService.findCategoryByName(name));
-    }
-
-    @PostMapping("/closeRental/{closeRental}")
-    public ResponseEntity<CloseRentalResponse> closeRental(@PathVariable CloseRentalRequest closeRental) {
-        return ResponseEntity.ok(rentService.closeRental(closeRental));
     }
 
 }
