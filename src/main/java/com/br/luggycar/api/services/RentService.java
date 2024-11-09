@@ -186,21 +186,19 @@ public class RentService {
 
         if (rent.getStatus() == RentStatus.COMPLETED) {
             throw new RuntimeException("Não é possível finalizar um aluguel já concluído");
+        }else {
+            rent.setStatus(RentStatus.COMPLETED);
         }
 
         Vehicle vehicle = rent.getVehicle();
-        rent.setKmFinal(rentalRequestClose.kmFinal());
-
-        rent.setStatus(RentStatus.COMPLETED);
-
-        rent.setFinishedDate(rentalRequestClose.finishedDate());
         vehicle.setCurrentKm(rentalRequestClose.kmFinal());
 
-        rent.getRestrictions().clear();
-        rent.getRestrictions().addAll(rentalRequestClose.restrictions());
+        rent.setKmFinal(rentalRequestClose.kmFinal());
+        rent.setFinishedDate(rentalRequestClose.finishedDate());
 
-
-        if (rent.getRestrictions() != null) {
+        if (rentalRequestClose.restrictions() != null) {
+            rent.getRestrictions().clear();
+            rent.getRestrictions().addAll(rentalRequestClose.restrictions());
             rent.setStatus(RentStatus.PENDING);
         }
 
@@ -224,13 +222,9 @@ public class RentService {
             rent.setStatus(RentStatus.PENDING);
         }
 
-        if (rent.getRestrictions() != null) {
-            rent.setStatus(RentStatus.PENDING);
-        }
+        
         Double totalDailyPenalty = calculateFine(rent);
-        rent.setTotalValue(
-                rent.getTotalValue() + totalDailyPenalty
-        );
+        rent.setTotalValue(rent.getTotalValue() + totalDailyPenalty);
 
         return new CloseRentalResponse(rent, totalDailyPenalty);
     }
