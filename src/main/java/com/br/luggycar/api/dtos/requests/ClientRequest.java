@@ -33,7 +33,11 @@ public record ClientRequest(
         String email,
         String cep,
         @Size(min = 5, max = 300, message = "O endereço deve ter entre 3 e 300 caracteres.")
-        String endereco
+        String endereco,
+
+        String drivers_license_number,
+        Date drivers_license_validity,
+        String drivers_license_category
 
 ) {
     public ClientRequest {

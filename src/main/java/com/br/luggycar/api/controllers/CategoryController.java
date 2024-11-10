@@ -1,13 +1,14 @@
 package com.br.luggycar.api.controllers;
 
 
+import com.br.luggycar.api.dtos.requests.rent.RentalRequestClose;
 import com.br.luggycar.api.dtos.response.CategoryResponse;
-import com.br.luggycar.api.dtos.response.VehicleResponse;
+import com.br.luggycar.api.dtos.response.rent.CloseRentalResponse;
 import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.exceptions.ResourceExistsException;
-import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.dtos.requests.CategoryRequest;
 import com.br.luggycar.api.services.CategoryService;
+import com.br.luggycar.api.services.RentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,8 @@ public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private RentService rentService;
 
     @PostMapping
     public ResponseEntity<CategoryResponse> createCategory(@RequestBody CategoryRequest categoryRequest) {

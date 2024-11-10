@@ -6,6 +6,7 @@ import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.enums.rent.RentStatus;
+import com.br.luggycar.api.enums.vehicle.StatusVehicle;
 import com.br.luggycar.api.exceptions.ResourceDatabaseException;
 import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,6 +37,11 @@ public class VehicleService {
 
     public VehicleResponse createVehicle(VehicleRequest vehicleRequest) {
 
+        Optional<Vehicle> existingVehicle = vehicleRepository.findByPlate(vehicleRequest.getPlate());
+        if (existingVehicle.isPresent()) {
+            throw new ResourceExistsException("Já existe um veículo cadastrado com essa placa.");
+        }
+
         Category category = categoryRepository.findByName(vehicleRequest.categoryName())
                 .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
 
@@ -42,6 +49,7 @@ public class VehicleService {
         BeanUtils.copyProperties(vehicleRequest, vehicle);
         vehicle.setCategory(category);
         vehicle.setRegistrationDate(LocalDate.now());
+        vehicle.setStatusVehicle(StatusVehicle.AVAILABLE);
 
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
 
@@ -91,21 +99,38 @@ public class VehicleService {
                 .map(VehicleResponse::new);
     }
 
-    public List <VehicleResponse>getAvailableVehicles() {
+    public VehicleResponse getByPlate(String plate) {
+        Vehicle vehicle = vehicleRepository.findByPlate(plate)
+                .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado com a placa: " + plate));
 
+        return new VehicleResponse(vehicle);
+    }
+
+    public List<VehicleResponse> getAvailableVehicles() {
         try {
-            List<Vehicle> allVehicles = vehicleRepository.findAll();
             List<RentStatus> activeStatuses = List.of(RentStatus.PENDING, RentStatus.IN_PROGRESS);
-            List<Vehicle> rentedVehicles = rentRepository.findRentedVehiclesByStatusIn(activeStatuses);
-            allVehicles.removeAll(rentedVehicles);
+            List<Vehicle> availableVehicles = rentRepository.findRentedVehiclesByStatusInAndStatusVehicleAvailable(activeStatuses);
 
-            return allVehicles.stream()
+            return availableVehicles.stream()
                     .map(VehicleResponse::new)
                     .collect(Collectors.toList());
 
-        } catch (
-                ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao buscar os veiculos diponiveis para aluguel no banco de dados", e);
+        } catch (ResourceDatabaseException e) {
+            throw new ResourceDatabaseException("Erro ao buscar os veículos disponíveis para aluguel no banco de dados", e);
         }
     }
+
+
+    public boolean isVehicleAvailableById(Long id) {
+        try {
+
+            List<RentStatus> activeStatuses = Arrays.asList(RentStatus.IN_PROGRESS, RentStatus.PENDING);
+
+            return vehicleRepository.isVehicleAvailable(id, activeStatuses, StatusVehicle.AVAILABLE);
+        } catch (Exception e) {
+            throw new ResourceExistsException("O veículo com ID: " + id + " possui locação em andamento, ou pendente");
+        }
+    }
+
+
 }

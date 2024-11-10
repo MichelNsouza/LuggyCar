@@ -3,11 +3,14 @@ package com.br.luggycar.api.dtos.response;
 import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.enums.client.Gender;
 import com.br.luggycar.api.enums.client.PersonType;
+import com.br.luggycar.api.enums.client.licenseCategory;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.ZoneId;
 
 import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ClientResponse(
@@ -18,6 +21,9 @@ public record ClientResponse(
         String cnpj,
         String companyName,
         String email,
+        String drivers_license_number,
+        Date drivers_license_validity,
+        List<licenseCategory> drivers_license_category,
         Gender gender,
         LocalDate dateBirth,
         String cep,
@@ -34,6 +40,9 @@ public record ClientResponse(
                 client.getCnpj(),
                 client.getCompanyName(),
                 client.getEmail(),
+                client.getDrivers_license_number(),
+                client.getDrivers_license_validity(),
+                client.getDrivers_license_category(),
                 client.getGender(),
                 client.getDateBirth() != null ? client.getDateBirth().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : null,
                 client.getCep(),
