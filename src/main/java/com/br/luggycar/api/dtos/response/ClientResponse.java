@@ -25,7 +25,7 @@ public record ClientResponse(
         Date drivers_license_validity,
         List<licenseCategory> drivers_license_category,
         Gender gender,
-        LocalDate dateBirth,
+        Date dateBirth,
         String cep,
         String endereco,
         LocalDate registration
@@ -44,7 +44,7 @@ public record ClientResponse(
                 client.getDrivers_license_validity(),
                 client.getDrivers_license_category(),
                 client.getGender(),
-                client.getDateBirth() != null ? client.getDateBirth().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : null,
+                client.getDateBirth(),
                 client.getCep(),
                 client.getEndereco(),
                 client.getRegistration()
