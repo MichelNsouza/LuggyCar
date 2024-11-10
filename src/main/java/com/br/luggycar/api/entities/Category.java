@@ -26,8 +26,8 @@ public class Category {
 
     private String description;
 
-    @OneToMany(mappedBy = "category")
-    private List<DelayPenalty> delayPenalties; // Penalidades associadas a esta categoria
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private List<DelayPenalty> delayPenalties = new ArrayList<>();
 
     private LocalDate registration;
 

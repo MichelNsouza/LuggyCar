@@ -31,8 +31,8 @@ public class Accident {
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "vehicle_id")  // Nome da coluna que será a chave estrangeira
-    @JsonBackReference  // Evita o loop infinito de serialização JSON
+    @JoinColumn(name = "vehicle_id")
+    @JsonBackReference
     private Vehicle vehicle;
 
     private Date registrationDate;
