@@ -1,5 +1,9 @@
 package com.br.luggycar.api.Client;
 
+import com.br.luggycar.api.dtos.requests.ClientRequest;
+import com.br.luggycar.api.dtos.response.ClientResponse;
+import com.br.luggycar.api.enums.client.Gender;
+import com.br.luggycar.api.enums.client.PersonType;
 import com.br.luggycar.api.services.CategoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -10,6 +14,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static java.time.LocalDate.now;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,50 +37,54 @@ public class ClientControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-//    @Test
-//    public void testCreateClient() throws Exception {
-//
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//        Date birthDate = dateFormat.parse("1998-12-31");
-//
-//        ClientRequest clientRequest = new ClientRequest(
-//                PersonType.PF,
-//                "Michel Souza",
-//                "050.564.665-06",
-//                birthDate,
-//                Gender.MASCULINO,
-//                null,
-//                null,
-//                "michelphp@gmail.com",
-//                "41200100",
-//                "Rua XPTO"
-//        );
-//
-//        ClientResponse response = new ClientResponse(
-//                1L,
-//                PersonType.PF,
-//                "Michel Souza",
-//                "050.564.665-06",
-//                null,
-//                null,
-//                "michelphp@gmail.com",
-//                Gender.MASCULINO,
-//                birthDate,
-//                "41200100",
-//                "Rua XPTO",
-//                now()
-//                );
-//
-//        Mockito.when(categoryService.createCategory(any(CategoryRequest.class))).thenReturn(response);
-//
-//        mockMvc.perform(MockMvcRequestBuilders.post("/api/client")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectMapper.writeValueAsString(clientRequest)))
-//                .andExpect(status().isCreated())
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Hatch"))
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("Um carro pequeno"));
-//    }
+    @Test
+    public void testCreateClient() throws Exception {
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date birthDate = dateFormat.parse("1998-12-31");
+        Date licenseValidity = dateFormat.parse("2025-12-12");
+
+        ClientRequest clientRequest = new ClientRequest(
+                PersonType.PF,
+                "Michel Souza",
+                "050.564.665-06",
+                birthDate,
+                Gender.MASCULINO,
+                null,
+                null,
+                "michelphp@gmail.com",
+                "41200100",
+                "Rua XPTO",
+                "123456",
+                licenseValidity,
+                "B"
+        );
+
+        ClientResponse response = new ClientResponse(
+                1L,
+                PersonType.PF,
+                "Michel Souza",
+                "050.564.665-06",
+                null,
+                null,
+                "michelphp@gmail.com",
+                Gender.MASCULINO,
+                birthDate,
+                "41200100",
+                "Rua XPTO",
+                now()
+                );
+
+        Mockito.when(categoryService.createCategory(any(CategoryRequest.class))).thenReturn(response);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(clientRequest)))
+                .andExpect(status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Hatch"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("Um carro pequeno"));
+    }
 
     @Test
     public void testReadAllClient() throws Exception {

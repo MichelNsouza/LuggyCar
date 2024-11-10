@@ -1,5 +1,6 @@
 package com.br.luggycar.api.Optional;
 
+import com.br.luggycar.api.dtos.requests.Optional.OptionalItemRequest;
 import com.br.luggycar.api.dtos.requests.OptionalItemRequest;
 import com.br.luggycar.api.entities.OptionalItem;
 import com.br.luggycar.api.services.OptionalItemService;
