@@ -244,6 +244,7 @@ public class RentService {
                 Double daily = rent.getVehicle().getDailyRate();
                 Category category = rent.getVehicle().getCategory();
                 Double percent = 0.0;
+                Double mora = daily * 0.01;
 
                 for (DelayPenalty penalty : category.getDelayPenalties()) {
                     if (penalty.getDays() >= daysBetween) {
@@ -251,14 +252,10 @@ public class RentService {
                     }
                 }
 
-                return (daily + (daily * percent) ) * daysBetween;
+                return ((daily + (daily * percent) ) * daysBetween) * mora;
             }
             return 0.0;
         }
         return 0.0;
     }
-
-
-
-
 }
