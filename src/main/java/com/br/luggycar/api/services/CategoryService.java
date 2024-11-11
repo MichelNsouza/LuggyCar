@@ -1,8 +1,10 @@
 package com.br.luggycar.api.services;
 
 
+import com.br.luggycar.api.dtos.requests.DelayPenaltyRequest;
 import com.br.luggycar.api.dtos.response.CategoryResponse;
 import com.br.luggycar.api.entities.Category;
+import com.br.luggycar.api.entities.DelayPenalty;
 import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.exceptions.*;
 import com.br.luggycar.api.repositories.CategoryRepository;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,8 +30,6 @@ public class CategoryService {
     @Autowired
     private VehicleRepository vehicleRepository;
 
-    @Autowired
-    private RentRepository rentRepository;
 
     public CategoryResponse createCategory(CategoryRequest categoryRequest) {
 
@@ -39,22 +40,37 @@ public class CategoryService {
         }
 
         try {
-            Category category = new Category();
 
+            Category category = new Category();
             BeanUtils.copyProperties(categoryRequest, category);
+
 
             category.setRegistration(LocalDate.now());
 
+
+            if (categoryRequest.delayPenalties() != null && !categoryRequest.delayPenalties().isEmpty()) {
+                List<DelayPenalty> penalties = new ArrayList<>();
+                for (DelayPenaltyRequest penaltyRequest : categoryRequest.delayPenalties()) {
+                    DelayPenalty penalty = new DelayPenalty();
+                    penalty.setDays(penaltyRequest.days());
+                    penalty.setPercentage(penaltyRequest.percentage());
+                    penalty.setCategory(category);
+                    penalties.add(penalty);
+                }
+                category.setDelayPenalties(penalties);
+            }
+
+
             Category savedCategory = categoryRepository.save(category);
+
 
             return new CategoryResponse(savedCategory);
 
         } catch (ResourceDatabaseException e) {
             throw new ResourceDatabaseException("Erro ao salvar a categoria no banco de dados", e);
-
         }
-
     }
+
 
     public List<CategoryResponse> readAllCategories() {
         try {
