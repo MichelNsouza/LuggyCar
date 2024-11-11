@@ -222,33 +222,43 @@ public class RentService {
             rent.setStatus(RentStatus.PENDING);
         }
 
-        
-        Double totalDailyPenalty = calculateFine(rent);
-        rent.setTotalValue(rent.getTotalValue() + totalDailyPenalty);
+        Double totalPenalty = calculatePenalty(rent);
 
-        return new CloseRentalResponse(rent, totalDailyPenalty);
+        rent.setTotalValue(finalCalculate(rent, totalPenalty));
+
+        return new CloseRentalResponse(rent, totalPenalty );
     }
 
+    private Double finalCalculate(Rent rent, Double totalPenalty) {
+        return (rent.getDailyRate() * rent.getTotalDays()) + totalPenalty;
+    }
 
-    private Double calculateFine(Rent rent) {
+    private Double calculatePenalty(Rent rent) {
 
         if (rent.getExpectedCompletionDate() != null && rent.getFinishedDate() != null) {
 
             long daysBetween = ChronoUnit.DAYS.between(rent.getExpectedCompletionDate(), rent.getFinishedDate());
 
             if (daysBetween != 0) {
-                Vehicle vehicle = rent.getVehicle();
-                Category category = vehicle.getCategory();
+
+                Double daily = rent.getVehicle().getDailyRate();
+                Category category = rent.getVehicle().getCategory();
+                Double percent = 0.0;
 
                 for (DelayPenalty penalty : category.getDelayPenalties()) {
-                    if (penalty.getDays() == daysBetween) {
-                        return (Double)vehicle.getDailyRate() * (Double)(penalty.getPercentage() / 100.0);
+                    if (penalty.getDays() >= daysBetween) {
+                        percent = penalty.getPercentage() / 100.0;
                     }
                 }
+
+                return (daily + (daily * percent) ) * daysBetween;
             }
+            return 0.0;
         }
         return 0.0;
     }
+
+
 
 
 }

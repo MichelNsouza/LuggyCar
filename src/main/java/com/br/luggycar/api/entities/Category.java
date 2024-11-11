@@ -26,8 +26,10 @@ public class Category {
 
     private String description;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<DelayPenalty> delayPenalties = new ArrayList<>();
+
 
     private LocalDate registration;
 
