@@ -4,9 +4,12 @@ import com.br.luggycar.api.dtos.requests.ClientRequest;
 import com.br.luggycar.api.dtos.response.ClientResponse;
 import com.br.luggycar.api.enums.client.Gender;
 import com.br.luggycar.api.enums.client.PersonType;
+import com.br.luggycar.api.enums.client.licenseCategory;
 import com.br.luggycar.api.services.CategoryService;
+import com.br.luggycar.api.services.ClientService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,9 +17,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import static java.time.LocalDate.now;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,7 +37,7 @@ public class ClientControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private CategoryService categoryService;
+    private ClientService clientService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -68,6 +73,9 @@ public class ClientControllerTest {
                 null,
                 null,
                 "michelphp@gmail.com",
+                "123456",
+                licenseValidity,
+                List.of(new licenseCategory[]{}),
                 Gender.MASCULINO,
                 birthDate,
                 "41200100",
@@ -75,15 +83,26 @@ public class ClientControllerTest {
                 now()
                 );
 
-        Mockito.when(categoryService.createCategory(any(CategoryRequest.class))).thenReturn(response);
+        Mockito.when(clientService.createClient(any(ClientRequest.class))).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/client")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(clientRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Hatch"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("Um carro pequeno"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.naturalPersonName").value("Michel Souza"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.cpf").value("050.564.665-06"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.cnpj").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.companyName").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("michelphp@gmail.com"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.gender").value("MASCULINO"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("michelphp@gmail.com"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.drivers_license_number").value("123456"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.license_validity").value("2025-12-12"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.license_validity").value(licenseValidity))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.license_validity").value(licenseValidity))
+
+
     }
 
     @Test
