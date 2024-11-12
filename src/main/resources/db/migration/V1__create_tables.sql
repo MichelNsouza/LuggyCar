@@ -89,9 +89,7 @@ CREATE TABLE optional_item (
   name VARCHAR(255) NOT NULL,
   rental_value DOUBLE NOT NULL,
   quantity_available DOUBLE NOT NULL,
-  category_id BIGINT NOT NULL,
   CONSTRAINT pk_optionalitem PRIMARY KEY (id),
-  CONSTRAINT uc_optionalitem_name UNIQUE (name),
-  CONSTRAINT FK_OPTIONALITEM_ON_CATEGORY FOREIGN KEY (category_id) REFERENCES category (id)
+  CONSTRAINT uc_optionalitem_name UNIQUE (name)
 );
 

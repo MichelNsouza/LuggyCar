@@ -25,10 +25,10 @@ INSERT INTO restriction_rental (rent_id, restriction_type, description) VALUES
 (1, 'OPTIONAL_ITEM_DAMAGED', 'Bebê conforto danificado'),
 (2, 'VEHICLE_STOLEN', 'Veículo roubado durante a locação');
 
-INSERT INTO optional_item (name, rental_value, quantity_available, category_id) VALUES
-('GPS', 10.00, 5, 1),
-('Bebê Conforto', 15.00, 3, 2),
-('Wi-Fi', 20.00, 2, 3);
+INSERT INTO optional_item (name, rental_value, quantity_available) VALUES
+('GPS', 10.00, 5),
+('Bebê Conforto', 15.00, 3),
+('Wi-Fi', 20.00, 2);
 
 
 
