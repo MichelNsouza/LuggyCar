@@ -39,7 +39,7 @@ public class CategoryControllerTest {
 
     @Test
     public void testCreateCategory() throws Exception {
-        List<DelayPenaltyRequest> delayPenaltiesRequest = Collections.emptyList(); // Lista de penalidades vazia para o request
+        List<DelayPenaltyRequest> delayPenaltiesRequest = Collections.emptyList();
 
         CategoryRequest categoryRequest = new CategoryRequest(
                 "Hatch",
@@ -47,7 +47,7 @@ public class CategoryControllerTest {
                 delayPenaltiesRequest
         );
 
-        List<DelayPenalty> delayPenaltiesResponse = Collections.emptyList(); // Lista de penalidades vazia para o response
+        List<DelayPenalty> delayPenaltiesResponse = Collections.emptyList();
 
         CategoryResponse response = new CategoryResponse(
                 1L,

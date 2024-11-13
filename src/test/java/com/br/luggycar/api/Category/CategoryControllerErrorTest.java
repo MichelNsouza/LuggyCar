@@ -46,14 +46,13 @@ public class CategoryControllerErrorTest {
                 List.of(new DelayPenaltyRequest(5, 20.0))
         );
 
-        // Simula a exceção de categoria já existente
         Mockito.when(categoryService.createCategory(any(CategoryRequest.class)))
                 .thenThrow(new ResourceExistsException("Categoria já existe!"));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/category")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(categoryRequest)))
-                .andExpect(status().isBadRequest()) // Espera o código HTTP 400
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Categoria já existe!"));
     }
 
@@ -69,14 +68,13 @@ public class CategoryControllerErrorTest {
                 List.of(new DelayPenaltyRequest(5, 20.0))
         );
 
-        // Simulando a exceção de categoria não encontrada
         Mockito.when(categoryService.updateCategory(eq(id), any(CategoryRequest.class)))
                 .thenThrow(new ResourceNotFoundException("Categoria não encontrada"));
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/category/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(categoryRequest)))
-                .andExpect(status().isNotFound()) // Esperado HTTP Status Code 404 Not Found
+                .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Categoria não encontrada"));
     }
 
@@ -84,12 +82,11 @@ public class CategoryControllerErrorTest {
     public void testDeleteCategoryNotFound() throws Exception {
         Long id = 1L;
 
-        // Simulando a exceção de categoria não encontrada
         Mockito.doThrow(new ResourceNotFoundException("Categoria não encontrada"))
                 .when(categoryService).deleteCategory(eq(id));
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/category/{id}", id))
-                .andExpect(status().isNotFound()) // Esperado HTTP Status Code 404 Not Found
+                .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Categoria não encontrada"));
     }
 
@@ -100,12 +97,12 @@ public class CategoryControllerErrorTest {
     public void testFindCategoryByIdNotFound() throws Exception {
         Long id = 1L;
 
-        // Simulando a exceção de categoria não encontrada
+
         Mockito.when(categoryService.findCategoryById(eq(id)))
                 .thenThrow(new ResourceNotFoundException("Categoria não encontrada"));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/category/{id}", id))
-                .andExpect(status().isNotFound()) // Esperado HTTP Status Code 404 Not Found
+                .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Categoria não encontrada"));
     }
 
