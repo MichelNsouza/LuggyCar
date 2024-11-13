@@ -127,9 +127,10 @@ public class CategoryService {
 
     }
 
-    public Category findCategoryByName(String name) {
-        return categoryRepository.findByName(name)
+    public CategoryResponse findCategoryByName(String name) {
+        Category category = categoryRepository.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada com o nome: " + name));
+        return new CategoryResponse(category);
     }
 
     public CategoryResponse findCategoryById(long id) {
@@ -137,5 +138,6 @@ public class CategoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Category não encontrado"));
         return new CategoryResponse(category);
     }
+
 
 }

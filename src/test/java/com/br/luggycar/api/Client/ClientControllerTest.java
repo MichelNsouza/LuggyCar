@@ -100,7 +100,7 @@ public class ClientControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.drivers_license_number").value("123456"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.license_validity").value("2025-12-12"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.license_validity").value(licenseValidity))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.license_validity").value(licenseValidity))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.license_validity").value(licenseValidity));
 
 
     }

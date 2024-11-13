@@ -5,6 +5,7 @@ import com.br.luggycar.api.dtos.requests.rent.RentalRequestClose;
 import com.br.luggycar.api.dtos.response.CategoryResponse;
 import com.br.luggycar.api.dtos.response.rent.CloseRentalResponse;
 import com.br.luggycar.api.entities.Category;
+import com.br.luggycar.api.exceptions.ResourceCategoryHasActiveVehicleException;
 import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.dtos.requests.CategoryRequest;
 import com.br.luggycar.api.services.CategoryService;
@@ -63,10 +64,5 @@ public class CategoryController {
         return ResponseEntity
                 .ok(categoryService.findCategoryById(id));
     }
-
-    @GetMapping("/name/{name}")
-    public ResponseEntity<Category> findCategoryByName(@PathVariable String name) {
-        return ResponseEntity.ok(categoryService.findCategoryByName(name));
-    }
-
 }
+
