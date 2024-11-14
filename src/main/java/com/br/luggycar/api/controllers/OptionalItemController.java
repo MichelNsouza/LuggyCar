@@ -2,6 +2,7 @@ package com.br.luggycar.api.controllers;
 
 import com.br.luggycar.api.entities.OptionalItem;
 import com.br.luggycar.api.dtos.requests.Optional.OptionalItemRequest;
+import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.services.OptionalItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ public class OptionalItemController {
     private OptionalItemService optionalItemService;
 
     @PostMapping
-    public ResponseEntity<OptionalItem> createOptionalItem(@RequestBody OptionalItemRequest optionalItemRequest) {
+    public ResponseEntity<OptionalItem> createOptionalItem(@RequestBody OptionalItemRequest optionalItemRequest) throws ResourceNotFoundException {
         OptionalItem optionalItem = optionalItemService.createOptionalItem(optionalItemRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(optionalItem);
     }
