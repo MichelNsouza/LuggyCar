@@ -1,12 +1,10 @@
 package com.br.luggycar.api.dtos.requests;
 
-
-import java.time.LocalDate;
+import java.util.List;
 
 public record CategoryRequest(
         String name,
         String description,
-        String image,
-        LocalDate registration
+        List<DelayPenaltyRequest> delayPenalties // Alterado para DTO específico
 ) {
 }

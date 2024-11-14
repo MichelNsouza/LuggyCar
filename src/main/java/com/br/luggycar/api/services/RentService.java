@@ -14,6 +14,7 @@ import com.br.luggycar.api.enums.rent.RentStatus;
 import com.br.luggycar.api.enums.vehicle.StatusVehicle;
 import com.br.luggycar.api.exceptions.ResourceBadRequestException;
 import com.br.luggycar.api.exceptions.ResourceDatabaseException;
+import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.*;
 import com.br.luggycar.api.dtos.requests.rent.RentRequestCreate;
@@ -52,7 +53,7 @@ public class RentService {
     private AccidentRepository accidentRepository;
 
 
-    public RentCreateResponse createRent(RentRequestCreate rentRequestCreate) {
+    public RentCreateResponse createRent(RentRequestCreate rentRequestCreate) throws ResourceBadRequestException {
         try {
 
             validaVehicleAndClient(rentRequestCreate);
@@ -91,116 +92,92 @@ public class RentService {
 
             return new RentCreateResponse(rent);
 
-        }catch (ResourceBadRequestException e){
-            throw new ResourceBadRequestException("Algo errado na requisição! " + e.getMessage());
+        } catch (ResourceNotFoundException | ResourceDatabaseException | ResourceExistsException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Transactional
-    public List<RentResponse> readAllRent() {
-        try {
-            List<Rent> rents = rentRepository.findAll();
-            return rents
-                    .stream()
-                    .map(RentResponse::new)
-                    .collect(Collectors.toList());
-
-        }catch (ResourceBadRequestException e){
-            throw new ResourceDatabaseException("Erro ao buscar no banco de dados", e);
-        }
+    public List<RentResponse> readAllRent() throws ResourceDatabaseException {
+        List<Rent> rents = rentRepository.findAll();
+        return rents
+                .stream()
+                .map(RentResponse::new)
+                .collect(Collectors.toList());
 
     }
 
     @Transactional
-    public RentResponseUpdate updateRent(Long id, RentRequestUpdate rentRequestUpdate) {
+    public RentResponseUpdate updateRent(Long id, RentRequestUpdate rentRequestUpdate) throws ResourceBadRequestException {
         Optional<Rent> rentOpt = rentRepository.findById(id);
-        try {
 
-            Rent updatedRent = rentOpt.get();
+        Rent updatedRent = rentOpt.get();
 
-            BeanUtils.copyProperties(rentRequestUpdate, updatedRent, "id");
+        BeanUtils.copyProperties(rentRequestUpdate, updatedRent, "id");
 
-            updatedRent.setUpdate_at(LocalDate.now());
+        updatedRent.setUpdate_at(LocalDate.now());
 
-            Rent savedRent = rentRepository.save(updatedRent);
+        Rent savedRent = rentRepository.save(updatedRent);
 
-            return new RentResponseUpdate(savedRent);
+        return new RentResponseUpdate(savedRent);
 
-        }catch (ResourceBadRequestException e){
-            throw new ResourceBadRequestException("Algo deu errado! " + e.getMessage());
-        }
     }
 
     @Transactional
-    public void deleteRent(Long id) {
-        try {
-            rentRepository.deleteById(id);
-        }catch (ResourceDatabaseException e){
-            throw new ResourceDatabaseException("Algo deu errado!", e);
-        }
+    public void deleteRent(Long id) throws ResourceDatabaseException {
+        rentRepository.deleteById(id);
     }
 
     @Transactional
-    public Optional<RentResponse> findRentById(Long id) {
-        try {
-            return rentRepository.findById(id)
-                    .map(RentResponse::new);
-        }catch (ResourceNotFoundException e){
-        throw new ResourceNotFoundException("Aluguel não encontrado! " + e.getMessage());
-        }
+    public Optional<RentResponse> findRentById(Long id) throws ResourceNotFoundException {
+        return rentRepository.findById(id)
+                .map(RentResponse::new);
     }
 
     @Transactional
-    public List<RentResponse> findAllRentByClientId(Long id) {
+    public List<RentResponse> findAllRentByClientId(Long id) throws ResourceNotFoundException, ResourceDatabaseException {
 
         clientService.findClientById(id);
 
-        try {
+        List<Rent> rents = rentRepository.findByClientId(id);
 
-            List<Rent> rents = rentRepository.findByClientId(id);
+        List<RentResponse> rentResponses = rents.stream()
+                .map(rent -> {
+                    RentResponse rentResponse = new RentResponse(rent);
+                    return rentResponse;
+                })
+                .collect(Collectors.toList());
 
-            List<RentResponse> rentResponses = rents.stream()
-                    .map(rent -> {
-                        RentResponse rentResponse = new RentResponse(rent);
-                        return rentResponse;
-                    })
-                    .collect(Collectors.toList());
+        return rentResponses;
 
-            return rentResponses;
-
-        } catch (ResourceNotFoundException e) {
-            throw new ResourceNotFoundException("O Cliente não possui locações cadastradas! " + e.getMessage());
-        }
     }
 
-    public void validaVehicleAndClient(RentRequestCreate rentRequestCreate){
+    public void validaVehicleAndClient(RentRequestCreate rentRequestCreate) throws ResourceDatabaseException, ResourceNotFoundException, ResourceBadRequestException, ResourceExistsException {
         clientService.clientAvailable(rentRequestCreate.client_id());
         vehicleService.isVehicleAvailableById(rentRequestCreate.vehicle_id());
     }
 
     @Transactional
-    public CloseRentalResponse closeRental(Long id, RentalRequestClose rentalRequestClose) {
+    public CloseRentalResponse closeRental(Long id, RentalRequestClose rentalRequestClose) throws ResourceNotFoundException {
 
         Rent rent = rentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Aluguel não encontrado!"));
 
         if (rent.getStatus() == RentStatus.COMPLETED) {
             throw new RuntimeException("Não é possível finalizar um aluguel já concluído");
+        }else {
+            rent.setStatus(RentStatus.COMPLETED);
         }
 
         Vehicle vehicle = rent.getVehicle();
-        rent.setKmFinal(rentalRequestClose.kmFinal());
-
-        rent.setStatus(RentStatus.COMPLETED);
-
-        rent.setFinishedDate(rentalRequestClose.finishedDate());
         vehicle.setCurrentKm(rentalRequestClose.kmFinal());
 
-        rent.getRestrictions().clear();
-        rent.getRestrictions().addAll(rentalRequestClose.restrictions());
+        rent.setKmFinal(rentalRequestClose.kmFinal());
+        rent.setFinishedDate(rentalRequestClose.finishedDate());
 
-
-        if (rent.getRestrictions() != null) {
+        if (rentalRequestClose.restrictions() != null) {
+            rent.getRestrictions().clear();
+            rent.getRestrictions().addAll(rentalRequestClose.restrictions());
             rent.setStatus(RentStatus.PENDING);
         }
 
@@ -224,37 +201,40 @@ public class RentService {
             rent.setStatus(RentStatus.PENDING);
         }
 
-        if (rent.getRestrictions() != null) {
-            rent.setStatus(RentStatus.PENDING);
-        }
-        Double totalDailyPenalty = calculateFine(rent);
-        rent.setTotalValue(
-                rent.getTotalValue() + totalDailyPenalty
-        );
+        Double totalPenalty = calculatePenalty(rent);
 
-        return new CloseRentalResponse(rent, totalDailyPenalty);
+        rent.setTotalValue(finalCalculate(rent, totalPenalty));
+
+        return new CloseRentalResponse(rent, totalPenalty );
     }
 
+    private Double finalCalculate(Rent rent, Double totalPenalty) {
+        return (rent.getDailyRate() * rent.getTotalDays()) + totalPenalty;
+    }
 
-    private Double calculateFine(Rent rent) {
+    private Double calculatePenalty(Rent rent) {
 
         if (rent.getExpectedCompletionDate() != null && rent.getFinishedDate() != null) {
 
             long daysBetween = ChronoUnit.DAYS.between(rent.getExpectedCompletionDate(), rent.getFinishedDate());
 
             if (daysBetween != 0) {
-                Vehicle vehicle = rent.getVehicle();
-                Category category = vehicle.getCategory();
+
+                Double daily = rent.getVehicle().getDailyRate();
+                Category category = rent.getVehicle().getCategory();
+                Double percent = 0.0;
+                Double mora = daily * 0.01;
 
                 for (DelayPenalty penalty : category.getDelayPenalties()) {
-                    if (penalty.getDays() == daysBetween) {
-                        return (Double)vehicle.getDailyRate() * (Double)(penalty.getPercentage() / 100.0);
+                    if (penalty.getDays() >= daysBetween) {
+                        percent = penalty.getPercentage() / 100.0;
                     }
                 }
+
+                return ((daily + (daily * percent) ) * daysBetween) * mora;
             }
+            return 0.0;
         }
         return 0.0;
     }
-
-
 }

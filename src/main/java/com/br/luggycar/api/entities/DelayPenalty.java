@@ -1,8 +1,7 @@
 package com.br.luggycar.api.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,13 +14,17 @@ import lombok.NoArgsConstructor;
 public class DelayPenalty {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // ou GenerationType.AUTO, conforme necessário
     private Long id;
 
-    private Integer days; // Número de dias de atraso (1, 3, 5, etc.)
+    private Integer days;
 
-    private Double percentage; // Porcentagem de multa a ser aplicada sobre o valor da diária
+    private Double percentage;
 
     @ManyToOne
+    @JoinColumn(name = "category_id")
+    @JsonBackReference
     private Category category;
+
 
 }

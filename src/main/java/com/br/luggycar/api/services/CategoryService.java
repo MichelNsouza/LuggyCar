@@ -1,8 +1,10 @@
 package com.br.luggycar.api.services;
 
 
+import com.br.luggycar.api.dtos.requests.DelayPenaltyRequest;
 import com.br.luggycar.api.dtos.response.CategoryResponse;
 import com.br.luggycar.api.entities.Category;
+import com.br.luggycar.api.entities.DelayPenalty;
 import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.exceptions.*;
 import com.br.luggycar.api.repositories.CategoryRepository;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,10 +30,8 @@ public class CategoryService {
     @Autowired
     private VehicleRepository vehicleRepository;
 
-    @Autowired
-    private RentRepository rentRepository;
 
-    public CategoryResponse createCategory(CategoryRequest categoryRequest) {
+    public CategoryResponse createCategory(CategoryRequest categoryRequest) throws ResourceDatabaseException, ResourceExistsException {
 
         Optional<Category> existingCategory = categoryRepository.findByName(categoryRequest.name());
 
@@ -38,39 +39,44 @@ public class CategoryService {
             throw new ResourceExistsException("Categoria já existe!");
         }
 
-        try {
-            Category category = new Category();
+        Category category = new Category();
+        BeanUtils.copyProperties(categoryRequest, category);
 
-            BeanUtils.copyProperties(categoryRequest, category);
 
-            category.setRegistration(LocalDate.now());
+        category.setRegistration(LocalDate.now());
 
-            Category savedCategory = categoryRepository.save(category);
 
-            return new CategoryResponse(savedCategory);
-
-        } catch (ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao salvar a categoria no banco de dados", e);
-
+        if (categoryRequest.delayPenalties() != null && !categoryRequest.delayPenalties().isEmpty()) {
+            List<DelayPenalty> penalties = new ArrayList<>();
+            for (DelayPenaltyRequest penaltyRequest : categoryRequest.delayPenalties()) {
+                DelayPenalty penalty = new DelayPenalty();
+                penalty.setDays(penaltyRequest.days());
+                penalty.setPercentage(penaltyRequest.percentage());
+                penalty.setCategory(category);
+                penalties.add(penalty);
+            }
+            category.setDelayPenalties(penalties);
         }
+
+
+        Category savedCategory = categoryRepository.save(category);
+
+
+        return new CategoryResponse(savedCategory);
 
     }
 
-    public List<CategoryResponse> readAllCategories() {
-        try {
-            List<Category> categories = categoryRepository.findAll();
-            return categories
-                    .stream()
-                    .map(CategoryResponse::new)
-                    .collect(Collectors.toList());
 
-        } catch (ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao Buscar categorias no banco de dados", e);
-        }
+    public List<CategoryResponse> readAllCategories() throws ResourceDatabaseException {
+        List<Category> categories = categoryRepository.findAll();
+        return categories
+                .stream()
+                .map(CategoryResponse::new)
+                .collect(Collectors.toList());
 
     }
 
-    public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest)  {
+    public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest) throws ResourceDatabaseException {
 
         try {
                 Category categoryUpdate = categoryRepository.findById(id)
@@ -82,14 +88,13 @@ public class CategoryService {
 
                 return new CategoryResponse(categoryUpdate);
 
-        } catch (ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao atualizar a categoria no banco de dados", e);
-
+        } catch (ResourceNotFoundException e) {
+            throw new RuntimeException(e);
         }
 
     }
 
-    public void deleteCategory(long id) {
+    public void deleteCategory(long id) throws ResourceDatabaseException {
 
         try {
             Category category = categoryRepository.findById(id)
@@ -105,18 +110,20 @@ public class CategoryService {
 
             categoryRepository.delete(category);
 
-        } catch (ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao deletar a categoria no banco de dados", e);
+        } catch (ResourceNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (ResourceCategoryHasActiveVehicleException e) {
+            throw new RuntimeException(e);
         }
 
     }
 
-    public Category findCategoryByName(String name) {
+    public Category findCategoryByName(String name) throws ResourceNotFoundException {
         return categoryRepository.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada com o nome: " + name));
     }
 
-    public CategoryResponse findCategoryById(long id) {
+    public CategoryResponse findCategoryById(long id) throws ResourceNotFoundException {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category não encontrado"));
         return new CategoryResponse(category);
