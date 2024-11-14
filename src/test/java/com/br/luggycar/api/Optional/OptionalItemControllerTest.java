@@ -111,17 +111,17 @@ public class OptionalItemControllerTest {
                 .andExpect(jsonPath("$.name").value(response.getName()));
     }
 
-//    @Test
-//    public void testDeleteOptionalItem() throws Exception {
-//        Long id = 1L;
-//
-//        when(optionalItemService.deleteOptionalItem(any(Long.class))).thenReturn(true);
-//
-//        mockMvc.perform(delete("/api/optionalitem/{id}", id)
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.value").value(true));
-//    }
+    @Test
+    public void testDeleteOptionalItem() throws Exception {
+        Long id = 1L;
+
+        when(optionalItemService.deleteOptionalItem(any(Long.class))).thenReturn(true);
+
+        mockMvc.perform(delete("/api/optionalitem/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
 
 
     @Test
