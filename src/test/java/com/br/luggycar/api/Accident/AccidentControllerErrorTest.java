@@ -46,18 +46,16 @@ public class AccidentControllerErrorTest {
         accidentRequest = new AccidentRequest(Severity.MEDIUM, "Acidente com colisão", new java.util.Date());
     }
 
-//    @Test
-//    void testCreateAccidentWithNullSeverity() throws Exception {
-//        AccidentRequest invalidRequest = new AccidentRequest(null, "Acidente com colisão", new Date());
-//
-//        mockMvc.perform(post("/api/accident")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectMapper.writeValueAsString(invalidRequest)))
-//                .andExpect(status().isBadRequest())
-//                .andExpect(jsonPath("$.message").value("Severity is required"));
-//    }
-//
+    @Test
+    void testCreateAccidentWithInvalidSeverity() throws Exception {
+        String invalidJson = "{ \"severity\": \"INVALID\", \"description\": \"Acidente com colisão\", \"registrationDate\": \"" + new java.util.Date() + "\"}";
 
+        mockMvc.perform(post("/api/accident")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidJson))
+                .andExpect(status().isBadRequest());
+
+    }
 
     @Test
     void testUpdateAccidentNotFound() throws Exception {
