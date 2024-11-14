@@ -5,9 +5,11 @@ import com.br.luggycar.api.enums.vehicle.VehicleAccessorie;
 import com.br.luggycar.api.enums.vehicle.VehicleColor;
 import com.br.luggycar.api.enums.vehicle.VehicleManufacturer;
 import com.br.luggycar.api.enums.vehicle.Vehicletransmission;
+import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.services.VehicleService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +39,12 @@ public class VehicleControllerErrorTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Test
-    public void testCreateVehicleNotFoundException() throws Exception {
+    private VehicleRequest vehicleRequest;
 
-        VehicleRequest vehicleRequest = new VehicleRequest(
-                "",
+    @BeforeEach
+    public void setUp() {
+        vehicleRequest = new VehicleRequest(
+                "Palio",
                 VehicleManufacturer.FIAT,
                 "flex",
                 "Hatch",
@@ -55,14 +58,62 @@ public class VehicleControllerErrorTest {
                 Set.of(VehicleAccessorie.GPS),
                 500.0
         );
+    }
+
+    @Test
+    public void testCreateVehiclePlateExists() throws Exception {
 
         when(vehicleService.createVehicle(Mockito.any(VehicleRequest.class)))
-                .thenThrow(new ResourceNotFoundException("Veículo não encontrado"));
+                .thenThrow(new ResourceExistsException("Já existe um veículo cadastrado com essa placa."));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/vehicle")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(vehicleRequest)))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Veículo não encontrado"));
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Já existe um veículo cadastrado com essa placa."));
     }
+
+    @Test
+    public void testCreateVehicleCategoryNotFound() throws Exception {
+
+        when(vehicleService.createVehicle(Mockito.any(VehicleRequest.class)))
+                .thenThrow(new ResourceExistsException("Categoria não encontrada."));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/vehicle")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(vehicleRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Categoria não encontrada."));
+    }
+
+    @Test
+    public void testUpdateVehicleNotFound() throws Exception {
+        Long nonExistentVehicleId = 999L;
+
+        when(vehicleService.updateVehicle(Mockito.eq(nonExistentVehicleId), Mockito.any(VehicleRequest.class)))
+                .thenThrow(new ResourceNotFoundException("Veículo não encontrado."));
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/vehicle/{id}", nonExistentVehicleId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(vehicleRequest)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Veículo não encontrado."));
+    }
+
+    @Test
+    public void testUpdateVehicleRentInProgress() throws Exception {
+        Long rentInProgress = 1L;
+
+        when(vehicleService.updateVehicle(Mockito.eq(rentInProgress), Mockito.any(VehicleRequest.class)))
+                .thenThrow(new ResourceExistsException("veículo com aluguel em curso não pode ser editado."));
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/vehicle/{id}", rentInProgress)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(vehicleRequest)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("veículo com aluguel em curso não pode ser editado."));
+    }
+
+
+
 }
