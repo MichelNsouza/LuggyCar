@@ -68,7 +68,7 @@ public class VehicleController {
 
     }
 
-    @GetMapping("/plate")
+    @GetMapping("/plate/{plate}")
     public ResponseEntity<VehicleResponse> getVehicleByLicensePlate(@PathVariable String plate) {
         VehicleResponse response = vehicleService.getByPlate(plate);
         return ResponseEntity.ok(response);
