@@ -39,7 +39,8 @@ public class VehicleService {
     @Autowired
     private RentRepository rentRepository;
     @Autowired
-    RedisTemplate redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
+
 
     private static final String PREFIXO_CACHE_REDIS = "plate:";
 
@@ -143,7 +144,8 @@ public class VehicleService {
 
 
     public VehicleResponse getByPlate(String plate) {
-        String cacheKey = PREFIXO_CACHE_REDIS + plate;
+
+        String cacheKey = PREFIXO_CACHE_REDIS + "plate";
 
         Vehicle cachedVehicle = (Vehicle) redisTemplate.opsForValue().get(cacheKey); //Caso não tenha e salvar no cache
 
