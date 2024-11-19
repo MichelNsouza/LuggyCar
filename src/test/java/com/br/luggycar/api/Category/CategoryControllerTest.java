@@ -1,4 +1,5 @@
 package com.br.luggycar.api.Category;
+
 import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.dtos.requests.CategoryRequest;
 import com.br.luggycar.api.dtos.requests.DelayPenaltyRequest;
@@ -6,6 +7,7 @@ import com.br.luggycar.api.dtos.response.CategoryResponse;
 import com.br.luggycar.api.entities.DelayPenalty;
 import com.br.luggycar.api.services.CategoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,26 +39,31 @@ public class CategoryControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private Long id;
+    private CategoryRequest categoryRequest;
+    private CategoryResponse categoryResponse;
+
+    @BeforeEach
+    public void setUp() {
+        id = 1L;
+
+        categoryRequest = new CategoryRequest(
+                "Hatch",
+                "Um carro pequeno",
+                Collections.emptyList()
+        );
+
+        categoryResponse = new CategoryResponse(
+                id,
+                "Hatch",
+                "Um carro pequeno",
+                Collections.emptyList()
+        );
+    }
+
     @Test
     public void testCreateCategory() throws Exception {
-        List<DelayPenaltyRequest> delayPenaltiesRequest = Collections.emptyList();
-
-        CategoryRequest categoryRequest = new CategoryRequest(
-                "Hatch",
-                "Um carro pequeno",
-                delayPenaltiesRequest
-        );
-
-        List<DelayPenalty> delayPenaltiesResponse = Collections.emptyList();
-
-        CategoryResponse response = new CategoryResponse(
-                1L,
-                "Hatch",
-                "Um carro pequeno",
-                delayPenaltiesResponse
-        );
-
-        Mockito.when(categoryService.createCategory(any(CategoryRequest.class))).thenReturn(response);
+        Mockito.when(categoryService.createCategory(any(CategoryRequest.class))).thenReturn(categoryResponse);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/category")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -76,25 +83,14 @@ public class CategoryControllerTest {
 
     @Test
     public void testUpdateCategory() throws Exception {
-        Long id = 1L;
-        List<DelayPenaltyRequest> delayPenaltiesRequest = Collections.emptyList();
-
-        CategoryRequest categoryRequest = new CategoryRequest(
-                "Hatch",
-                "Um carro legalzão",
-                delayPenaltiesRequest
-        );
-
-        List<DelayPenalty> delayPenaltiesResponse = Collections.emptyList();
-
-        CategoryResponse response = new CategoryResponse(
+        CategoryResponse updatedResponse = new CategoryResponse(
                 id,
                 "Hatch2",
                 "Um carro legalzão",
-                delayPenaltiesResponse
+                Collections.emptyList()
         );
 
-        Mockito.when(categoryService.updateCategory(eq(id), any(CategoryRequest.class))).thenReturn(response);
+        Mockito.when(categoryService.updateCategory(eq(id), any(CategoryRequest.class))).thenReturn(updatedResponse);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/category/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -107,25 +103,13 @@ public class CategoryControllerTest {
 
     @Test
     public void testDeleteCategory() throws Exception {
-        Long id = 1L;
-
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/category/{id}", id))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     public void testFindCategoryById() throws Exception {
-        Long id = 1L;
-        List<DelayPenalty> delayPenaltiesResponse = Collections.emptyList();
-
-        CategoryResponse response = new CategoryResponse(
-                id,
-                "Hatch",
-                "Um carro pequeno",
-                delayPenaltiesResponse
-        );
-
-        Mockito.when(categoryService.findCategoryById(id)).thenReturn(response);
+        Mockito.when(categoryService.findCategoryById(id)).thenReturn(categoryResponse);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/category/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -134,7 +118,7 @@ public class CategoryControllerTest {
                 .andExpect(jsonPath("$.name").value("Hatch"))
                 .andExpect(jsonPath("$.description").value("Um carro pequeno"));
     }
-
 }
+
 
 

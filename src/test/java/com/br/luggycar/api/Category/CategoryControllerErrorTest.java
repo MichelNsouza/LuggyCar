@@ -8,6 +8,7 @@ import com.br.luggycar.api.services.CategoryService;
 import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,14 +39,21 @@ public class CategoryControllerErrorTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Test
-    public void testCreateCategoryAlreadyExists() throws Exception {
-        CategoryRequest categoryRequest = new CategoryRequest(
+    private CategoryRequest categoryRequest;
+    private Long id;
+
+    @BeforeEach
+    public void setUp() {
+        id = 1L;
+        categoryRequest = new CategoryRequest(
                 "Hatch",
                 "Um carro legalzão",
                 List.of(new DelayPenaltyRequest(5, 20.0))
         );
+    }
 
+    @Test
+    public void testCreateCategoryAlreadyExists() throws Exception {
         Mockito.when(categoryService.createCategory(any(CategoryRequest.class)))
                 .thenThrow(new ResourceExistsException("Categoria já existe!"));
 
@@ -56,18 +64,8 @@ public class CategoryControllerErrorTest {
                 .andExpect(jsonPath("$.message").value("Categoria já existe!"));
     }
 
-
-
-
     @Test
     public void testUpdateCategoryNotFound() throws Exception {
-        Long id = 1L;
-        CategoryRequest categoryRequest = new CategoryRequest(
-                "Hatch",
-                "Um carro legalzão",
-                List.of(new DelayPenaltyRequest(5, 20.0))
-        );
-
         Mockito.when(categoryService.updateCategory(eq(id), any(CategoryRequest.class)))
                 .thenThrow(new ResourceNotFoundException("Categoria não encontrada"));
 
@@ -80,8 +78,6 @@ public class CategoryControllerErrorTest {
 
     @Test
     public void testDeleteCategoryNotFound() throws Exception {
-        Long id = 1L;
-
         Mockito.doThrow(new ResourceNotFoundException("Categoria não encontrada"))
                 .when(categoryService).deleteCategory(eq(id));
 
@@ -90,14 +86,8 @@ public class CategoryControllerErrorTest {
                 .andExpect(jsonPath("$.message").value("Categoria não encontrada"));
     }
 
-
-
-
     @Test
     public void testFindCategoryByIdNotFound() throws Exception {
-        Long id = 1L;
-
-
         Mockito.when(categoryService.findCategoryById(eq(id)))
                 .thenThrow(new ResourceNotFoundException("Categoria não encontrada"));
 
@@ -105,8 +95,8 @@ public class CategoryControllerErrorTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Categoria não encontrada"));
     }
-
 }
+
 
 
 
