@@ -25,7 +25,7 @@ public class OptionalItemService {
     @Autowired
     private RentOptionalRepository rentOptionalRepository;
 
-    public OptionalItem createOptionalItem(OptionalItemRequest optionalItemRequest) {
+    public OptionalItem createOptionalItem(OptionalItemRequest optionalItemRequest) throws ResourceNotFoundException {
 
         if (optionalItemRepository.findByName(optionalItemRequest.name()).isPresent()) {
             throw new ResourceNotFoundException("Opcional já cadastrado!");
@@ -69,7 +69,7 @@ public class OptionalItemService {
 
 
     @Transactional
-    public List<RentOptionalItem> processAddOptionalItems(List<OptionalQuantityRequest> optionalItems, Rent rent) {
+    public List<RentOptionalItem> processAddOptionalItems(List<OptionalQuantityRequest> optionalItems, Rent rent) throws ResourceNotFoundException {
 
         List<RentOptionalItem> rentOptionalItems = new ArrayList<>();
 

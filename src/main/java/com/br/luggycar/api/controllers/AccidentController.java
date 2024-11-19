@@ -19,7 +19,7 @@ public class AccidentController {
     private AccidentService accidentService;
 
     @PostMapping
-    public ResponseEntity<Accident> createAccident(@RequestBody AccidentRequest accidentRequest) {
+    public ResponseEntity<Accident> createAccident(@RequestBody AccidentRequest accidentRequest) throws ResourceNotFoundException {
         return ResponseEntity.ok(accidentService.createAccident(accidentRequest));
     }
 

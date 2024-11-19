@@ -1,7 +1,9 @@
 package com.br.luggycar.api.services;
 
+import com.br.luggycar.api.dtos.response.ClientResponse;
 import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.entities.Category;
+import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.enums.rent.RentStatus;
 import com.br.luggycar.api.enums.vehicle.StatusVehicle;
@@ -9,6 +11,7 @@ import com.br.luggycar.api.exceptions.ResourceDatabaseException;
 import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.CategoryRepository;
+import com.br.luggycar.api.repositories.ClientRepository;
 import com.br.luggycar.api.repositories.RentRepository;
 import com.br.luggycar.api.repositories.VehicleRepository;
 import com.br.luggycar.api.dtos.requests.VehicleRequest;
@@ -80,7 +83,7 @@ public class VehicleService {
         return new VehicleResponse(updatedVehicle);
     }
 
-    public Throwable deleteVehicle(Long id) {
+    public void deleteVehicle(Long id) {
 
         List<RentStatus> activeStatuses = List.of(RentStatus.PENDING, RentStatus.IN_PROGRESS);
 
@@ -89,7 +92,6 @@ public class VehicleService {
         }
 
         vehicleRepository.deleteById(id);
-        return null;
     }
 
     public Optional<VehicleResponse> findVehicleById(Long id) {

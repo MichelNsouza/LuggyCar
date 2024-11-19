@@ -18,7 +18,7 @@ public class AccidentService {
     @Autowired
     private AccidentRepository accidentRepository;
 
-    public Accident createAccident(AccidentRequest accidentRequest) {
+    public Accident createAccident(AccidentRequest accidentRequest) throws ResourceNotFoundException {
 
         if (accidentRepository.findByDescription(accidentRequest.description()).isPresent()) {
             throw new ResourceNotFoundException("sinistro já cadastrado!");
