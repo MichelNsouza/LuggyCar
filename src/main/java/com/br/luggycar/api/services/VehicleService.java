@@ -35,7 +35,7 @@ public class VehicleService {
     @Autowired
     private RentRepository rentRepository;
 
-    public VehicleResponse createVehicle(VehicleRequest vehicleRequest) {
+    public VehicleResponse createVehicle(VehicleRequest vehicleRequest) throws ResourceExistsException {
 
         Optional<Vehicle> existingVehicle = vehicleRepository.findByPlate(vehicleRequest.getPlate());
         if (existingVehicle.isPresent()) {
@@ -66,7 +66,7 @@ public class VehicleService {
 
     }
 
-    public VehicleResponse updateVehicle(Long id, VehicleRequest vehicleRequest) throws ResourceNotFoundException {
+    public VehicleResponse updateVehicle(Long id, VehicleRequest vehicleRequest) throws ResourceNotFoundException, ResourceExistsException {
         Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado"));
 
@@ -83,7 +83,7 @@ public class VehicleService {
         return new VehicleResponse(updatedVehicle);
     }
 
-    public void deleteVehicle(Long id) {
+    public void deleteVehicle(Long id) throws ResourceExistsException {
 
         List<RentStatus> activeStatuses = List.of(RentStatus.PENDING, RentStatus.IN_PROGRESS);
 
@@ -99,29 +99,25 @@ public class VehicleService {
                 .map(VehicleResponse::new);
     }
 
-    public VehicleResponse getByPlate(String plate) {
+    public VehicleResponse getByPlate(String plate) throws ResourceNotFoundException {
         Vehicle vehicle = vehicleRepository.findByPlate(plate)
                 .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado com a placa: " + plate));
 
         return new VehicleResponse(vehicle);
     }
 
-    public List<VehicleResponse> getAvailableVehicles() {
-        try {
-            List<RentStatus> activeStatuses = List.of(RentStatus.PENDING, RentStatus.IN_PROGRESS);
-            List<Vehicle> availableVehicles = rentRepository.findRentedVehiclesByStatusInAndStatusVehicleAvailable(activeStatuses);
+    public List<VehicleResponse> getAvailableVehicles() throws ResourceDatabaseException {
+        List<RentStatus> activeStatuses = List.of(RentStatus.PENDING, RentStatus.IN_PROGRESS);
+        List<Vehicle> availableVehicles = rentRepository.findRentedVehiclesByStatusInAndStatusVehicleAvailable(activeStatuses);
 
-            return availableVehicles.stream()
-                    .map(VehicleResponse::new)
-                    .collect(Collectors.toList());
+        return availableVehicles.stream()
+                .map(VehicleResponse::new)
+                .collect(Collectors.toList());
 
-        } catch (ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao buscar os veículos disponíveis para aluguel no banco de dados", e);
-        }
     }
 
 
-    public boolean isVehicleAvailableById(Long id) {
+    public boolean isVehicleAvailableById(Long id) throws ResourceExistsException {
         try {
 
             List<RentStatus> activeStatuses = Arrays.asList(RentStatus.IN_PROGRESS, RentStatus.PENDING);
