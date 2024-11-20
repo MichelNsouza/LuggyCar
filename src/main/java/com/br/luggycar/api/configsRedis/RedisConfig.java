@@ -13,6 +13,12 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
 
+    public static final String PREFIXO_VEHICLE_CACHE_REDIS = "vehicles:";
+    public static final String PREFIXO_RENT_CACHE_REDIS = "rent:";
+    public static final String PREFIXO_ACCIDENT_CACHE_REDIS = "accident:";
+    public static final String PREFIXO_CATEGORY_CACHE_REDIS = "category:";
+
+
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         return new JedisConnectionFactory();

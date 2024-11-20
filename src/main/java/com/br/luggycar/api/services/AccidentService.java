@@ -1,17 +1,26 @@
 package com.br.luggycar.api.services;
 
+import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.entities.Accident;
+import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.AccidentRepository;
 import com.br.luggycar.api.dtos.requests.AccidentRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static com.br.luggycar.api.configsRedis.RedisConfig.PREFIXO_ACCIDENT_CACHE_REDIS;
+import static com.br.luggycar.api.configsRedis.RedisConfig.PREFIXO_VEHICLE_CACHE_REDIS;
 
 
 @Service
@@ -21,9 +30,6 @@ public class AccidentService {
     private AccidentRepository accidentRepository;
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
-
-
-    private static final String PREFIXO_CACHE_REDIS = "accident:";
 
     public Accident createAccident(AccidentRequest accidentRequest) {
 
@@ -35,18 +41,32 @@ public class AccidentService {
 
         BeanUtils.copyProperties(accidentRequest, accident);
 
-        redisTemplate.delete(PREFIXO_CACHE_REDIS + "all_accidents");
+        redisTemplate.delete(PREFIXO_ACCIDENT_CACHE_REDIS + "all_accidents");
 
         return accidentRepository.save(accident);
     }
 
     public List<Accident> readAllAccident() {
-        String cacheKey = PREFIXO_CACHE_REDIS + "all_accidents";
 
-        List<Accident> cachedAccidents = (List<Accident>) redisTemplate.opsForValue().get(cacheKey);
+        List<LinkedHashMap> cachedAccidentMap = (List<LinkedHashMap>) redisTemplate.opsForValue().get(PREFIXO_ACCIDENT_CACHE_REDIS);
+
+        if (cachedAccidentMap != null) {
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+
+
+            List<Accident> cachedAccident = cachedAccidentMap.stream()
+                    .map(map -> mapper.convertValue(map, Accident.class))
+                    .collect(Collectors.toList());
+
+            return cachedAccident.stream().collect(Collectors.toList());
+        }
+
+        List<Accident> cachedAccidents = (List<Accident>) redisTemplate.opsForValue().get(PREFIXO_ACCIDENT_CACHE_REDIS + "all_accidents");
         if (cachedAccidents == null) {
             List<Accident> accidents = accidentRepository.findAll();
-            redisTemplate.opsForValue().set(cacheKey, (Accident) accidents, 3, TimeUnit.DAYS);
+            redisTemplate.opsForValue().set(PREFIXO_ACCIDENT_CACHE_REDIS + "all_accidents" , accidents, 3, TimeUnit.DAYS);
             return accidents;
         }
 
@@ -64,8 +84,7 @@ public class AccidentService {
 
             Accident updatedAccident = accidentRepository.save(accidentToUpdate);
 
-            redisTemplate.delete(PREFIXO_CACHE_REDIS + id);
-            redisTemplate.delete(PREFIXO_CACHE_REDIS + "all_accidents");
+            redisTemplate.delete(PREFIXO_ACCIDENT_CACHE_REDIS + "all_accidents");
 
             return updatedAccident;
         }
@@ -80,8 +99,7 @@ public class AccidentService {
         if (accident.isPresent()) {
             accidentRepository.delete(accident.get());
 
-            redisTemplate.delete(PREFIXO_CACHE_REDIS + id);
-            redisTemplate.delete(PREFIXO_CACHE_REDIS + "all_accidents");
+            redisTemplate.delete(PREFIXO_ACCIDENT_CACHE_REDIS + "all_accidents");
 
             return true;
         }
