@@ -28,10 +28,8 @@ public class CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
-
     @Autowired
     private VehicleRepository vehicleRepository;
-
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 

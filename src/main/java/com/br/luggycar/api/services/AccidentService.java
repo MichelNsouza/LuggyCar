@@ -46,7 +46,7 @@ public class AccidentService {
         List<Accident> cachedAccidents = (List<Accident>) redisTemplate.opsForValue().get(cacheKey);
         if (cachedAccidents == null) {
             List<Accident> accidents = accidentRepository.findAll();
-            redisTemplate.opsForValue().set(cacheKey, accidents, 3, TimeUnit.DAYS);
+            redisTemplate.opsForValue().set(cacheKey, (Accident) accidents, 3, TimeUnit.DAYS);
             return accidents;
         }
 
@@ -91,19 +91,14 @@ public class AccidentService {
 
 
     public Accident findAccidentById(Long id) {
-        String cacheKey = PREFIXO_CACHE_REDIS + id;
 
-        Accident cachedAccident = (Accident) redisTemplate.opsForValue().get(cacheKey);
-
-        if (cachedAccident == null) {
             Accident accident = accidentRepository.findById(id).orElseThrow(()
              -> new ResourceNotFoundException("Acidente não encontrado com o ID: " + id));
 
-            redisTemplate.opsForValue().set(cacheKey, accident, 3, TimeUnit.DAYS);
             return accident;
-        }
 
-        return cachedAccident;
+
+
     }
 
 }

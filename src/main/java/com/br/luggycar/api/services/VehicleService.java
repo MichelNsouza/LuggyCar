@@ -15,13 +15,16 @@ import com.br.luggycar.api.repositories.ClientRepository;
 import com.br.luggycar.api.repositories.RentRepository;
 import com.br.luggycar.api.repositories.VehicleRepository;
 import com.br.luggycar.api.dtos.requests.VehicleRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -62,16 +65,30 @@ public class VehicleService {
 
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
 
+        String cacheKey = PREFIXO_CACHE_REDIS + vehicle.getPlate();
+        redisTemplate.delete(cacheKey);
+
         return new VehicleResponse(savedVehicle);
 
     }
 
+
+
     public List<VehicleResponse> readAllVehicle() {
         String cacheKey = PREFIXO_CACHE_REDIS + "all_vehicles";
 
-        List<Vehicle> cachedVehicles = (List<Vehicle>) redisTemplate.opsForValue().get(cacheKey);
+        List<LinkedHashMap> cachedVehiclesMap = (List<LinkedHashMap>) redisTemplate.opsForValue().get(cacheKey);
 
-        if (cachedVehicles != null) {
+        if (cachedVehiclesMap != null) {
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+
+
+            List<Vehicle> cachedVehicles = cachedVehiclesMap.stream()
+                    .map(map -> mapper.convertValue(map, Vehicle.class))
+                    .collect(Collectors.toList());
+
             return cachedVehicles.stream().map(VehicleResponse::new).collect(Collectors.toList());
         }
 
@@ -81,6 +98,8 @@ public class VehicleService {
 
         return vehicles.stream().map(VehicleResponse::new).collect(Collectors.toList());
     }
+
+
 
 
     public VehicleResponse updateVehicle(Long id, VehicleRequest vehicleRequest) throws ResourceNotFoundException {
@@ -110,14 +129,11 @@ public class VehicleService {
         if (rentRepository.existsByVehicleIdAndStatusIn(id, activeStatuses)) {
             throw new ResourceExistsException("veículo com aluguel em curso não pode ser excluido.");
         }
-
-        // Obtém o veículo antes de deletar para poder remover o cache
-        Vehicle vehicle = vehicleRepository.findById(id)
+                Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado"));
 
         vehicleRepository.deleteById(id);
 
-        // Remove o cache
         String cacheKey = PREFIXO_CACHE_REDIS + vehicle.getPlate();
         redisTemplate.delete(cacheKey);
     }
