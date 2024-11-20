@@ -2,6 +2,7 @@ package com.br.luggycar.api.services;
 
 import com.br.luggycar.api.dtos.requests.rent.RentRequestUpdate;
 import com.br.luggycar.api.dtos.requests.rent.RentalRequestClose;
+import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.dtos.response.rent.CloseRentalResponse;
 import com.br.luggycar.api.dtos.response.rent.RentCreateResponse;
 import com.br.luggycar.api.dtos.response.rent.RentResponse;
@@ -18,16 +19,23 @@ import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.*;
 import com.br.luggycar.api.dtos.requests.rent.RentRequestCreate;
 import com.br.luggycar.api.utils.AuthUtil;
+import com.fasterxml.jackson.core.StreamWriteConstraints;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import static com.br.luggycar.api.configsRedis.RedisConfig.*;
 
 @Service
 public class RentService {
@@ -50,6 +58,8 @@ public class RentService {
     private OptionalItemRepository optionalItemRepository;
     @Autowired
     private AccidentRepository accidentRepository;
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
 
     public RentCreateResponse createRent(RentRequestCreate rentRequestCreate) {
@@ -89,6 +99,8 @@ public class RentService {
             );
             rentRepository.save(rent);
 
+            redisTemplate.delete(PREFIXO_VEHICLE_CACHE_REDIS + "available_vehicles");
+
             return new RentCreateResponse(rent);
 
         }catch (ResourceBadRequestException e){
@@ -98,8 +110,27 @@ public class RentService {
 
     @Transactional
     public List<RentResponse> readAllRent() {
+
+        List<LinkedHashMap> cachedRentsMap = (List<LinkedHashMap>) redisTemplate.opsForValue().get(PREFIXO_RENT_CACHE_REDIS + "all_rents");
+
+        if (cachedRentsMap != null) {
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.getFactory().setStreamWriteConstraints
+                    (StreamWriteConstraints.builder().maxNestingDepth(2000).build()
+                    );
+
+            List<Rent> cachedRent = cachedRentsMap.stream()
+                    .map(map -> mapper.convertValue(map, Rent.class))
+                    .collect(Collectors.toList());
+
+            return cachedRent.stream().map(RentResponse::new).collect(Collectors.toList());
+        }
+
+
         try {
             List<Rent> rents = rentRepository.findAll();
+            redisTemplate.opsForValue().set(PREFIXO_RENT_CACHE_REDIS + "all_rents", rents, 3, TimeUnit.DAYS);
             return rents
                     .stream()
                     .map(RentResponse::new)
@@ -124,7 +155,10 @@ public class RentService {
 
             Rent savedRent = rentRepository.save(updatedRent);
 
+            redisTemplate.delete(PREFIXO_RENT_CACHE_REDIS + "all_rents");
+
             return new RentResponseUpdate(savedRent);
+
 
         }catch (ResourceBadRequestException e){
             throw new ResourceBadRequestException("Algo deu errado! " + e.getMessage());
@@ -135,9 +169,12 @@ public class RentService {
     public void deleteRent(Long id) {
         try {
             rentRepository.deleteById(id);
+            redisTemplate.delete(PREFIXO_VEHICLE_CACHE_REDIS + "available_vehicles");
+            redisTemplate.delete(PREFIXO_RENT_CACHE_REDIS + "all_rents");
         }catch (ResourceDatabaseException e){
             throw new ResourceDatabaseException("Algo deu errado!", e);
         }
+
     }
 
     @Transactional
@@ -188,6 +225,7 @@ public class RentService {
             throw new RuntimeException("Não é possível finalizar um aluguel já concluído");
         }else {
             rent.setStatus(RentStatus.COMPLETED);
+
         }
 
         Vehicle vehicle = rent.getVehicle();
@@ -226,7 +264,11 @@ public class RentService {
 
         rent.setTotalValue(finalCalculate(rent, totalPenalty));
 
+        redisTemplate.delete(PREFIXO_VEHICLE_CACHE_REDIS + "available_vehicles");
+
         return new CloseRentalResponse(rent, totalPenalty );
+
+
     }
 
     private Double finalCalculate(Rent rent, Double totalPenalty) {
