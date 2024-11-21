@@ -17,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Collections;
 import java.util.List;
@@ -65,13 +66,14 @@ public class CategoryControllerTest {
     public void testCreateCategory() throws Exception {
         Mockito.when(categoryService.createCategory(any(CategoryRequest.class))).thenReturn(categoryResponse);
 
+        String response = objectMapper.writeValueAsString(categoryResponse);
+
         mockMvc.perform(MockMvcRequestBuilders.post("/api/category")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(categoryRequest)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("Hatch"))
-                .andExpect(jsonPath("$.description").value("Um carro pequeno"));
+                .andExpect(MockMvcResultMatchers.content().json(response));
+
     }
 
     @Test
@@ -111,12 +113,12 @@ public class CategoryControllerTest {
     public void testFindCategoryById() throws Exception {
         Mockito.when(categoryService.findCategoryById(id)).thenReturn(categoryResponse);
 
+        String response = objectMapper.writeValueAsString(categoryResponse);
+
         mockMvc.perform(MockMvcRequestBuilders.get("/api/category/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(id))
-                .andExpect(jsonPath("$.name").value("Hatch"))
-                .andExpect(jsonPath("$.description").value("Um carro pequeno"));
+                .andExpect(MockMvcResultMatchers.content().json(response));
     }
 }
 
