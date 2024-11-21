@@ -11,6 +11,8 @@ import com.br.luggycar.api.repositories.CategoryRepository;
 import com.br.luggycar.api.dtos.requests.CategoryRequest;
 import com.br.luggycar.api.repositories.RentRepository;
 import com.br.luggycar.api.repositories.VehicleRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,10 +20,14 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static com.br.luggycar.api.configsRedis.RedisConfig.PREFIXO_CATEGORY_CACHE_REDIS;
+import static com.br.luggycar.api.configsRedis.RedisConfig.PREFIXO_VEHICLE_CACHE_REDIS;
 
 @Service
 public class CategoryService {
@@ -32,8 +38,6 @@ public class CategoryService {
     private VehicleRepository vehicleRepository;
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
-
-    private static final String PREFIXO_CACHE_REDIS = "category:";
 
 
     public CategoryResponse createCategory(CategoryRequest categoryRequest) {
@@ -68,7 +72,7 @@ public class CategoryService {
 
             Category savedCategory = categoryRepository.save(category);
 
-            redisTemplate.delete(PREFIXO_CACHE_REDIS + "all_categories");
+            redisTemplate.delete(PREFIXO_CATEGORY_CACHE_REDIS + "all_categories");
 
             return new CategoryResponse(savedCategory);
 
@@ -79,27 +83,28 @@ public class CategoryService {
 
 
     public List<CategoryResponse> readAllCategories() {
-        String cacheKey = PREFIXO_CACHE_REDIS + "all_categories";
 
-        try {
-            List<Category> cachedCategories = (List<Category>) redisTemplate.opsForValue().get(cacheKey);
-            if (cachedCategories != null) {
-                return cachedCategories
-                  .stream()
-                  .map(CategoryResponse::new)
-                  .collect(Collectors.toList());
-            }
+        List<LinkedHashMap> cachedCategoriesMap = (List<LinkedHashMap>) redisTemplate.opsForValue().get(PREFIXO_CATEGORY_CACHE_REDIS + "all_categories");
 
-            List<Category> categories = categoryRepository.findAll();
-            redisTemplate.opsForValue().set(cacheKey, categories, 3, TimeUnit.DAYS);
+        if (cachedCategoriesMap != null) {
 
-            return categories.stream().map(CategoryResponse::new).collect(Collectors.toList());
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
 
-        } catch (ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao Buscar categorias no banco de dados", e);
+            List<Category> cachedCategories = cachedCategoriesMap.stream()
+                    .map(map -> mapper.convertValue(map, Category.class))
+                    .collect(Collectors.toList());
+
+            return cachedCategories.stream().map(CategoryResponse::new).collect(Collectors.toList());
         }
 
+        List<Category> categories = categoryRepository.findAll();
+
+        redisTemplate.opsForValue().set(PREFIXO_CATEGORY_CACHE_REDIS + "all_categories", categories, 3, TimeUnit.DAYS);
+
+        return categories.stream().map(CategoryResponse::new).collect(Collectors.toList());
     }
+
 
     public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest)  {
 
@@ -111,8 +116,7 @@ public class CategoryService {
 
                 categoryRepository.save(categoryUpdate);
 
-                redisTemplate.delete(PREFIXO_CACHE_REDIS + "category_id:" + id);
-                redisTemplate.delete(PREFIXO_CACHE_REDIS + "all_categories");
+                redisTemplate.delete(PREFIXO_CATEGORY_CACHE_REDIS + "all_categories");
 
                 return new CategoryResponse(categoryUpdate);
 
@@ -139,8 +143,7 @@ public class CategoryService {
 
             categoryRepository.delete(category);
 
-            redisTemplate.delete(PREFIXO_CACHE_REDIS + "category_id:" + id);
-            redisTemplate.delete(PREFIXO_CACHE_REDIS + "all_categories");
+            redisTemplate.delete(PREFIXO_CATEGORY_CACHE_REDIS + "all_categories");
 
         } catch (ResourceDatabaseException e) {
             throw new ResourceDatabaseException("Erro ao deletar a categoria no banco de dados", e);
@@ -153,23 +156,10 @@ public class CategoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada com o nome: " + name));
     }
 
-    public CategoryResponse findCategoryById(long id) {
-        String cacheKey = PREFIXO_CACHE_REDIS + "category_id:" + id;
-
-        try {
-            Category cachedCategory = (Category) redisTemplate.opsForValue().get(cacheKey);
-            if (cachedCategory != null) {
-                return new CategoryResponse(cachedCategory);
-            }
-
-
-            Category category = categoryRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Category não encontrado"));
-            return new CategoryResponse(category);
-
-        } catch (ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao buscar categoria no banco de dados", e);
-        }
+    public CategoryResponse findCategoryById(long id) throws ResourceNotFoundException {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category não encontrado"));
+        return new CategoryResponse(category);
     }
 
 }
