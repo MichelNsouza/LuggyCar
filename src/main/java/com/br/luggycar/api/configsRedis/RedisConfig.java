@@ -18,6 +18,7 @@ public class RedisConfig {
     public static final String PREFIXO_RENT_CACHE_REDIS = "rent:";
     public static final String PREFIXO_ACCIDENT_CACHE_REDIS = "accident:";
     public static final String PREFIXO_CATEGORY_CACHE_REDIS = "category:";
+    public static final String PREFIXO_OPTIONAL_CACHE_REDIS = "optional:";
 
 
     @Bean
