@@ -4,6 +4,7 @@ import com.br.luggycar.api.entities.Accident;
 import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.enums.rent.RentStatus;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -49,6 +50,7 @@ public class Rent {
 
 
     @OneToMany(mappedBy = "rent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<RestrictionRental> restrictions;
 
 

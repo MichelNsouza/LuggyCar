@@ -20,7 +20,9 @@ import com.br.luggycar.api.repositories.*;
 import com.br.luggycar.api.dtos.requests.rent.RentRequestCreate;
 import com.br.luggycar.api.utils.AuthUtil;
 import com.fasterxml.jackson.core.StreamWriteConstraints;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
@@ -100,6 +102,7 @@ public class RentService {
             rentRepository.save(rent);
 
             redisTemplate.delete(PREFIXO_VEHICLE_CACHE_REDIS + "available_vehicles");
+            redisTemplate.delete(PREFIXO_VEHICLE_CACHE_REDIS + "all_rents");
 
             return new RentCreateResponse(rent);
 
@@ -110,15 +113,15 @@ public class RentService {
 
     @Transactional
     public List<RentResponse> readAllRent() {
-
         List<LinkedHashMap> cachedRentsMap = (List<LinkedHashMap>) redisTemplate.opsForValue().get(PREFIXO_RENT_CACHE_REDIS + "all_rents");
 
         if (cachedRentsMap != null) {
-
             ObjectMapper mapper = new ObjectMapper();
-            mapper.getFactory().setStreamWriteConstraints
-                    (StreamWriteConstraints.builder().maxNestingDepth(2000).build()
-                    );
+            mapper.registerModule(new JavaTimeModule());
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            mapper.disable(SerializationFeature.FAIL_ON_SELF_REFERENCES);
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            mapper.getFactory().setStreamWriteConstraints(StreamWriteConstraints.builder().maxNestingDepth(2000).build());
 
             List<Rent> cachedRent = cachedRentsMap.stream()
                     .map(map -> mapper.convertValue(map, Rent.class))
@@ -127,20 +130,16 @@ public class RentService {
             return cachedRent.stream().map(RentResponse::new).collect(Collectors.toList());
         }
 
-
         try {
             List<Rent> rents = rentRepository.findAll();
             redisTemplate.opsForValue().set(PREFIXO_RENT_CACHE_REDIS + "all_rents", rents, 3, TimeUnit.DAYS);
-            return rents
-                    .stream()
-                    .map(RentResponse::new)
-                    .collect(Collectors.toList());
+            return rents.stream().map(RentResponse::new).collect(Collectors.toList());
 
-        }catch (ResourceBadRequestException e){
+        } catch (ResourceBadRequestException e) {
             throw new ResourceDatabaseException("Erro ao buscar no banco de dados", e);
         }
-
     }
+
 
     @Transactional
     public RentResponseUpdate updateRent(Long id, RentRequestUpdate rentRequestUpdate) {
@@ -265,6 +264,7 @@ public class RentService {
         rent.setTotalValue(finalCalculate(rent, totalPenalty));
 
         redisTemplate.delete(PREFIXO_VEHICLE_CACHE_REDIS + "available_vehicles");
+        redisTemplate.delete(PREFIXO_RENT_CACHE_REDIS + "all_rents");
 
         return new CloseRentalResponse(rent, totalPenalty );
 
