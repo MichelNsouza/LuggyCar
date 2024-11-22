@@ -28,7 +28,7 @@ public class Rent {
     @JoinColumn(name = "client_id")
     private Client client;
     @ManyToOne
-    @JoinColumn(name = "vehicle_id", nullable = false ,unique = false)
+    @JoinColumn(name = "vehicle_id", nullable = false, unique = false)
     private Vehicle vehicle;
     private int totalDays;
     private Double securityDeposit;
@@ -52,7 +52,6 @@ public class Rent {
     @OneToMany(mappedBy = "rent", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<RestrictionRental> restrictions;
-
 
 
     private LocalDate create_at;

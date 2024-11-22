@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
 import static com.br.luggycar.api.configsRedis.RedisConfig.*;
 
 @Service
@@ -90,14 +91,14 @@ public class RentService {
             rent = rentRepository.save(rent);
 
             rent.setRentOptionalItems(
-                    optionalItemService.processAddOptionalItems(rentRequestCreate.optionalItems(),rent)
+                    optionalItemService.processAddOptionalItems(rentRequestCreate.optionalItems(), rent)
             );
             rent.setTotalValueOptionalItems(
                     optionalItemService.processTotalOptionalItems(rent.getRentOptionalItems())
             );
             rent.setTotalValue(
                     (vehicle.getDailyRate() * (rent.getTotalDays()))
-                    + rent.getTotalValueOptionalItems()
+                            + rent.getTotalValueOptionalItems()
             );
             rentRepository.save(rent);
 
@@ -130,14 +131,10 @@ public class RentService {
             return cachedRent.stream().map(RentResponse::new).collect(Collectors.toList());
         }
 
-        try {
-            List<Rent> rents = rentRepository.findAll();
-            redisTemplate.opsForValue().set(PREFIXO_RENT_CACHE_REDIS + "all_rents", rents, 3, TimeUnit.DAYS);
-            return rents.stream().map(RentResponse::new).collect(Collectors.toList());
+        List<Rent> rents = rentRepository.findAll();
+        redisTemplate.opsForValue().set(PREFIXO_RENT_CACHE_REDIS + "all_rents", rents, 3, TimeUnit.DAYS);
+        return rents.stream().map(RentResponse::new).collect(Collectors.toList());
 
-        } catch (ResourceBadRequestException e) {
-            throw new ResourceDatabaseException("Erro ao buscar no banco de dados", e);
-        }
     }
 
 
@@ -160,14 +157,10 @@ public class RentService {
     }
 
     @Transactional
-    public void deleteRent(Long id) {
-        try {
-            rentRepository.deleteById(id);
-            redisTemplate.delete(PREFIXO_VEHICLE_CACHE_REDIS + "available_vehicles");
-            redisTemplate.delete(PREFIXO_RENT_CACHE_REDIS + "all_rents");
-        }catch (ResourceDatabaseException e){
-            throw new ResourceDatabaseException("Algo deu errado!", e);
-        }
+    public void deleteRent(Long id) throws ResourceDatabaseException {
+        rentRepository.deleteById(id);
+        redisTemplate.delete(PREFIXO_VEHICLE_CACHE_REDIS + "available_vehicles");
+        redisTemplate.delete(PREFIXO_RENT_CACHE_REDIS + "all_rents");
 
     }
 
@@ -208,7 +201,7 @@ public class RentService {
 
         if (rent.getStatus() == RentStatus.COMPLETED) {
             throw new RuntimeException("Não é possível finalizar um aluguel já concluído");
-        }else {
+        } else {
             rent.setStatus(RentStatus.COMPLETED);
 
         }
@@ -238,7 +231,7 @@ public class RentService {
             accidentRepository.save(accident);
 
             if (rentalRequestClose.accident().getSeverity() == Severity.HIGH
-                    || rentalRequestClose.accident().getSeverity() == Severity.MEDIUM ) {
+                    || rentalRequestClose.accident().getSeverity() == Severity.MEDIUM) {
                 vehicle.setStatusVehicle(StatusVehicle.UNAVAILABLE);
                 vehicleRepository.save(vehicle);
             }
@@ -252,7 +245,7 @@ public class RentService {
         redisTemplate.delete(PREFIXO_VEHICLE_CACHE_REDIS + "available_vehicles");
         redisTemplate.delete(PREFIXO_RENT_CACHE_REDIS + "all_rents");
 
-        return new CloseRentalResponse(rent, totalPenalty );
+        return new CloseRentalResponse(rent, totalPenalty);
 
 
     }
@@ -280,7 +273,7 @@ public class RentService {
                     }
                 }
 
-                return ((daily + (daily * percent) ) * daysBetween) * mora;
+                return ((daily + (daily * percent)) * daysBetween) * mora;
             }
             return 0.0;
         }

@@ -20,8 +20,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.br.luggycar.api.configsRedis.RedisConfig.PREFIXO_ACCIDENT_CACHE_REDIS;
-import static com.br.luggycar.api.configsRedis.RedisConfig.PREFIXO_VEHICLE_CACHE_REDIS;
-
 
 @Service
 public class AccidentService {
@@ -66,14 +64,14 @@ public class AccidentService {
         List<Accident> cachedAccidents = (List<Accident>) redisTemplate.opsForValue().get(PREFIXO_ACCIDENT_CACHE_REDIS + "all_accidents");
         if (cachedAccidents == null) {
             List<Accident> accidents = accidentRepository.findAll();
-            redisTemplate.opsForValue().set(PREFIXO_ACCIDENT_CACHE_REDIS + "all_accidents" , accidents, 3, TimeUnit.DAYS);
+            redisTemplate.opsForValue().set(PREFIXO_ACCIDENT_CACHE_REDIS + "all_accidents", accidents, 3, TimeUnit.DAYS);
             return accidents;
         }
 
         return cachedAccidents;
     }
 
-    public Accident updateAccident(Long id, AccidentRequest accidentRequest) {
+    public Accident updateAccident(Long id, AccidentRequest accidentRequest) throws ResourceNotFoundException {
         Optional<Accident> accident = accidentRepository.findById(id);
 
         if (accident.isPresent()) {
@@ -93,7 +91,7 @@ public class AccidentService {
     }
 
 
-    public boolean deleteAccident(Long id) {
+    public boolean deleteAccident(Long id) throws ResourceNotFoundException {
         Optional<Accident> accident = accidentRepository.findById(id);
 
         if (accident.isPresent()) {
@@ -107,14 +105,12 @@ public class AccidentService {
     }
 
 
+    public Accident findAccidentById(Long id) throws ResourceNotFoundException {
 
-    public Accident findAccidentById(Long id) {
+        Accident accident = accidentRepository.findById(id).orElseThrow(()
+                -> new ResourceNotFoundException("Acidente não encontrado com o ID: " + id));
 
-            Accident accident = accidentRepository.findById(id).orElseThrow(()
-             -> new ResourceNotFoundException("Acidente não encontrado com o ID: " + id));
-
-            return accident;
-
+        return accident;
 
 
     }

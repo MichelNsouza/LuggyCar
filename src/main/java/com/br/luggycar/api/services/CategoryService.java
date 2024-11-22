@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.br.luggycar.api.configsRedis.RedisConfig.PREFIXO_CATEGORY_CACHE_REDIS;
-import static com.br.luggycar.api.configsRedis.RedisConfig.PREFIXO_VEHICLE_CACHE_REDIS;
+
 
 @Service
 public class CategoryService {
@@ -71,7 +71,7 @@ public class CategoryService {
 
         Category savedCategory = categoryRepository.save(category);
 
-            redisTemplate.delete(PREFIXO_CATEGORY_CACHE_REDIS + "all_categories");
+        redisTemplate.delete(PREFIXO_CATEGORY_CACHE_REDIS + "all_categories");
 
         return new CategoryResponse(savedCategory);
 
@@ -105,16 +105,16 @@ public class CategoryService {
     public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest) throws ResourceDatabaseException {
 
         try {
-             Category categoryUpdate = categoryRepository.findById(id)
+            Category categoryUpdate = categoryRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada"));
 
-                BeanUtils.copyProperties(categoryRequest, categoryUpdate);
+            BeanUtils.copyProperties(categoryRequest, categoryUpdate);
 
-                categoryRepository.save(categoryUpdate);
+            categoryRepository.save(categoryUpdate);
 
-                redisTemplate.delete(PREFIXO_CATEGORY_CACHE_REDIS + "all_categories");
+            redisTemplate.delete(PREFIXO_CATEGORY_CACHE_REDIS + "all_categories");
 
-                return new CategoryResponse(categoryUpdate);
+            return new CategoryResponse(categoryUpdate);
 
         } catch (ResourceNotFoundException e) {
             throw new ResourceDatabaseException("Erro ao atualizar a categoria no banco de dados");
@@ -141,8 +141,8 @@ public class CategoryService {
 
             redisTemplate.delete(PREFIXO_CATEGORY_CACHE_REDIS + "all_categories");
 
-        } catch (ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao deletar a categoria no banco de dados", e);
+        } catch (ResourceNotFoundException e) {
+            throw new RuntimeException(e);
         }
 
     }

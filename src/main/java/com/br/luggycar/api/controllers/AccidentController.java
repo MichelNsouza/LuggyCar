@@ -34,7 +34,7 @@ public class AccidentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Accident> deleteAccident(@PathVariable Long id) {
+    public ResponseEntity<Accident> deleteAccident(@PathVariable Long id) throws ResourceNotFoundException {
         accidentService.deleteAccident(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
@@ -42,7 +42,7 @@ public class AccidentController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Accident> findAccidentById(@PathVariable Long id) {
+    public ResponseEntity<Accident> findAccidentById(@PathVariable Long id) throws ResourceNotFoundException {
         return ResponseEntity.ok(accidentService.findAccidentById(id));
     }
 

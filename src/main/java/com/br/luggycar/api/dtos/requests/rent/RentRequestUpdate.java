@@ -11,19 +11,20 @@ import java.util.List;
 
 
 public record RentRequestUpdate(
-    RentStatus status,
-    String user,
-    Client client,
-    Vehicle vehicle,
-    int totalDays,
-    Double securityDeposit,
-    LocalDate rentalDateTimeIn,
-    LocalDate rentalDateTimeOut,
-    Double dailyRate,
-    Double kmInitial,
-    Double kmFinal,
-    List<OptionalItem> optionalItems,
-    List<RentOptionalItem> rentOptionalItems,
-    LocalDate create_at,
-    LocalDate update_at
-    ){}
+        RentStatus status,
+        String user,
+        Client client,
+        Vehicle vehicle,
+        int totalDays,
+        Double securityDeposit,
+        LocalDate rentalDateTimeIn,
+        LocalDate rentalDateTimeOut,
+        Double dailyRate,
+        Double kmInitial,
+        Double kmFinal,
+        List<OptionalItem> optionalItems,
+        List<RentOptionalItem> rentOptionalItems,
+        LocalDate create_at,
+        LocalDate update_at
+) {
+}

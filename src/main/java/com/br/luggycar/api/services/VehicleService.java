@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
 import static com.br.luggycar.api.configsRedis.RedisConfig.PREFIXO_VEHICLE_CACHE_REDIS;
 
 
@@ -109,14 +111,14 @@ public class VehicleService {
         return new VehicleResponse(updatedVehicle);
     }
 
-    public void deleteVehicle(Long id) throws ResourceExistsException {
+    public void deleteVehicle(Long id) throws ResourceExistsException, ResourceNotFoundException {
 
         List<RentStatus> activeStatuses = List.of(RentStatus.PENDING, RentStatus.IN_PROGRESS);
 
         if (rentRepository.existsByVehicleIdAndStatusIn(id, activeStatuses)) {
             throw new ResourceExistsException("veículo com aluguel em curso não pode ser excluido.");
         }
-                Vehicle vehicle = vehicleRepository.findById(id)
+        Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado"));
 
         vehicleRepository.deleteById(id);
@@ -141,11 +143,11 @@ public class VehicleService {
         Vehicle vehicle = vehicleRepository.findByPlate(plate)
                 .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado com a placa: " + plate));
 
-            return new VehicleResponse(vehicle);
-        }
+        return new VehicleResponse(vehicle);
+    }
 
 
-    public List<VehicleResponse> getAvailableVehicles() {
+    public List<VehicleResponse> getAvailableVehicles() throws ResourceDatabaseException {
 
         List<Vehicle> cachedVehicles = (List<Vehicle>) redisTemplate.opsForValue().get(PREFIXO_VEHICLE_CACHE_REDIS);
 
@@ -153,21 +155,16 @@ public class VehicleService {
             return cachedVehicles.stream().map(VehicleResponse::new).collect(Collectors.toList());
         }
 
-        try {
-            List<RentStatus> activeStatuses = List.of(RentStatus.PENDING, RentStatus.IN_PROGRESS);
-            List<Vehicle> availableVehicles = rentRepository.findRentedVehiclesByStatusInAndStatusVehicleAvailable(activeStatuses);
+        List<RentStatus> activeStatuses = List.of(RentStatus.PENDING, RentStatus.IN_PROGRESS);
+        List<Vehicle> availableVehicles = rentRepository.findRentedVehiclesByStatusInAndStatusVehicleAvailable(activeStatuses);
 
-            redisTemplate.opsForValue().set(PREFIXO_VEHICLE_CACHE_REDIS + "available_vehicles", availableVehicles, 3, TimeUnit.DAYS);
+        redisTemplate.opsForValue().set(PREFIXO_VEHICLE_CACHE_REDIS + "available_vehicles", availableVehicles, 3, TimeUnit.DAYS);
 
-            return availableVehicles.stream().map(VehicleResponse::new).collect(Collectors.toList());
-        } catch (ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao buscar os veículos disponíveis para aluguel no banco de dados", e);
-        }
+        return availableVehicles.stream().map(VehicleResponse::new).collect(Collectors.toList());
     }
 
 
-
-    public boolean isVehicleAvailableById(Long id) {
+    public boolean isVehicleAvailableById(Long id) throws ResourceExistsException {
 
 
         try {
@@ -180,7 +177,6 @@ public class VehicleService {
             throw new ResourceExistsException("O veículo com ID: " + id + " possui locação em andamento, ou pendente");
         }
     }
-
 
 
 }

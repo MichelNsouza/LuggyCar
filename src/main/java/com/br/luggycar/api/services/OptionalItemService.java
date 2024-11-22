@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import static com.br.luggycar.api.configsRedis.RedisConfig.PREFIXO_OPTIONAL_CACHE_REDIS;
 import static com.br.luggycar.api.configsRedis.RedisConfig.PREFIXO_VEHICLE_CACHE_REDIS;
 
+
 @Service
 public class OptionalItemService {
 
@@ -148,7 +149,7 @@ public class OptionalItemService {
     }
 
     @Transactional
-    public Double processTotalOptionalItems(List<RentOptionalItem> rentOptionalItems){
+    public Double processTotalOptionalItems(List<RentOptionalItem> rentOptionalItems) {
 
         Double total = 0.0;
 
