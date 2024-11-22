@@ -2,8 +2,6 @@ package com.br.luggycar.api.Category;
 
 import com.br.luggycar.api.dtos.requests.CategoryRequest;
 import com.br.luggycar.api.dtos.requests.DelayPenaltyRequest;
-import com.br.luggycar.api.dtos.response.CategoryResponse;
-import com.br.luggycar.api.exceptions.ResourceCategoryHasActiveVehicleException;
 import com.br.luggycar.api.services.CategoryService;
 import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;

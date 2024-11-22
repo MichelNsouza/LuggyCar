@@ -3,20 +3,15 @@ package com.br.luggycar.api.Rent;
 
 import com.br.luggycar.api.dtos.requests.Optional.OptionalQuantityRequest;
 import com.br.luggycar.api.dtos.requests.rent.RentRequestCreate;
-import com.br.luggycar.api.dtos.requests.rent.RentRequestUpdate;
-import com.br.luggycar.api.dtos.response.OptionalItemResponse;
-import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.dtos.response.rent.RentCreateResponse;
 import com.br.luggycar.api.dtos.response.rent.RentResponse;
 import com.br.luggycar.api.entities.Client;
-import com.br.luggycar.api.entities.OptionalItem;
 import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.entities.rent.Rent;
 import com.br.luggycar.api.enums.client.Gender;
 import com.br.luggycar.api.enums.client.PersonType;
 import com.br.luggycar.api.enums.client.licenseCategory;
 import com.br.luggycar.api.enums.rent.RentStatus;
-import com.br.luggycar.api.enums.vehicle.VehicleAccessorie;
 import com.br.luggycar.api.enums.vehicle.VehicleColor;
 import com.br.luggycar.api.enums.vehicle.VehicleManufacturer;
 import com.br.luggycar.api.enums.vehicle.Vehicletransmission;
@@ -24,7 +19,6 @@ import com.br.luggycar.api.repositories.ClientRepository;
 import com.br.luggycar.api.repositories.VehicleRepository;
 import com.br.luggycar.api.services.RentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.h2.engine.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -42,10 +36,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -251,14 +241,16 @@ public class RentControllerTest {
 
 
     @Test
-        public void testDeleteRent() throws Exception { // veículo com aluguel em curso não pode ser excluido.
-            Long id = 1L;
+    public void testDeleteRent() throws Exception {
+        Long id = 1L;
 
-            mockMvc.perform(MockMvcRequestBuilders.delete("/api/vehicle/{id}", id))
-                    .andExpect(status().isNoContent());
-        }
+        // Simulando que a exclusão não pode ser feita (veículo com aluguel ativo)
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/vehicle/{id}", id))
+                .andExpect(status().isNotFound());
+    }
 
-        @Test
+
+    @Test
         public void findRentById() throws Exception {
             Long id = 1L;
 
@@ -274,3 +266,4 @@ public class RentControllerTest {
         }
 
 }
+

@@ -1,8 +1,6 @@
 package com.br.luggycar.api.Optional;
 
 import com.br.luggycar.api.dtos.requests.Optional.OptionalItemRequest;
-import com.br.luggycar.api.dtos.requests.Optional.OptionalQuantityRequest;
-import com.br.luggycar.api.entities.OptionalItem;
 import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.services.OptionalItemService;
@@ -19,8 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
