@@ -103,7 +103,7 @@ public class RentService {
             rentRepository.save(rent);
 
             redisTemplate.delete(PREFIXO_VEHICLE_CACHE_REDIS + "available_vehicles");
-            redisTemplate.delete(PREFIXO_VEHICLE_CACHE_REDIS + "all_rents");
+            redisTemplate.delete(PREFIXO_RENT_CACHE_REDIS + "all_rents");
 
             return new RentCreateResponse(rent);
 
