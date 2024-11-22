@@ -6,6 +6,7 @@ import com.br.luggycar.api.dtos.response.CategoryResponse;
 import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.entities.DelayPenalty;
 import com.br.luggycar.api.entities.Vehicle;
+import com.br.luggycar.api.enums.rent.RentStatus;
 import com.br.luggycar.api.exceptions.*;
 import com.br.luggycar.api.repositories.CategoryRepository;
 import com.br.luggycar.api.dtos.requests.CategoryRequest;
@@ -101,11 +102,15 @@ public class CategoryService {
     }
 
 
-    public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest) throws ResourceDatabaseException {
+    public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest) throws ResourceDatabaseException, ResourceExistsException {
 
         try {
             Category categoryUpdate = categoryRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada"));
+
+            if (isCategoryLinkedWithUncompletedRent(id)) {
+                throw new ResourceExistsException("Categoria com aluguel em andamento não pode ser editada!");
+            }
 
             BeanUtils.copyProperties(categoryRequest, categoryUpdate);
 
@@ -157,4 +162,7 @@ public class CategoryService {
         return new CategoryResponse(category);
     }
 
+    public boolean isCategoryLinkedWithUncompletedRent(Long categoryId) {
+        return categoryRepository.existsByCategoryIdAndStatusNotCompleted(categoryId, RentStatus.COMPLETED);
+    }
 }
