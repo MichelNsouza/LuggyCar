@@ -1,10 +1,8 @@
 package com.br.luggycar.api.Client;
 
 import com.br.luggycar.api.dtos.requests.ClientRequest;
-import com.br.luggycar.api.dtos.response.ClientResponse;
 import com.br.luggycar.api.enums.client.Gender;
 import com.br.luggycar.api.enums.client.PersonType;
-import com.br.luggycar.api.enums.client.licenseCategory;
 import com.br.luggycar.api.exceptions.ResourceClientHasActiveRentalsException;
 import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
@@ -22,16 +20,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
-import static java.time.LocalDate.now;
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 

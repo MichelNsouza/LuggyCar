@@ -1,10 +1,7 @@
 package com.br.luggycar.api.Category;
 
-import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.dtos.requests.CategoryRequest;
-import com.br.luggycar.api.dtos.requests.DelayPenaltyRequest;
 import com.br.luggycar.api.dtos.response.CategoryResponse;
-import com.br.luggycar.api.entities.DelayPenalty;
 import com.br.luggycar.api.services.CategoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +17,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Collections;
-import java.util.List;
+
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;

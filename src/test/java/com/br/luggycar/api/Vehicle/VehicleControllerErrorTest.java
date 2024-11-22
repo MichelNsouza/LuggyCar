@@ -1,7 +1,6 @@
-package com.br.luggycar.api.controllers;
+package com.br.luggycar.api.Vehicle;
 
 import com.br.luggycar.api.dtos.requests.VehicleRequest;
-import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.enums.vehicle.VehicleAccessorie;
 import com.br.luggycar.api.enums.vehicle.VehicleColor;
 import com.br.luggycar.api.enums.vehicle.VehicleManufacturer;
@@ -12,13 +11,11 @@ import com.br.luggycar.api.services.VehicleService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -27,7 +24,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -109,14 +105,17 @@ public class VehicleControllerErrorTest {
 
     @Test
     public void testGetAllAvailableVehiclesNotFound() throws Exception {
-        when(vehicleService.getAvailableVehicles()).thenThrow(new ResourceNotFoundException("Não há veículos disponíveis"));
+        Mockito.doAnswer(invocation -> {
+            throw new ResourceNotFoundException("Não há veículos disponíveis");
+        }).when(vehicleService).getAvailableVehicles();
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/vehicle/available"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Não há veículos disponíveis"));
     }
+}
 
-    }
+
 
 
 

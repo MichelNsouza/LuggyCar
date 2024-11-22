@@ -5,7 +5,6 @@ import com.br.luggycar.api.dtos.response.ClientResponse;
 import com.br.luggycar.api.enums.client.Gender;
 import com.br.luggycar.api.enums.client.PersonType;
 import com.br.luggycar.api.enums.client.licenseCategory;
-import com.br.luggycar.api.services.CategoryService;
 import com.br.luggycar.api.services.ClientService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,13 +24,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import static java.time.LocalDate.now;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest

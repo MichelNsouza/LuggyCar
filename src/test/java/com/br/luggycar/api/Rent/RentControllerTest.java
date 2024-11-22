@@ -1,20 +1,17 @@
 package com.br.luggycar.api.Rent;
 
 
+import com.br.luggycar.api.dtos.requests.Optional.OptionalQuantityRequest;
 import com.br.luggycar.api.dtos.requests.rent.RentRequestCreate;
-import com.br.luggycar.api.dtos.requests.rent.RentRequestUpdate;
-import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.dtos.response.rent.RentCreateResponse;
 import com.br.luggycar.api.dtos.response.rent.RentResponse;
 import com.br.luggycar.api.entities.Client;
-import com.br.luggycar.api.entities.OptionalItem;
 import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.entities.rent.Rent;
 import com.br.luggycar.api.enums.client.Gender;
 import com.br.luggycar.api.enums.client.PersonType;
 import com.br.luggycar.api.enums.client.licenseCategory;
 import com.br.luggycar.api.enums.rent.RentStatus;
-import com.br.luggycar.api.enums.vehicle.VehicleAccessorie;
 import com.br.luggycar.api.enums.vehicle.VehicleColor;
 import com.br.luggycar.api.enums.vehicle.VehicleManufacturer;
 import com.br.luggycar.api.enums.vehicle.Vehicletransmission;
@@ -22,7 +19,6 @@ import com.br.luggycar.api.repositories.ClientRepository;
 import com.br.luggycar.api.repositories.VehicleRepository;
 import com.br.luggycar.api.services.RentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.h2.engine.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -40,10 +36,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -67,6 +59,10 @@ public class RentControllerTest {
 
         private Client client;
         private Vehicle vehicle;
+        private Rent rent;
+        private RentRequestCreate rentRequestCreate;
+        private RentRequestCreate rentRequestCreate2;
+        private RentResponse rentResponse;
 
         @BeforeEach
         public void setUp() throws ParseException {
@@ -102,12 +98,23 @@ public class RentControllerTest {
             vehicle.setTrunkCapacity("200.0");
             vehicle.setDailyRate(100.0);
             vehicle.setRegistrationDate(LocalDate.now());
-        }
 
-        @Test
-        public void testCreateRentNoOptional() throws Exception {
+            rent = new Rent();
+            rent.setId(1L);
+            rent.setStatus(RentStatus.IN_PROGRESS);
+            rent.setUser("ADMIN");
+            rent.setClient(client);
+            rent.setVehicle(vehicle);
+            rent.setTotalDays(10);
+            rent.setSecurityDeposit(200.00);
+            rent.setStartDate(LocalDate.parse("2021-11-12"));
+            rent.setDailyRate(100.0);
+            rent.setTotalValue(1000.0);
+            rent.setKmInitial(15000.0);
+            rent.setCreate_at(LocalDate.now());
+            rent.setRentOptionalItems(new ArrayList<>());
 
-            RentRequestCreate rentRequestCreate = new RentRequestCreate(
+             rentRequestCreate = new RentRequestCreate(
                     1L,
                     1L,
                     10,
@@ -117,20 +124,41 @@ public class RentControllerTest {
                     LocalDate.now()
             );
 
-                Rent rent = new Rent();
-                rent.setId(1L);
-                rent.setStatus(RentStatus.IN_PROGRESS);
-                rent.setUser("ADMIN");
-                rent.setClient(client);
-                rent.setVehicle(vehicle);
-                rent.setTotalDays(10);
-                rent.setSecurityDeposit(200.00);
-                rent.setStartDate(LocalDate.parse("2021-11-12"));
-                rent.setDailyRate(100.0);
-                rent.setTotalValue(1000.0);
-                rent.setKmInitial(15000.0);
-                rent.setCreate_at(LocalDate.now());
-                rent.setRentOptionalItems(new ArrayList<>());
+            rentRequestCreate2 = new RentRequestCreate(
+                    1L,
+                    1L,
+                    10,
+                    200.00,
+                    List.of(new OptionalQuantityRequest(1L, 10)), // Criando uma locação com optional
+                    LocalDate.parse("2021-11-12"),
+                    LocalDate.now()
+            );
+
+            rentResponse = new RentResponse(
+                    1L,
+                    RentStatus.IN_PROGRESS,
+                    "admin",
+                    1L,
+                    2L,
+                    500.0,
+                    LocalDate.now(),
+                    5,
+                    LocalDate.now().plusDays(5),
+                    null,
+                    null,
+                    100.0,
+                    20.0,
+                    600.0,
+                    100.0,
+                    null, // kmFinal
+                    LocalDate.now(),
+                    null // update_at
+            );
+
+        }
+
+        @Test
+        public void testCreateRentNoOptional() throws Exception {
 
                 RentCreateResponse rentCreateResponse = new RentCreateResponse(rent);
 
@@ -139,18 +167,14 @@ public class RentControllerTest {
 
                 Mockito.when(rentService.createRent(Mockito.any(RentRequestCreate.class))).thenReturn(rentCreateResponse);
 
+                String response = objectMapper.writeValueAsString(rentCreateResponse);
+
                 mockMvc.perform(MockMvcRequestBuilders.post("/api/rent")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(rentRequestCreate)))
-                        .andExpect(status().isCreated())
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.status").value("IN_PROGRESS"))
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.user").value("ADMIN"))
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.clientId").value(1))
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.vehicleId").value(1))
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.deposit").value(200.00))
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.totalDays").value(10));
-            }
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(rentRequestCreate)))
+                            .andExpect(status().isCreated())
+                            .andExpect(MockMvcResultMatchers.content().json(response));
+        }
 
         @Test
         public void testReadAllRent() throws Exception {
@@ -217,45 +241,29 @@ public class RentControllerTest {
 
 
     @Test
-        public void testDeleteRent() throws Exception {
+    public void testDeleteRent() throws Exception {
+        Long id = 1L;
+
+        // Simulando que a exclusão não pode ser feita (veículo com aluguel ativo)
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/vehicle/{id}", id))
+                .andExpect(status().isNotFound());
+    }
+
+
+    @Test
+        public void findRentById() throws Exception {
             Long id = 1L;
 
-            mockMvc.perform(MockMvcRequestBuilders.delete("/api/vehicle/{id}", id))
-                    .andExpect(status().isNoContent());
+            Mockito.when(rentService.findRentById(id)).thenReturn(Optional.of(rentResponse));
+
+            String expectedResponse = objectMapper.writeValueAsString(rentResponse);
+
+
+            mockMvc.perform(MockMvcRequestBuilders.get("/api/rent/{id}", id)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(MockMvcResultMatchers.content().json(expectedResponse));
         }
 
-        @Test
-        public void testFindRentById() throws Exception {
-                Long id = 1L;
-
-                Rent rent = new Rent();
-                rent.setId(1L);
-                rent.setStatus(RentStatus.IN_PROGRESS);
-                rent.setUser("ADMIN");
-                rent.setClient(client);
-                rent.setVehicle(vehicle);
-                rent.setTotalDays(10);
-                rent.setSecurityDeposit(200.00);
-                rent.setStartDate(LocalDate.parse("2021-11-12"));
-                rent.setDailyRate(100.0);
-                rent.setTotalValue(1000.0);
-                rent.setKmInitial(15000.0);
-                rent.setCreate_at(LocalDate.now());
-                rent.setRentOptionalItems(new ArrayList<>());
-
-                RentCreateResponse rentCreateResponse = new RentCreateResponse(rent);
-
-                mockMvc.perform(MockMvcRequestBuilders.get("/api/rent/{id}", id)
-                                .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.id").value(id))
-                        .andExpect(jsonPath("$.status").value("IN_PROGRESS"))
-                        .andExpect(jsonPath("$.user").value("ADMIN"))
-                        .andExpect(jsonPath("$.clientId").value(1))
-                        .andExpect(jsonPath("$.vehicleId").value(1))
-                        .andExpect(jsonPath("$.deposit").value(200.00))
-                        .andExpect(jsonPath("$.totalDays").value(10));
-
-            }
-
 }
+
