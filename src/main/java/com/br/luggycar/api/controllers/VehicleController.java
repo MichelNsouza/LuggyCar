@@ -28,7 +28,7 @@ public class VehicleController {
 
 
     @PostMapping
-    public ResponseEntity<VehicleResponse> createVehicle(@RequestBody VehicleRequest vehicleRequest) throws ResourceExistsException {
+    public ResponseEntity<VehicleResponse> createVehicle(@RequestBody VehicleRequest vehicleRequest) throws ResourceExistsException, ResourceNotFoundException {
 
         VehicleResponse savedVehicle = vehicleService.createVehicle(vehicleRequest);
 

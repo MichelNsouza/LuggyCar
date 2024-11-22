@@ -42,7 +42,7 @@ public class VehicleService {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
-    public VehicleResponse createVehicle(VehicleRequest vehicleRequest) throws ResourceExistsException {
+    public VehicleResponse createVehicle(VehicleRequest vehicleRequest) throws ResourceExistsException, ResourceNotFoundException {
 
         Optional<Vehicle> existingVehicle = vehicleRepository.findByPlate(vehicleRequest.getPlate());
         if (existingVehicle.isPresent()) {
@@ -50,7 +50,7 @@ public class VehicleService {
         }
 
         Category category = categoryRepository.findByName(vehicleRequest.categoryName())
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada"));
 
         Vehicle vehicle = new Vehicle();
         BeanUtils.copyProperties(vehicleRequest, vehicle);
