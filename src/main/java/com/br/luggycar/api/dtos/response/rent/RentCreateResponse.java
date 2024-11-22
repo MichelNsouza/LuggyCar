@@ -3,11 +3,14 @@ package com.br.luggycar.api.dtos.response.rent;
 import com.br.luggycar.api.dtos.response.OptionalItemResponse;
 import com.br.luggycar.api.entities.rent.Rent;
 import com.br.luggycar.api.enums.rent.RentStatus;
+import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Data
@@ -26,6 +29,7 @@ public class RentCreateResponse {
     private int totalDays;
     private LocalDate expectedCompletionDate;
     private Double dailyRate;
+    @Nullable
     private List<OptionalItemResponse> optionalItems;
     private Double kmInitial;
 
@@ -50,13 +54,15 @@ public class RentCreateResponse {
         this.totalValue = rent.getTotalValue();
         this.create_at = rent.getCreate_at();
 
-        this.optionalItems = rent.getRentOptionalItems().stream()
-                .map(item -> new OptionalItemResponse(
-                        item.getOptionalItem().getName(),
-                        item.getOptionalItem().getRentalValue(),
-                        item.getQuantity()
-                ))
-                .collect(Collectors.toList());
+        this.optionalItems = Optional.ofNullable(rent.getRentOptionalItems())
+                .map(items -> items.stream()
+                        .map(item -> new OptionalItemResponse(
+                                item.getOptionalItem().getName(),
+                                item.getOptionalItem().getRentalValue(),
+                                item.getQuantity()
+                        ))
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
         this.totalValueOptionalItems = rent.getTotalValueOptionalItems();
     }
 

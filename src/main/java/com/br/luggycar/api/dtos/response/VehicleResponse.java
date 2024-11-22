@@ -1,15 +1,13 @@
 package com.br.luggycar.api.dtos.response;
 
 import com.br.luggycar.api.entities.Vehicle;
-import com.br.luggycar.api.enums.vehicle.VehicleAccessorie;
-import com.br.luggycar.api.enums.vehicle.VehicleColor;
-import com.br.luggycar.api.enums.vehicle.VehicleManufacturer;
-import com.br.luggycar.api.enums.vehicle.Vehicletransmission;
+import com.br.luggycar.api.enums.vehicle.*;
 
 import java.util.Set;
 
 public record VehicleResponse(
         Long id,
+        StatusVehicle statusVehicle,
         String name,
         VehicleManufacturer manufacturer,
         String version,
@@ -27,6 +25,7 @@ public record VehicleResponse(
     public VehicleResponse(Vehicle vehicle) {
         this(
                 vehicle.getId(),
+                vehicle.getStatusVehicle(),
                 vehicle.getName(),
                 vehicle.getManufacturer(),
                 vehicle.getVersion(),

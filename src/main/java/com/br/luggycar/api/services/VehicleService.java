@@ -5,6 +5,7 @@ import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.enums.rent.RentStatus;
 import com.br.luggycar.api.enums.vehicle.StatusVehicle;
+import com.br.luggycar.api.exceptions.ResourceBadRequestException;
 import com.br.luggycar.api.exceptions.ResourceDatabaseException;
 import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
@@ -147,7 +148,7 @@ public class VehicleService {
     }
 
 
-    public List<VehicleResponse> getAvailableVehicles() throws ResourceDatabaseException {
+    public List<VehicleResponse> getAvailableVehicles(){
 
         List<Vehicle> cachedVehicles = (List<Vehicle>) redisTemplate.opsForValue().get(PREFIXO_VEHICLE_CACHE_REDIS);
 
@@ -165,15 +166,18 @@ public class VehicleService {
 
 
     public boolean isVehicleAvailableById(Long id) throws ResourceExistsException {
-
-
         try {
-
+            System.out.println("Verificando disponibilidade do veículo com ID: " + id);
             List<RentStatus> activeStatuses = Arrays.asList(RentStatus.IN_PROGRESS, RentStatus.PENDING);
             boolean isAvailable = vehicleRepository.isVehicleAvailable(id, activeStatuses, StatusVehicle.AVAILABLE);
+            System.out.println("Disponibilidade do veículo: " + isAvailable);
 
+            if (!isAvailable) {
+                throw new ResourceExistsException("O veículo com ID: " + id + " possui locação em andamento, ou pendente");
+            }
             return isAvailable;
         } catch (Exception e) {
+            System.out.println("Erro ao verificar disponibilidade: " + e.getMessage());
             throw new ResourceExistsException("O veículo com ID: " + id + " possui locação em andamento, ou pendente");
         }
     }

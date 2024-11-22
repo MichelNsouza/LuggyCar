@@ -3,11 +3,14 @@ package com.br.luggycar.api.dtos.response.rent;
 import com.br.luggycar.api.dtos.response.OptionalItemResponse;
 import com.br.luggycar.api.entities.rent.Rent;
 import com.br.luggycar.api.enums.rent.RentStatus;
+import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Data
@@ -35,6 +38,7 @@ public class RentResponseUpdate {
     private Double kmInitial;
     private Double kmFinal;
 
+    @Nullable
     private List<OptionalItemResponse> optionalItems;
 
     private LocalDate update_at;
@@ -59,13 +63,15 @@ public class RentResponseUpdate {
         this.update_at = rent.getUpdate_at();
 
 
-        this.optionalItems = rent.getRentOptionalItems().stream()
-                .map(item -> new OptionalItemResponse(
-                        item.getOptionalItem().getName(),
-                        item.getOptionalItem().getRentalValue(),
-                        item.getQuantity()
-                ))
-                .collect(Collectors.toList());
+        this.optionalItems = Optional.ofNullable(rent.getRentOptionalItems())
+                .map(items -> items.stream()
+                        .map(item -> new OptionalItemResponse(
+                                item.getOptionalItem().getName(),
+                                item.getOptionalItem().getRentalValue(),
+                                item.getQuantity()
+                        ))
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
     }
 
 

@@ -68,7 +68,8 @@ public class RentService {
     public RentCreateResponse createRent(RentRequestCreate rentRequestCreate) throws ResourceBadRequestException {
         try {
 
-            validaVehicleAndClient(rentRequestCreate);
+            clientService.clientAvailable(rentRequestCreate.client_id());
+            vehicleService.isVehicleAvailableById(rentRequestCreate.vehicle_id());
 
             String user = authUtil.getAuthenticatedUsername();
             Client client = clientRepository.findById(rentRequestCreate.client_id())
@@ -90,12 +91,17 @@ public class RentService {
 
             rent = rentRepository.save(rent);
 
-            rent.setRentOptionalItems(
-                    optionalItemService.processAddOptionalItems(rentRequestCreate.optionalItems(), rent)
-            );
-            rent.setTotalValueOptionalItems(
-                    optionalItemService.processTotalOptionalItems(rent.getRentOptionalItems())
-            );
+            if (rentRequestCreate.optionalItems() != null){
+                rent.setRentOptionalItems(
+                        optionalItemService.processAddOptionalItems(rentRequestCreate.optionalItems(), rent)
+                );
+                rent.setTotalValueOptionalItems(
+                        optionalItemService.processTotalOptionalItems(rent.getRentOptionalItems())
+                );
+            }else {
+                rent.setTotalValueOptionalItems(0.0);
+            }
+
             rent.setTotalValue(
                     (vehicle.getDailyRate() * (rent.getTotalDays()))
                             + rent.getTotalValueOptionalItems()
@@ -186,11 +192,6 @@ public class RentService {
 
         return rentResponses;
 
-    }
-
-    public void validaVehicleAndClient(RentRequestCreate rentRequestCreate) throws ResourceDatabaseException, ResourceNotFoundException, ResourceBadRequestException, ResourceExistsException {
-        clientService.clientAvailable(rentRequestCreate.client_id());
-        vehicleService.isVehicleAvailableById(rentRequestCreate.vehicle_id());
     }
 
     @Transactional
