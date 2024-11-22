@@ -1,4 +1,4 @@
-package com.br.luggycar.api.controllers;
+package com.br.luggycar.api.Vehicle;
 
 import com.br.luggycar.api.dtos.requests.VehicleRequest;
 import com.br.luggycar.api.dtos.response.VehicleResponse;
@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -109,14 +110,17 @@ public class VehicleControllerErrorTest {
 
     @Test
     public void testGetAllAvailableVehiclesNotFound() throws Exception {
-        when(vehicleService.getAvailableVehicles()).thenThrow(new ResourceNotFoundException("Não há veículos disponíveis"));
+        Mockito.doAnswer(invocation -> {
+            throw new ResourceNotFoundException("Não há veículos disponíveis");
+        }).when(vehicleService).getAvailableVehicles();
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/vehicle/available"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Não há veículos disponíveis"));
     }
+}
 
-    }
+
 
 
 

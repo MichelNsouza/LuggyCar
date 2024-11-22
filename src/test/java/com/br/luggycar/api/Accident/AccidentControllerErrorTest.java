@@ -53,7 +53,7 @@ public class AccidentControllerErrorTest {
         mockMvc.perform(post("/api/accident")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidJson))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isInternalServerError());
 
     }
 

@@ -66,8 +66,11 @@ public class CategoryControllerErrorTest {
 
     @Test
     public void testUpdateCategoryNotFound() throws Exception {
-        Mockito.when(categoryService.updateCategory(eq(id), any(CategoryRequest.class)))
-                .thenThrow(new ResourceNotFoundException("Categoria não encontrada"));
+        Long id = 1L;
+
+        Mockito.doAnswer(invocation -> {
+            throw new ResourceNotFoundException("Categoria não encontrada");
+        }).when(categoryService).updateCategory(eq(id), any(CategoryRequest.class));
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/category/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -76,15 +79,20 @@ public class CategoryControllerErrorTest {
                 .andExpect(jsonPath("$.message").value("Categoria não encontrada"));
     }
 
+
     @Test
     public void testDeleteCategoryNotFound() throws Exception {
-        Mockito.doThrow(new ResourceNotFoundException("Categoria não encontrada"))
-                .when(categoryService).deleteCategory(eq(id));
+        Long id = 1L;
+
+        Mockito.doAnswer(invocation -> {
+            throw new ResourceNotFoundException("Categoria não encontrada");
+        }).when(categoryService).deleteCategory(eq(id));
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/category/{id}", id))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Categoria não encontrada"));
     }
+
 
     @Test
     public void testFindCategoryByIdNotFound() throws Exception {
