@@ -29,4 +29,5 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
                                @Param("activeStatuses") List<RentStatus> activeStatuses,
                                @Param("status") StatusVehicle status);
 
+
 }

@@ -42,16 +42,16 @@ public record ClientRequest(
 ) {
     public ClientRequest {
 
-    if (cpf != null) {
-        cpf = cpf.replace(".", "").replace("-", "");
-        cnpj = null;
-        companyName = null;
-    }
+        if (cpf != null) {
+            cpf = cpf.replace(".", "").replace("-", "");
+            cnpj = null;
+            companyName = null;
+        }
 
-    if (cnpj != null) {
-        cnpj = cnpj.replace(".", "").replace("-", "").replace("/", "");
-        cpf = null;
-        gender = null;
+        if (cnpj != null) {
+            cnpj = cnpj.replace(".", "").replace("-", "").replace("/", "");
+            cpf = null;
+            gender = null;
         }
     }
 

@@ -19,16 +19,26 @@ import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.*;
 import com.br.luggycar.api.dtos.requests.rent.RentRequestCreate;
 import com.br.luggycar.api.utils.AuthUtil;
+import com.fasterxml.jackson.core.StreamWriteConstraints;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static com.br.luggycar.api.configsRedis.RedisConfig.*;
 
 @Service
 public class RentService {
@@ -51,12 +61,15 @@ public class RentService {
     private OptionalItemRepository optionalItemRepository;
     @Autowired
     private AccidentRepository accidentRepository;
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
 
     public RentCreateResponse createRent(RentRequestCreate rentRequestCreate) throws ResourceBadRequestException {
         try {
 
-            validaVehicleAndClient(rentRequestCreate);
+            clientService.clientAvailable(rentRequestCreate.client_id());
+            vehicleService.isVehicleAvailableById(rentRequestCreate.vehicle_id());
 
             String user = authUtil.getAuthenticatedUsername();
             Client client = clientRepository.findById(rentRequestCreate.client_id())
@@ -78,17 +91,25 @@ public class RentService {
 
             rent = rentRepository.save(rent);
 
-            rent.setRentOptionalItems(
-                    optionalItemService.processAddOptionalItems(rentRequestCreate.optionalItems(),rent)
-            );
-            rent.setTotalValueOptionalItems(
-                    optionalItemService.processTotalOptionalItems(rent.getRentOptionalItems())
-            );
+            if (rentRequestCreate.optionalItems() != null){
+                rent.setRentOptionalItems(
+                        optionalItemService.processAddOptionalItems(rentRequestCreate.optionalItems(), rent)
+                );
+                rent.setTotalValueOptionalItems(
+                        optionalItemService.processTotalOptionalItems(rent.getRentOptionalItems())
+                );
+            }else {
+                rent.setTotalValueOptionalItems(0.0);
+            }
+
             rent.setTotalValue(
                     (vehicle.getDailyRate() * (rent.getTotalDays()))
-                    + rent.getTotalValueOptionalItems()
+                            + rent.getTotalValueOptionalItems()
             );
             rentRepository.save(rent);
+
+            redisTemplate.delete(PREFIXO_VEHICLE_CACHE_REDIS + "available_vehicles");
+            redisTemplate.delete(PREFIXO_RENT_CACHE_REDIS + "all_rents");
 
             return new RentCreateResponse(rent);
 
@@ -99,13 +120,29 @@ public class RentService {
 
     @Transactional
     public List<RentResponse> readAllRent() throws ResourceDatabaseException {
+        List<LinkedHashMap> cachedRentsMap = (List<LinkedHashMap>) redisTemplate.opsForValue().get(PREFIXO_RENT_CACHE_REDIS + "all_rents");
+
+        if (cachedRentsMap != null) {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            mapper.disable(SerializationFeature.FAIL_ON_SELF_REFERENCES);
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            mapper.getFactory().setStreamWriteConstraints(StreamWriteConstraints.builder().maxNestingDepth(2000).build());
+
+            List<Rent> cachedRent = cachedRentsMap.stream()
+                    .map(map -> mapper.convertValue(map, Rent.class))
+                    .collect(Collectors.toList());
+
+            return cachedRent.stream().map(RentResponse::new).collect(Collectors.toList());
+        }
+
         List<Rent> rents = rentRepository.findAll();
-        return rents
-                .stream()
-                .map(RentResponse::new)
-                .collect(Collectors.toList());
+        redisTemplate.opsForValue().set(PREFIXO_RENT_CACHE_REDIS + "all_rents", rents, 3, TimeUnit.DAYS);
+        return rents.stream().map(RentResponse::new).collect(Collectors.toList());
 
     }
+
 
     @Transactional
     public RentResponseUpdate updateRent(Long id, RentRequestUpdate rentRequestUpdate) throws ResourceBadRequestException {
@@ -119,6 +156,8 @@ public class RentService {
 
         Rent savedRent = rentRepository.save(updatedRent);
 
+        redisTemplate.delete(PREFIXO_RENT_CACHE_REDIS + "all_rents");
+
         return new RentResponseUpdate(savedRent);
 
     }
@@ -126,6 +165,9 @@ public class RentService {
     @Transactional
     public void deleteRent(Long id) throws ResourceDatabaseException {
         rentRepository.deleteById(id);
+        redisTemplate.delete(PREFIXO_VEHICLE_CACHE_REDIS + "available_vehicles");
+        redisTemplate.delete(PREFIXO_RENT_CACHE_REDIS + "all_rents");
+
     }
 
     @Transactional
@@ -152,11 +194,6 @@ public class RentService {
 
     }
 
-    public void validaVehicleAndClient(RentRequestCreate rentRequestCreate) throws ResourceDatabaseException, ResourceNotFoundException, ResourceBadRequestException, ResourceExistsException {
-        clientService.clientAvailable(rentRequestCreate.client_id());
-        vehicleService.isVehicleAvailableById(rentRequestCreate.vehicle_id());
-    }
-
     @Transactional
     public CloseRentalResponse closeRental(Long id, RentalRequestClose rentalRequestClose) throws ResourceNotFoundException {
 
@@ -165,8 +202,9 @@ public class RentService {
 
         if (rent.getStatus() == RentStatus.COMPLETED) {
             throw new RuntimeException("Não é possível finalizar um aluguel já concluído");
-        }else {
+        } else {
             rent.setStatus(RentStatus.COMPLETED);
+
         }
 
         Vehicle vehicle = rent.getVehicle();
@@ -194,7 +232,7 @@ public class RentService {
             accidentRepository.save(accident);
 
             if (rentalRequestClose.accident().getSeverity() == Severity.HIGH
-                    || rentalRequestClose.accident().getSeverity() == Severity.MEDIUM ) {
+                    || rentalRequestClose.accident().getSeverity() == Severity.MEDIUM) {
                 vehicle.setStatusVehicle(StatusVehicle.UNAVAILABLE);
                 vehicleRepository.save(vehicle);
             }
@@ -205,7 +243,12 @@ public class RentService {
 
         rent.setTotalValue(finalCalculate(rent, totalPenalty));
 
-        return new CloseRentalResponse(rent, totalPenalty );
+        redisTemplate.delete(PREFIXO_VEHICLE_CACHE_REDIS + "available_vehicles");
+        redisTemplate.delete(PREFIXO_RENT_CACHE_REDIS + "all_rents");
+
+        return new CloseRentalResponse(rent, totalPenalty);
+
+
     }
 
     private Double finalCalculate(Rent rent, Double totalPenalty) {
@@ -231,7 +274,7 @@ public class RentService {
                     }
                 }
 
-                return ((daily + (daily * percent) ) * daysBetween) * mora;
+                return ((daily + (daily * percent)) * daysBetween) * mora;
             }
             return 0.0;
         }

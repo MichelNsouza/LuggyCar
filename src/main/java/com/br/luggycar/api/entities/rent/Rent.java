@@ -4,6 +4,8 @@ import com.br.luggycar.api.entities.Accident;
 import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.enums.rent.RentStatus;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,7 +29,7 @@ public class Rent {
     @JoinColumn(name = "client_id")
     private Client client;
     @ManyToOne
-    @JoinColumn(name = "vehicle_id", nullable = false ,unique = false)
+    @JoinColumn(name = "vehicle_id", nullable = false, unique = false)
     private Vehicle vehicle;
     private int totalDays;
     private Double securityDeposit;
@@ -44,13 +46,14 @@ public class Rent {
     @JoinColumn(name = "accident_id")
     private Accident accident;
 
+    @Nullable
     @OneToMany(mappedBy = "rent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RentOptionalItem> rentOptionalItems;
 
 
     @OneToMany(mappedBy = "rent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<RestrictionRental> restrictions;
-
 
 
     private LocalDate create_at;

@@ -27,7 +27,7 @@ public class RentOptionalItem {
 
     private int quantity;
 
-    public Double calculateTotal(){
+    public Double calculateTotal() {
         return this.optionalItem.getRentalValue() * this.quantity;
     }
 }

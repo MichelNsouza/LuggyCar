@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/client")
@@ -25,7 +24,7 @@ public class ClientController {
     private ClientService clientService;
 
     @PostMapping
-    public ResponseEntity<ClientResponse> createClient(@RequestBody  @Valid ClientRequest clientRequest) throws ResourceExistsException, ResourceDatabaseException, ResourceNotFoundException {
+    public ResponseEntity<ClientResponse> createClient(@RequestBody @Valid ClientRequest clientRequest) throws ResourceExistsException, ResourceDatabaseException, ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.CREATED).body(clientService.createClient(clientRequest));
     }
 

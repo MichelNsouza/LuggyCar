@@ -1,25 +1,11 @@
 package com.br.luggycar.api.dtos.response.rent;
 
-import com.br.luggycar.api.dtos.response.OptionalItemResponse;
 import com.br.luggycar.api.entities.rent.Rent;
 import com.br.luggycar.api.enums.rent.RentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import com.br.luggycar.api.dtos.response.OptionalItemResponse;
-import com.br.luggycar.api.entities.rent.Rent;
-import com.br.luggycar.api.enums.rent.RentStatus;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor

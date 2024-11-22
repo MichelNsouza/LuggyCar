@@ -6,20 +6,28 @@ import com.br.luggycar.api.dtos.response.CategoryResponse;
 import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.entities.DelayPenalty;
 import com.br.luggycar.api.entities.Vehicle;
+import com.br.luggycar.api.enums.rent.RentStatus;
 import com.br.luggycar.api.exceptions.*;
 import com.br.luggycar.api.repositories.CategoryRepository;
 import com.br.luggycar.api.dtos.requests.CategoryRequest;
-import com.br.luggycar.api.repositories.RentRepository;
 import com.br.luggycar.api.repositories.VehicleRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static com.br.luggycar.api.configsRedis.RedisConfig.PREFIXO_CATEGORY_CACHE_REDIS;
+
 
 @Service
 public class CategoryService {
@@ -29,9 +37,11 @@ public class CategoryService {
 
     @Autowired
     private VehicleRepository vehicleRepository;
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
 
-    public CategoryResponse createCategory(CategoryRequest categoryRequest) throws ResourceDatabaseException, ResourceExistsException {
+    public CategoryResponse createCategory(CategoryRequest categoryRequest) throws ResourceExistsException, ResourceDatabaseException {
 
         Optional<Category> existingCategory = categoryRepository.findByName(categoryRequest.name());
 
@@ -61,6 +71,7 @@ public class CategoryService {
 
         Category savedCategory = categoryRepository.save(category);
 
+        redisTemplate.delete(PREFIXO_CATEGORY_CACHE_REDIS + "all_categories");
 
         return new CategoryResponse(savedCategory);
 
@@ -68,28 +79,50 @@ public class CategoryService {
 
 
     public List<CategoryResponse> readAllCategories() throws ResourceDatabaseException {
-        List<Category> categories = categoryRepository.findAll();
-        return categories
-                .stream()
-                .map(CategoryResponse::new)
-                .collect(Collectors.toList());
 
+        List<LinkedHashMap> cachedCategoriesMap = (List<LinkedHashMap>) redisTemplate.opsForValue().get(PREFIXO_CATEGORY_CACHE_REDIS + "all_categories");
+
+        if (cachedCategoriesMap != null) {
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+
+            List<Category> cachedCategories = cachedCategoriesMap.stream()
+                    .map(map -> mapper.convertValue(map, Category.class))
+                    .collect(Collectors.toList());
+
+            return cachedCategories.stream().map(CategoryResponse::new).collect(Collectors.toList());
+        }
+
+        List<Category> categories = categoryRepository.findAll();
+
+        redisTemplate.opsForValue().set(PREFIXO_CATEGORY_CACHE_REDIS + "all_categories", categories, 3, TimeUnit.DAYS);
+
+        return categories.stream().map(CategoryResponse::new).collect(Collectors.toList());
     }
 
-    public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest) throws ResourceDatabaseException {
+
+    public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest) throws ResourceDatabaseException, ResourceExistsException {
 
         try {
-                Category categoryUpdate = categoryRepository.findById(id)
+            Category categoryUpdate = categoryRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada"));
 
-                BeanUtils.copyProperties(categoryRequest, categoryUpdate);
+            if (isCategoryLinkedWithUncompletedRent(id)) {
+                throw new ResourceExistsException("Categoria com aluguel em andamento não pode ser editada!");
+            }
 
-                categoryRepository.save(categoryUpdate);
+            BeanUtils.copyProperties(categoryRequest, categoryUpdate);
 
-                return new CategoryResponse(categoryUpdate);
+            categoryRepository.save(categoryUpdate);
+
+            redisTemplate.delete(PREFIXO_CATEGORY_CACHE_REDIS + "all_categories");
+
+            return new CategoryResponse(categoryUpdate);
 
         } catch (ResourceNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new ResourceDatabaseException("Erro ao atualizar a categoria no banco de dados");
+
         }
 
     }
@@ -110,9 +143,9 @@ public class CategoryService {
 
             categoryRepository.delete(category);
 
+            redisTemplate.delete(PREFIXO_CATEGORY_CACHE_REDIS + "all_categories");
+
         } catch (ResourceNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (ResourceCategoryHasActiveVehicleException e) {
             throw new RuntimeException(e);
         }
 
@@ -129,4 +162,7 @@ public class CategoryService {
         return new CategoryResponse(category);
     }
 
+    public boolean isCategoryLinkedWithUncompletedRent(Long categoryId) {
+        return categoryRepository.existsByCategoryIdAndStatusNotCompleted(categoryId, RentStatus.COMPLETED);
+    }
 }

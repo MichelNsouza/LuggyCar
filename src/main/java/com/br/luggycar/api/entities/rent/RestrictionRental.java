@@ -1,6 +1,7 @@
 package com.br.luggycar.api.entities.rent;
 
 import com.br.luggycar.api.enums.rent.RestrictionType;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,6 +19,7 @@ public class RestrictionRental {
 
     @ManyToOne
     @JoinColumn(name = "rent_id")
+    @JsonBackReference
     private Rent rent;
 
     @Enumerated(EnumType.STRING)

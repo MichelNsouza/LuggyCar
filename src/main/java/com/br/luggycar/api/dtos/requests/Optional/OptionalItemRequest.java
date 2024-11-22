@@ -4,4 +4,5 @@ public record OptionalItemRequest(
         String name,
         double rentalValue,
         double quantityAvailable
-) {}
+) {
+}

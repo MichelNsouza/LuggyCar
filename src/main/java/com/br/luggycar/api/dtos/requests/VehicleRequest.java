@@ -2,7 +2,6 @@ package com.br.luggycar.api.dtos.requests;
 
 
 import com.br.luggycar.api.enums.vehicle.*;
-import jakarta.validation.constraints.Pattern;
 
 import java.util.Set;
 

@@ -53,7 +53,7 @@ public class RentController {
     }
 
     @GetMapping("/{id}/client")
-    public  ResponseEntity<List<RentResponse>> findAllRentByClientId(@PathVariable Long id) throws ResourceNotFoundException, ResourceDatabaseException {
+    public ResponseEntity<List<RentResponse>> findAllRentByClientId(@PathVariable Long id) throws ResourceNotFoundException, ResourceDatabaseException {
         return ResponseEntity.ok().body(rentService.findAllRentByClientId(id));
     }
 

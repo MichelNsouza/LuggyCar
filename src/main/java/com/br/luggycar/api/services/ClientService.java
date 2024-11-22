@@ -1,7 +1,7 @@
 package com.br.luggycar.api.services;
+
 import com.br.luggycar.api.dtos.requests.ClientRequest;
 import com.br.luggycar.api.dtos.response.ClientResponse;
-import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.entities.Client;
 import com.br.luggycar.api.enums.client.PersonType;
 import com.br.luggycar.api.enums.rent.RentStatus;
@@ -10,7 +10,6 @@ import com.br.luggycar.api.http.viaCepClient;
 import com.br.luggycar.api.repositories.ClientRepository;
 import com.br.luggycar.api.repositories.RentRepository;
 import com.br.luggycar.api.utils.JWTUtils;
-import jakarta.validation.constraints.Email;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.ArrayList;
 
 
 @Service
@@ -36,10 +34,6 @@ public class ClientService {
 
     public ClientResponse createClient(ClientRequest clientRequest) throws ResourceDatabaseException, ResourceExistsException, ResourceNotFoundException {
 
-//        if (clientRequest.personType() == null) {
-//            throw new ResourceNullException("O campo 'personType' não pode ser nulo.");
-//        }
-
         Optional<Client> client = (clientRequest.personType() == PersonType.PF)
                 ? clientRepository.findByCpf(clientRequest.cpf())
                 : clientRepository.findByCnpj(clientRequest.cnpj());
@@ -48,10 +42,10 @@ public class ClientService {
             throw new ResourceExistsException("já existe um cliente com esse documento.");
         }
 
-         // manter 404 ou criar outro exception?
+        // manter 404 ou criar outro exception?
         try {
             cephttpClient.validaCep(clientRequest.cep());
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new ResourceNotFoundException("CEP não encontrado ou é invalido.");
         }
 
@@ -124,7 +118,8 @@ public class ClientService {
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
         return new ClientResponse(client);
     }
-// se colocar em rentService esta dando loop
+
+    // se colocar em rentService esta dando loop
     public boolean hasActiveRentals(Long clientId) {
         List<RentStatus> activeStatuses = List.of(RentStatus.PENDING, RentStatus.IN_PROGRESS);
         return rentRepository.existsActiveRentByClientId(clientId, activeStatuses);
@@ -141,7 +136,7 @@ public class ClientService {
             if (client.drivers_license_validity().before(currentDate)) {
                 throw new ResourceBadRequestException("A CNH do cliente está vencida!");
             }
-            if (hasActiveRentals(client.id())){
+            if (hasActiveRentals(client.id())) {
                 throw new ResourceBadRequestException("O cliente possui aluguel pendente!");
             }
 

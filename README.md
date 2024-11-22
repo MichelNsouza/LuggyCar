@@ -115,8 +115,22 @@ Para criar ou atualizar uma Categoria, utilize o seguinte modelo JSON:
 
 ```json
 {
-  "name": "Sedan",
-  "description": "Carro como um sedan"
+	"name": "Economico2",
+	"description":"veiculos mais baratos e que consomem menos2",
+	"delayPenalties":  [
+        {
+            "days": 1,
+            "percentage": 10
+        },
+ 				{
+            "days": 3,
+            "percentage": 20
+        },
+					{
+            "days": 5,
+            "percentage": 30
+        }
+    ]
 }
 ```
 
@@ -134,17 +148,22 @@ Para criar ou atualizar uma Categoria, utilize o seguinte modelo JSON:
    - **Descrição:** Cria um novo registro de veiculo. 
    É necessário enviar os dados do veiculos no corpo da requisição (modelo json mais a baixo).
 
-3. **Mostrar uma veiculo específico por id**
+3. **Mostrar uma veiculo específico por placa**
+   - **Método HTTP:** `GET`
+   - **Rota:** `/api/vehicle/plate/ABC1234`
+   - **Descrição:** Recupera as informações de um veiculo baseado no `plate`.
+     
+4. **Mostrar uma veiculo específico por id**
    - **Método HTTP:** `GET`
    - **Rota:** `/api/vehicle/{id}`
    - **Descrição:** Recupera as informações de um veiculo baseado no `id`.
-
-4. **Atualizar um veiculo em específico**
+     
+5. **Atualizar um veiculo em específico**
    - **Método HTTP:** `PUT`
    - **Rota:** `/api/vehicle/{id}`
    - **Descrição:** Atualiza um veiculo específico baseado no `id`. Os dados atualizados devem ser enviados no corpo da requisição. (modelo json mais a baixo).
 
-5. **Excluir um veiculo específico**
+6. **Excluir um veiculo específico**
    - **Método HTTP:** `DELETE`
    - **Rota:** `/api/vehicle/{id}`
    - **Descrição:** Remove um veiculo específico baseado no `id`.
@@ -155,20 +174,21 @@ Para criar ou atualizar um veiculo, utilize o seguinte modelo JSON:
 
 ```json
 {
-  "name": "Creta",
-  "manufacturer": "HONDA",
+  "name": "ESCORT GL",
+  "manufacturer": "FORD",
   "version": "flex",
-  "categoryName": "Cabriolet",
+  "categoryName": "SUV",
   "urlFipe": "https://www.fipe.org.br/mustang-gt",
-  "plate": "CBC1234",
+  "plate": "CAY6378",
   "color": "SILVER",
   "transmission": "MANUAL",
-  "currentKm": "15000",
+  "currentKm": 15000,
   "passangerCapacity": "4",
   "trunkCapacity": "450",
   "accessories": ["AIRBAGS", "GPS"],
   "dailyRate": 500.00
 }
+
 ```
 
 ## Clientes
@@ -212,30 +232,34 @@ O CEP é validado pela API dos correios.
 
 ### Estrutura Json do cliente
 Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
-Pessoa fisica
+Pessoa Juridica
 ```json
-   {
-   	"personType": "PJ",
-   	"cnpj": "{cnpj valido}",
-   	"companyName": "company xyz",
-   	"email": "xyz@example.com",
-   	"dateBirth": "1998-12-30",
-   	"cep": "41200100",
-   	"endereco": "rua xyz",
-   	"registration": "2024-11-01"
+   {{
+	"personType": "PJ",
+	"companyName": "XPTO BUSSINES",
+	"cnpj": "{inserir cnpj valido}",
+	"email": "joao@example.com",
+	"cep": "41200100",
+	"endereco": "rua xyz",
+	"drivers_license_number":"123456",
+	"drivers_license_validity":"2025-12-12",
+	"drivers_license_category":"B"
 }
 ```
-Pessoa Juridica
+Pessoa Fisica
 ```json
 {
 	"personType": "PF",
-	"naturalPersonName": "joao silva",
-	"cpf": "{cpf valido}",
+	"naturalPersonName": "Thales Souza",
+	"cpf": "{inserir CPF valido}",
 	"email": "joao@example.com",
 	"gender": "MASCULINO",
 	"dateBirth": "1998-12-31",
 	"cep": "41200100",
-	"endereco": "rua xyz"
+	"endereco": "rua xyz",
+	"drivers_license_number":"123456",
+	"drivers_license_validity":"2025-12-12",
+	"drivers_license_category":"B"
 }
 ```
 ## Sinistros
@@ -274,9 +298,11 @@ Para criar ou atualizar um sinistro, utilize o seguinte modelo JSON:
 
 ```json
 {
-   "severity": "LOW",
-   "description": "Accidente leve, sem feridos.",
-}
+
+		"severity": "HIGH",
+		"description": "Perda total",
+		"registrationDate": "2024-10-30T15:50:58.000+00:00"
+	}
 ```
 
 ## Opcionais
@@ -315,10 +341,10 @@ Para criar ou atualizar um opcional, utilize o seguinte modelo JSON:
 
 ```json
 {
-   "name": "Cadeira De Bebê",
-   "rentalValue": 15.5,
-   "quantityAvailable": 10.0
-}
+		"name": "SHIFTLIGHT",
+		"rentalValue": 15.5,
+		"quantityAvailable": 10.0
+	}
 ```
 
 
@@ -363,17 +389,17 @@ Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
 
 ```json
 {
-  "dailyRate": 100.00,
-  "totalDays": 1,
-  "deposit": 100.00,
-  "kmInitial": 15.000,
-  "kmFinal": 15.800,
-  "client": {
-    "id": 1
-  },
-  "vehicle":{
-    "id": 1
-  }
+    "client_id": 2,
+    "vehicle_id": 2,
+    "optionalItems": [
+        {
+            "id": 2,
+            "quantity": 1
+        }
+    ],
+    "totalDays": 7,
+    "securityDeposit": 500.00,
+		"startDate":"2024-11-01"
 }
 ```
 

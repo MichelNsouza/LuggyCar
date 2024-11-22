@@ -1,7 +1,6 @@
 package com.br.luggycar.api.controllers;
 
 import com.br.luggycar.api.dtos.response.VehicleResponse;
-import com.br.luggycar.api.entities.Category;
 import com.br.luggycar.api.exceptions.ResourceDatabaseException;
 import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
@@ -29,7 +28,7 @@ public class VehicleController {
 
 
     @PostMapping
-    public ResponseEntity<VehicleResponse> createVehicle(@RequestBody VehicleRequest vehicleRequest) throws ResourceExistsException {
+    public ResponseEntity<VehicleResponse> createVehicle(@RequestBody VehicleRequest vehicleRequest) throws ResourceExistsException, ResourceNotFoundException {
 
         VehicleResponse savedVehicle = vehicleService.createVehicle(vehicleRequest);
 
@@ -53,7 +52,7 @@ public class VehicleController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Vehicle> deleteVehicle(@PathVariable Long id) throws ResourceExistsException {
+    public ResponseEntity<Vehicle> deleteVehicle(@PathVariable Long id) throws ResourceExistsException, ResourceNotFoundException {
         vehicleService.deleteVehicle(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
@@ -70,7 +69,7 @@ public class VehicleController {
 
     }
 
-    @GetMapping("/plate")
+    @GetMapping("/plate/{plate}")
     public ResponseEntity<VehicleResponse> getVehicleByLicensePlate(@PathVariable String plate) throws ResourceNotFoundException {
         VehicleResponse response = vehicleService.getByPlate(plate);
         return ResponseEntity.ok(response);

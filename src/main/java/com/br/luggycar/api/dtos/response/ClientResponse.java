@@ -6,8 +6,6 @@ import com.br.luggycar.api.enums.client.PersonType;
 import com.br.luggycar.api.enums.client.licenseCategory;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.time.ZoneId;
-
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
