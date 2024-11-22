@@ -9,7 +9,6 @@ import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.exceptions.*;
 import com.br.luggycar.api.repositories.CategoryRepository;
 import com.br.luggycar.api.dtos.requests.CategoryRequest;
-import com.br.luggycar.api.repositories.RentRepository;
 import com.br.luggycar.api.repositories.VehicleRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

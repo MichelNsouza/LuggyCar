@@ -1,8 +1,6 @@
 package com.br.luggycar.api.services;
 
-import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.entities.Accident;
-import com.br.luggycar.api.entities.Vehicle;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.AccidentRepository;
 import com.br.luggycar.api.dtos.requests.AccidentRequest;
