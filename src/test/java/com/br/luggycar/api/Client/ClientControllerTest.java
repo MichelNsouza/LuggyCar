@@ -25,6 +25,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static java.time.LocalDate.now;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,6 +47,9 @@ public class ClientControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private Long responseId;
+    private Long responseIdPJ;
+
     private Date birthDate;
     private Date birthDatePJ;
     private Date licenseValidity;
@@ -58,6 +62,10 @@ public class ClientControllerTest {
 
     @BeforeEach
     public void setUp() throws ParseException {
+
+        responseId = 1L;
+        responseIdPJ = 2L;
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         birthDate = dateFormat.parse("1998-12-31");
         licenseValidity = dateFormat.parse("2025-12-12");
@@ -82,7 +90,7 @@ public class ClientControllerTest {
         );
 
          response = new ClientResponse(
-                1L,
+                responseId,
                 PersonType.PF,
                 "Michel Souza",
                 "050.564.665-06",
@@ -116,7 +124,7 @@ public class ClientControllerTest {
         );
 
         responsePJ = new ClientResponse(
-                2L,
+                responseIdPJ,
                 PersonType.PJ,
                 null,
                 null,
@@ -183,7 +191,7 @@ public class ClientControllerTest {
 
 
         ClientResponse updatedResponseUpdated = new ClientResponse(
-                1L,
+                responseId,
                 PersonType.PF,
                 "Michel Atualizado",
                 "050.564.665-06",
@@ -231,6 +239,20 @@ public class ClientControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/client/{id}", id))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testFindClientById() throws Exception {
+
+        Mockito.when(clientService.findClientById(responseId)).thenReturn(response);
+
+        String expectedResponse = objectMapper.writeValueAsString(response);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/client/{id}", responseId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(expectedResponse));
+
     }
 
 }

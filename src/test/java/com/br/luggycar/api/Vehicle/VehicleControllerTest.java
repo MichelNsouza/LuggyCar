@@ -18,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,11 +42,17 @@ public class VehicleControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+
+    private Long id;
     private VehicleRequest vehicleRequest;
     private VehicleResponse vehicleResponse;
+    private VehicleResponse vehicleResponse2;
+
 
     @BeforeEach
     public void setUp() {
+
+        id = 1L;
 
         vehicleRequest = new VehicleRequest(
                 "Palio",
@@ -64,50 +71,7 @@ public class VehicleControllerTest {
         );
 
         vehicleResponse = new VehicleResponse(
-                1L,
-                "Palio",
-                VehicleManufacturer.FIAT,
-                "flex",
-                "Hatch",
-                "https://www.fipe.org.br/palio",
-                "ABCD1234",
-                VehicleColor.BLACK,
-                Vehicletransmission.MANUAL,
-                15000.0,
-                "4",
-                "450",
-                Set.of(VehicleAccessorie.AR_CONDICIONADO_DIGITAL, VehicleAccessorie.GPS),
-                500.0
-        );
-    }
-
-    @Test
-    public void testCreateVehicle() throws Exception {
-        Mockito.when(vehicleService.createVehicle(Mockito.any(VehicleRequest.class)))
-                .thenReturn(vehicleResponse);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/vehicle")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vehicleRequest)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("Palio"))
-                .andExpect(jsonPath("$.manufacturer").value("FIAT"))
-                .andExpect(jsonPath("$.version").value("flex"))
-                .andExpect(jsonPath("$.categoryName").value("Hatch"))
-                .andExpect(jsonPath("$.urlFipe").value("https://www.fipe.org.br/palio"))
-                .andExpect(jsonPath("$.plate").value("ABCD1234"))
-                .andExpect(jsonPath("$.color").value("BLACK"))
-                .andExpect(jsonPath("$.currentKm").value("15000.0"))
-                .andExpect(jsonPath("$.passangerCapacity").value("4"))
-                .andExpect(jsonPath("$.trunkCapacity").value("450"))
-                .andExpect(jsonPath("$.accessories").value(org.hamcrest.Matchers.hasItems("AR_CONDICIONADO_DIGITAL", "GPS")));
-    }
-
-    @Test
-    public void testReadAllVehicles() throws Exception {
-        VehicleResponse vehicle1 = new VehicleResponse(
-                1L,
+                id,
                 "Palio",
                 VehicleManufacturer.FIAT,
                 "flex",
@@ -123,7 +87,7 @@ public class VehicleControllerTest {
                 500.0
         );
 
-        VehicleResponse vehicle2 = new VehicleResponse(
+        vehicleResponse2 = new VehicleResponse(
                 2L,
                 "Civic",
                 VehicleManufacturer.HONDA,
@@ -140,7 +104,26 @@ public class VehicleControllerTest {
                 500.0
         );
 
-        Mockito.when(vehicleService.readAllVehicle()).thenReturn(List.of(vehicle1, vehicle2));
+    }
+
+    @Test
+    public void testCreateVehicle() throws Exception {
+        Mockito.when(vehicleService.createVehicle(Mockito.any(VehicleRequest.class)))
+                .thenReturn(vehicleResponse);
+
+        String response = objectMapper.writeValueAsString(vehicleResponse);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/vehicle")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(vehicleRequest)))
+                .andExpect(status().isCreated())
+                .andExpect(MockMvcResultMatchers.content().json(response));
+    }
+
+    @Test
+    public void testReadAllVehicles() throws Exception {
+
+        Mockito.when(vehicleService.readAllVehicle()).thenReturn(List.of(vehicleResponse, vehicleResponse2));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/vehicle")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -198,7 +181,7 @@ public class VehicleControllerTest {
                         .content(objectMapper.writeValueAsString(updatedVehicleRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id))
-                .andExpect(jsonPath("$.name").value("Palio Italia")) // Modificação no nome
+                .andExpect(jsonPath("$.name").value("Palio Italia"))
                 .andExpect(jsonPath("$.manufacturer").value("FIAT"))
                 .andExpect(jsonPath("$.version").value("flex"))
                 .andExpect(jsonPath("$.categoryName").value("Hatch"))
@@ -221,43 +204,16 @@ public class VehicleControllerTest {
 
     @Test
     public void testFindVehicleById() throws Exception {
-        Long id = 1L;
 
-        VehicleResponse response = new VehicleResponse(
-                id,
-                "Palio",
-                VehicleManufacturer.FIAT,
-                "flex",
-                "Hatch",
-                "https://www.fipe.org.br/palio",
-                "ABCD1234",
-                VehicleColor.BLACK,
-                Vehicletransmission.MANUAL,
-                15000.0,
-                "4",
-                "450",
-                Set.of(VehicleAccessorie.AR_CONDICIONADO_DIGITAL, VehicleAccessorie.GPS),
-                500.0
-        );
+        Mockito.when(vehicleService.findVehicleById(id)).thenReturn(Optional.of(vehicleResponse));
 
-        Mockito.when(vehicleService.findVehicleById(id)).thenReturn(Optional.of(response));
+        String response = objectMapper.writeValueAsString(vehicleResponse);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/vehicle/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(id))
-                .andExpect(jsonPath("$.name").value("Palio"))
-                .andExpect(jsonPath("$.manufacturer").value("FIAT"))
-                .andExpect(jsonPath("$.version").value("flex"))
-                .andExpect(jsonPath("$.categoryName").value("Hatch"))
-                .andExpect(jsonPath("$.urlFipe").value("https://www.fipe.org.br/palio"))
-                .andExpect(jsonPath("$.plate").value("ABCD1234"))
-                .andExpect(jsonPath("$.color").value("BLACK"))
-                .andExpect(jsonPath("$.currentKm").value("15000.0"))
-                .andExpect(jsonPath("$.passangerCapacity").value("4"))
-                .andExpect(jsonPath("$.trunkCapacity").value("450"))
-                .andExpect(jsonPath("$.accessories").value(org.hamcrest.Matchers.hasItems("AR_CONDICIONADO_DIGITAL", "GPS")))
-                .andExpect(jsonPath("$.dailyRate").value(500.0));
+                .andExpect(MockMvcResultMatchers.content().json(response));
+
     }
 }
 
