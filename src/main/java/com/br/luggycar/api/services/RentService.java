@@ -2,7 +2,6 @@ package com.br.luggycar.api.services;
 
 import com.br.luggycar.api.dtos.requests.rent.RentRequestUpdate;
 import com.br.luggycar.api.dtos.requests.rent.RentalRequestClose;
-import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.dtos.response.rent.CloseRentalResponse;
 import com.br.luggycar.api.dtos.response.rent.RentCreateResponse;
 import com.br.luggycar.api.dtos.response.rent.RentResponse;
@@ -15,6 +14,7 @@ import com.br.luggycar.api.enums.rent.RentStatus;
 import com.br.luggycar.api.enums.vehicle.StatusVehicle;
 import com.br.luggycar.api.exceptions.ResourceBadRequestException;
 import com.br.luggycar.api.exceptions.ResourceDatabaseException;
+import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.repositories.*;
 import com.br.luggycar.api.dtos.requests.rent.RentRequestCreate;
@@ -64,7 +64,7 @@ public class RentService {
     private RedisTemplate<String, Object> redisTemplate;
 
 
-    public RentCreateResponse createRent(RentRequestCreate rentRequestCreate) {
+    public RentCreateResponse createRent(RentRequestCreate rentRequestCreate) throws ResourceBadRequestException {
         try {
 
             validaVehicleAndClient(rentRequestCreate);
@@ -106,13 +106,13 @@ public class RentService {
 
             return new RentCreateResponse(rent);
 
-        }catch (ResourceBadRequestException e){
-            throw new ResourceBadRequestException("Algo errado na requisição! " + e.getMessage());
+        } catch (ResourceNotFoundException | ResourceDatabaseException | ResourceExistsException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Transactional
-    public List<RentResponse> readAllRent() {
+    public List<RentResponse> readAllRent() throws ResourceDatabaseException {
         List<LinkedHashMap> cachedRentsMap = (List<LinkedHashMap>) redisTemplate.opsForValue().get(PREFIXO_RENT_CACHE_REDIS + "all_rents");
 
         if (cachedRentsMap != null) {
@@ -142,26 +142,21 @@ public class RentService {
 
 
     @Transactional
-    public RentResponseUpdate updateRent(Long id, RentRequestUpdate rentRequestUpdate) {
+    public RentResponseUpdate updateRent(Long id, RentRequestUpdate rentRequestUpdate) throws ResourceBadRequestException {
         Optional<Rent> rentOpt = rentRepository.findById(id);
-        try {
 
-            Rent updatedRent = rentOpt.get();
+        Rent updatedRent = rentOpt.get();
 
-            BeanUtils.copyProperties(rentRequestUpdate, updatedRent, "id");
+        BeanUtils.copyProperties(rentRequestUpdate, updatedRent, "id");
 
-            updatedRent.setUpdate_at(LocalDate.now());
+        updatedRent.setUpdate_at(LocalDate.now());
 
-            Rent savedRent = rentRepository.save(updatedRent);
+        Rent savedRent = rentRepository.save(updatedRent);
 
-            redisTemplate.delete(PREFIXO_RENT_CACHE_REDIS + "all_rents");
+        redisTemplate.delete(PREFIXO_RENT_CACHE_REDIS + "all_rents");
 
-            return new RentResponseUpdate(savedRent);
+        return new RentResponseUpdate(savedRent);
 
-
-        }catch (ResourceBadRequestException e){
-            throw new ResourceBadRequestException("Algo deu errado! " + e.getMessage());
-        }
     }
 
     @Transactional
@@ -177,45 +172,36 @@ public class RentService {
     }
 
     @Transactional
-    public Optional<RentResponse> findRentById(Long id) {
-        try {
-            return rentRepository.findById(id)
-                    .map(RentResponse::new);
-        }catch (ResourceNotFoundException e){
-        throw new ResourceNotFoundException("Aluguel não encontrado! " + e.getMessage());
-        }
+    public Optional<RentResponse> findRentById(Long id) throws ResourceNotFoundException {
+        return rentRepository.findById(id)
+                .map(RentResponse::new);
     }
 
     @Transactional
-    public List<RentResponse> findAllRentByClientId(Long id) {
+    public List<RentResponse> findAllRentByClientId(Long id) throws ResourceNotFoundException, ResourceDatabaseException {
 
         clientService.findClientById(id);
 
-        try {
+        List<Rent> rents = rentRepository.findByClientId(id);
 
-            List<Rent> rents = rentRepository.findByClientId(id);
+        List<RentResponse> rentResponses = rents.stream()
+                .map(rent -> {
+                    RentResponse rentResponse = new RentResponse(rent);
+                    return rentResponse;
+                })
+                .collect(Collectors.toList());
 
-            List<RentResponse> rentResponses = rents.stream()
-                    .map(rent -> {
-                        RentResponse rentResponse = new RentResponse(rent);
-                        return rentResponse;
-                    })
-                    .collect(Collectors.toList());
+        return rentResponses;
 
-            return rentResponses;
-
-        } catch (ResourceNotFoundException e) {
-            throw new ResourceNotFoundException("O Cliente não possui locações cadastradas! " + e.getMessage());
-        }
     }
 
-    public void validaVehicleAndClient(RentRequestCreate rentRequestCreate){
+    public void validaVehicleAndClient(RentRequestCreate rentRequestCreate) throws ResourceDatabaseException, ResourceNotFoundException, ResourceBadRequestException, ResourceExistsException {
         clientService.clientAvailable(rentRequestCreate.client_id());
         vehicleService.isVehicleAvailableById(rentRequestCreate.vehicle_id());
     }
 
     @Transactional
-    public CloseRentalResponse closeRental(Long id, RentalRequestClose rentalRequestClose) {
+    public CloseRentalResponse closeRental(Long id, RentalRequestClose rentalRequestClose) throws ResourceNotFoundException {
 
         Rent rent = rentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Aluguel não encontrado!"));

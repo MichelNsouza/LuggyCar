@@ -40,7 +40,7 @@ public class VehicleService {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
-    public VehicleResponse createVehicle(VehicleRequest vehicleRequest) {
+    public VehicleResponse createVehicle(VehicleRequest vehicleRequest) throws ResourceExistsException {
 
         Optional<Vehicle> existingVehicle = vehicleRepository.findByPlate(vehicleRequest.getPlate());
         if (existingVehicle.isPresent()) {
@@ -90,9 +90,7 @@ public class VehicleService {
     }
 
 
-
-
-    public VehicleResponse updateVehicle(Long id, VehicleRequest vehicleRequest) throws ResourceNotFoundException {
+    public VehicleResponse updateVehicle(Long id, VehicleRequest vehicleRequest) throws ResourceNotFoundException, ResourceExistsException {
         Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado"));
 
@@ -111,8 +109,8 @@ public class VehicleService {
         return new VehicleResponse(updatedVehicle);
     }
 
+    public void deleteVehicle(Long id) throws ResourceExistsException {
 
-    public void deleteVehicle(Long id) {
         List<RentStatus> activeStatuses = List.of(RentStatus.PENDING, RentStatus.IN_PROGRESS);
 
         if (rentRepository.existsByVehicleIdAndStatusIn(id, activeStatuses)) {
@@ -139,8 +137,7 @@ public class VehicleService {
     }
 
 
-    public VehicleResponse getByPlate(String plate) {
-
+    public VehicleResponse getByPlate(String plate) throws ResourceNotFoundException {
         Vehicle vehicle = vehicleRepository.findByPlate(plate)
                 .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado com a placa: " + plate));
 
@@ -174,6 +171,7 @@ public class VehicleService {
 
 
         try {
+
             List<RentStatus> activeStatuses = Arrays.asList(RentStatus.IN_PROGRESS, RentStatus.PENDING);
             boolean isAvailable = vehicleRepository.isVehicleAvailable(id, activeStatuses, StatusVehicle.AVAILABLE);
 

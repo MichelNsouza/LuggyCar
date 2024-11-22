@@ -2,7 +2,7 @@ package com.br.luggycar.api.exceptions;
 
 import java.util.List;
 
-public class ResourceNullException extends RuntimeException {
+public class ResourceNullException extends Exception {
     private final List<String> messages;
 
     public ResourceNullException(List<String> messages) {

@@ -2,6 +2,8 @@ package com.br.luggycar.api.controllers;
 
 import com.br.luggycar.api.dtos.response.VehicleResponse;
 import com.br.luggycar.api.entities.Category;
+import com.br.luggycar.api.exceptions.ResourceDatabaseException;
+import com.br.luggycar.api.exceptions.ResourceExistsException;
 import com.br.luggycar.api.exceptions.ResourceNotFoundException;
 import com.br.luggycar.api.dtos.requests.VehicleRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,7 @@ public class VehicleController {
 
 
     @PostMapping
-    public ResponseEntity<VehicleResponse> createVehicle(@RequestBody VehicleRequest vehicleRequest) {
+    public ResponseEntity<VehicleResponse> createVehicle(@RequestBody VehicleRequest vehicleRequest) throws ResourceExistsException {
 
         VehicleResponse savedVehicle = vehicleService.createVehicle(vehicleRequest);
 
@@ -43,7 +45,7 @@ public class VehicleController {
 
     @PutMapping("/{id}")
     public ResponseEntity<VehicleResponse> updateVehicle(@PathVariable Long id, @RequestBody VehicleRequest vehicleRequest)
-            throws ResourceNotFoundException {
+            throws ResourceNotFoundException, ResourceExistsException {
 
         VehicleResponse updatedVehicleResponse = vehicleService.updateVehicle(id, vehicleRequest);
         return ResponseEntity.ok(updatedVehicleResponse);
@@ -51,7 +53,7 @@ public class VehicleController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Vehicle> deleteVehicle(@PathVariable Long id) {
+    public ResponseEntity<Vehicle> deleteVehicle(@PathVariable Long id) throws ResourceExistsException {
         vehicleService.deleteVehicle(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
@@ -76,7 +78,7 @@ public class VehicleController {
 
 
     @GetMapping("/available")
-    public ResponseEntity<List<VehicleResponse>> findAllVehicleAvailable() throws ResourceNotFoundException {
+    public ResponseEntity<List<VehicleResponse>> findAllVehicleAvailable() throws ResourceNotFoundException, ResourceDatabaseException {
 
         List<VehicleResponse> vehicleResponses = vehicleService.getAvailableVehicles();
         return ResponseEntity.ok(vehicleResponses);

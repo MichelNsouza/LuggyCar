@@ -31,7 +31,7 @@ public class AccidentService {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
-    public Accident createAccident(AccidentRequest accidentRequest) {
+    public Accident createAccident(AccidentRequest accidentRequest) throws ResourceNotFoundException {
 
         if (accidentRepository.findByDescription(accidentRequest.description()).isPresent()) {
             throw new ResourceNotFoundException("sinistro já cadastrado!");

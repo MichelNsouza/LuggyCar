@@ -34,7 +34,7 @@ public class ClientService {
     private viaCepClient cephttpClient;
 
 
-    public ClientResponse createClient(ClientRequest clientRequest) {
+    public ClientResponse createClient(ClientRequest clientRequest) throws ResourceDatabaseException, ResourceExistsException, ResourceNotFoundException {
 
 //        if (clientRequest.personType() == null) {
 //            throw new ResourceNullException("O campo 'personType' não pode ser nulo.");
@@ -55,58 +55,44 @@ public class ClientService {
             throw new ResourceNotFoundException("CEP não encontrado ou é invalido.");
         }
 
-        try {
-            Client clientResponse = new Client();
+        Client clientResponse = new Client();
 
-            BeanUtils.copyProperties(clientRequest, clientResponse);
+        BeanUtils.copyProperties(clientRequest, clientResponse);
 
-            clientResponse.setRegistration(LocalDate.now());
+        clientResponse.setRegistration(LocalDate.now());
 
-            clientRepository.save(clientResponse);
+        clientRepository.save(clientResponse);
 
-            return new ClientResponse(clientResponse);
-
-        } catch (ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao salvar o cliente no banco de dados", e);
-        }
+        return new ClientResponse(clientResponse);
 
     }
 
-    public List<ClientResponse> readAllClient() {
+    public List<ClientResponse> readAllClient() throws ResourceDatabaseException {
 
-        try {
+        List<Client> listClients = clientRepository.findAll();
+        return listClients
+                .stream()
+                .map(ClientResponse::new)
+                .collect(Collectors.toList());
 
-            List<Client> listClients = clientRepository.findAll();
-            return listClients
-                    .stream()
-                    .map(ClientResponse::new)
-                    .collect(Collectors.toList());
-
-        } catch (ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao Buscar clientes no banco de dados", e);
-        }
     }
 
-    public ClientResponse updateClient(Long id, ClientRequest clientRequest) throws ResourceNotFoundException {
+    public ClientResponse updateClient(Long id, ClientRequest clientRequest) throws ResourceNotFoundException, ResourceDatabaseException {
 
-        try {
-            Client client = clientRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Sem registros de cliente com o ID: " + id
-                    ));
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Sem registros de cliente com o ID: " + id
+                ));
 
-            BeanUtils.copyProperties(client, clientRequest);
+        BeanUtils.copyProperties(client, clientRequest);
 
-            clientRepository.save(client);
+        clientRepository.save(client);
 
-            return new ClientResponse(client);
+        return new ClientResponse(client);
 
-        } catch (ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao atualizar o cliente no banco de dados", e);
-        }
     }
 
-    public void deleteClient(Long id) {
+    public void deleteClient(Long id) throws ResourceClientHasActiveRentalsException, ResourceNotFoundException, ResourceDatabaseException {
 
         ClientResponse clientResponse = findClientById(id);
 
@@ -117,34 +103,26 @@ public class ClientService {
         Client client = new Client();
         BeanUtils.copyProperties(clientResponse, client);
 
-        try {
-            if (client.getPersonType() == PersonType.PF) {
-                client.setNaturalPersonName(JWTUtils.generateToken(client.getNaturalPersonName()));
-                client.setCpf(JWTUtils.generateToken(client.getCpf()));
-            } else {
-                client.setCompanyName(JWTUtils.generateToken(client.getCompanyName()));
-                client.setCnpj(JWTUtils.generateToken(client.getCnpj()));
-            }
-
-            client.setEmail(JWTUtils.generateToken(client.getEmail()));
-            client.setCep(JWTUtils.generateToken(client.getCep()));
-            client.setEndereco(JWTUtils.generateToken(client.getEndereco()));
-
-            clientRepository.save(client);
-
-        } catch (ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao pseudonimizar os dados do cliente no banco de dados", e);
+        if (client.getPersonType() == PersonType.PF) {
+            client.setNaturalPersonName(JWTUtils.generateToken(client.getNaturalPersonName()));
+            client.setCpf(JWTUtils.generateToken(client.getCpf()));
+        } else {
+            client.setCompanyName(JWTUtils.generateToken(client.getCompanyName()));
+            client.setCnpj(JWTUtils.generateToken(client.getCnpj()));
         }
+
+        client.setEmail(JWTUtils.generateToken(client.getEmail()));
+        client.setCep(JWTUtils.generateToken(client.getCep()));
+        client.setEndereco(JWTUtils.generateToken(client.getEndereco()));
+
+        clientRepository.save(client);
+
     }
 
-    public ClientResponse findClientById(Long id) throws ResourceNotFoundException {
-        try {
+    public ClientResponse findClientById(Long id) throws ResourceNotFoundException, ResourceDatabaseException {
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
         return new ClientResponse(client);
-        } catch (ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao buscar o cliente no banco de dados", e);
-        }
     }
 // se colocar em rentService esta dando loop
     public boolean hasActiveRentals(Long clientId) {
@@ -152,7 +130,7 @@ public class ClientService {
         return rentRepository.existsActiveRentByClientId(clientId, activeStatuses);
     }
 
-    public boolean clientAvailable(Long id) {
+    public boolean clientAvailable(Long id) throws ResourceDatabaseException, ResourceNotFoundException, ResourceBadRequestException {
 
         ClientResponse client = findClientById(id);
 

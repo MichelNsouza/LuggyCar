@@ -34,13 +34,14 @@ public class CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
     @Autowired
     private VehicleRepository vehicleRepository;
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
 
-    public CategoryResponse createCategory(CategoryRequest categoryRequest) {
+    public CategoryResponse createCategory(CategoryRequest categoryRequest) throws ResourceExistsException, ResourceDatabaseException {
 
         Optional<Category> existingCategory = categoryRepository.findByName(categoryRequest.name());
 
@@ -48,41 +49,36 @@ public class CategoryService {
             throw new ResourceExistsException("Categoria já existe!");
         }
 
-        try {
-
-            Category category = new Category();
-            BeanUtils.copyProperties(categoryRequest, category);
+        Category category = new Category();
+        BeanUtils.copyProperties(categoryRequest, category);
 
 
-            category.setRegistration(LocalDate.now());
+        category.setRegistration(LocalDate.now());
 
 
-            if (categoryRequest.delayPenalties() != null && !categoryRequest.delayPenalties().isEmpty()) {
-                List<DelayPenalty> penalties = new ArrayList<>();
-                for (DelayPenaltyRequest penaltyRequest : categoryRequest.delayPenalties()) {
-                    DelayPenalty penalty = new DelayPenalty();
-                    penalty.setDays(penaltyRequest.days());
-                    penalty.setPercentage(penaltyRequest.percentage());
-                    penalty.setCategory(category);
-                    penalties.add(penalty);
-                }
-                category.setDelayPenalties(penalties);
+        if (categoryRequest.delayPenalties() != null && !categoryRequest.delayPenalties().isEmpty()) {
+            List<DelayPenalty> penalties = new ArrayList<>();
+            for (DelayPenaltyRequest penaltyRequest : categoryRequest.delayPenalties()) {
+                DelayPenalty penalty = new DelayPenalty();
+                penalty.setDays(penaltyRequest.days());
+                penalty.setPercentage(penaltyRequest.percentage());
+                penalty.setCategory(category);
+                penalties.add(penalty);
             }
+            category.setDelayPenalties(penalties);
+        }
 
 
-            Category savedCategory = categoryRepository.save(category);
+        Category savedCategory = categoryRepository.save(category);
 
             redisTemplate.delete(PREFIXO_CATEGORY_CACHE_REDIS + "all_categories");
 
-            return new CategoryResponse(savedCategory);
+        return new CategoryResponse(savedCategory);
 
-        } catch (ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao salvar a categoria no banco de dados", e);
-        }
     }
 
 
-    public List<CategoryResponse> readAllCategories() {
+    public List<CategoryResponse> readAllCategories() throws ResourceDatabaseException {
 
         List<LinkedHashMap> cachedCategoriesMap = (List<LinkedHashMap>) redisTemplate.opsForValue().get(PREFIXO_CATEGORY_CACHE_REDIS + "all_categories");
 
@@ -106,7 +102,7 @@ public class CategoryService {
     }
 
 
-    public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest)  {
+    public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest) throws ResourceDatabaseException {
 
         try {
              Category categoryUpdate = categoryRepository.findById(id)
@@ -120,14 +116,14 @@ public class CategoryService {
 
                 return new CategoryResponse(categoryUpdate);
 
-        } catch (ResourceDatabaseException e) {
-            throw new ResourceDatabaseException("Erro ao atualizar a categoria no banco de dados", e);
+        } catch (ResourceNotFoundException e) {
+            throw new ResourceDatabaseException("Erro ao atualizar a categoria no banco de dados");
 
         }
 
     }
 
-    public void deleteCategory(long id) {
+    public void deleteCategory(long id) throws ResourceDatabaseException {
 
         try {
             Category category = categoryRepository.findById(id)
@@ -151,7 +147,7 @@ public class CategoryService {
 
     }
 
-    public Category findCategoryByName(String name) {
+    public Category findCategoryByName(String name) throws ResourceNotFoundException {
         return categoryRepository.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada com o nome: " + name));
     }

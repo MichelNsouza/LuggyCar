@@ -2,10 +2,12 @@ package com.br.luggycar.api.Accident;
 
 import com.br.luggycar.api.dtos.requests.AccidentRequest;
 import com.br.luggycar.api.entities.Accident;
-import com.br.luggycar.api.enums.accident.Severity;
 import com.br.luggycar.api.services.AccidentService;
+import com.br.luggycar.api.enums.accident.Severity;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,12 +15,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -35,108 +34,77 @@ public class AccidentControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Test
-    public void testCreateAccident() throws Exception {
-        AccidentRequest request = new AccidentRequest(
-                Severity.HIGH,
-                "Test Accident Description",
-                new Date()
-        );
+    private Accident accident;
+    private AccidentRequest accidentRequest;
 
-        Accident response = new Accident(
-                1L,
-                Severity.HIGH,
-                "Test Accident Description",
-                new Date()
-        );
+    @BeforeEach
+    void setUp() {
+        accident = new Accident();
+        accident.setId(1L);
+        accident.setDescription("Acidente com colisão");
+        accident.setSeverity(Severity.MEDIUM);
 
-        when(accidentService.createAccident(any(AccidentRequest.class))).thenReturn(response);
-
-        mockMvc.perform(post("/api/accident")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(response.getId()))
-                .andExpect(jsonPath("$.description").value(response.getDescription()));
+        accidentRequest = new AccidentRequest(Severity.MEDIUM, "Acidente com colisão", null);
     }
 
     @Test
-    public void testReadAllAccidents() throws Exception {
-        Accident response1 = new Accident(
-                1L,
-                Severity.LOW,
-                "Description 1",
-                new Date()
-        );
-        Accident response2 = new Accident(
-                2L,
-                Severity.MEDIUM,
-                "Description 2",
-                new Date()
-        );
-        List<Accident> accidents = Arrays.asList(response1, response2);
+    void createAccident() throws Exception {
+        when(accidentService.createAccident(any(AccidentRequest.class))).thenReturn(accident);
 
-        when(accidentService.readAllAccident()).thenReturn(accidents);
+        mockMvc.perform(post("/api/accident")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(accidentRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(accident.getId()))
+                .andExpect(jsonPath("$.description").value(accident.getDescription()))
+                .andExpect(jsonPath("$.severity").value(accident.getSeverity().toString()));
+    }
+
+    @Test
+    void readAllAccidents() throws Exception {
+        when(accidentService.readAllAccident()).thenReturn(List.of(accident));
 
         mockMvc.perform(get("/api/accident")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(accidents.size()));
+                .andExpect(jsonPath("$[0].id").value(accident.getId()))
+                .andExpect(jsonPath("$[0].description").value(accident.getDescription()))
+                .andExpect(jsonPath("$[0].severity").value(accident.getSeverity().toString()));
     }
 
     @Test
-    public void testUpdateAccident() throws Exception {
-        Long id = 1L;
-        AccidentRequest request = new AccidentRequest(
-                Severity.MEDIUM,
-                "Updated Description",
-                new Date()
-        );
+    void updateAccident() throws Exception {
+        when(accidentService.updateAccident(eq(1L), any(AccidentRequest.class))).thenReturn(accident);
 
-        Accident response = new Accident(
-                id,
-                Severity.MEDIUM,
-                "Updated Description",
-                new Date()
-        );
-
-        when(accidentService.updateAccident(any(Long.class), any(AccidentRequest.class))).thenReturn(response);
-
-        mockMvc.perform(put("/api/accident/{id}", id)
+        mockMvc.perform(put("/api/accident/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(accidentRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(response.getId()))
-                .andExpect(jsonPath("$.description").value(response.getDescription()));
+                .andExpect(jsonPath("$.id").value(accident.getId()))
+                .andExpect(jsonPath("$.description").value(accident.getDescription()))
+                .andExpect(jsonPath("$.severity").value(accident.getSeverity().toString()));
     }
 
     @Test
-    public void testDeleteAccident() throws Exception {
-        Long id = 1L;
+    void deleteAccident() throws Exception {
+        when(accidentService.deleteAccident(1L)).thenReturn(true);
 
-        mockMvc.perform(delete("/api/accident/{id}", id)
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(delete("/api/accident/{id}", 1L))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    public void testFindAccidentById() throws Exception {
-        Long id = 1L;
-        Accident response = new Accident(
-                1L,
-                Severity.HIGH,
-                "Test Accident Description",
-                new Date()
-        );
+    void findAccidentById() throws Exception {
+        when(accidentService.findAccidentById(1L)).thenReturn(accident);
 
-        when(accidentService.findAccidentById(any(Long.class))).thenReturn(response);
-
-        mockMvc.perform(get("/api/accident/{id}", id)
+        mockMvc.perform(get("/api/accident/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(response.getId()))
-                .andExpect(jsonPath("$.description").value(response.getDescription()));
+                .andExpect(jsonPath("$.id").value(accident.getId()))
+                .andExpect(jsonPath("$.description").value(accident.getDescription()))
+                .andExpect(jsonPath("$.severity").value(accident.getSeverity().toString()));
     }
 }
+
 
 
