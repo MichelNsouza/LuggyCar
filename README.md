@@ -39,6 +39,7 @@ Este projeto foi orientado pelo professor Paulo Reis e detalhado em um levantame
 * JDK 17 ou superior
 * Apache Maven
 * MySQL
+* Redis
 
 # Endpoints
 
@@ -234,7 +235,7 @@ O CEP é validado pela API dos correios.
 Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
 Pessoa Juridica
 ```json
-   {{
+{
 	"personType": "PJ",
 	"companyName": "XPTO BUSSINES",
 	"cnpj": "{inserir cnpj valido}",
@@ -406,8 +407,10 @@ Para criar ou atualizar uma cliente, utilize o seguinte modelo JSON:
 
 ## Passo a passo para executar o projeto
 
-#### Recomendamos 
-* O uso de IntelliJ IDEA 
+#### Observações
+* Deve possuir o mysql em localhost e com o banco "luggycar" disponivel na porta 3306
+* Deve possuir o Redis em localhost disponivel na porta 6379
+* Ou Configure o arquivo application.properties de acordo com suas configurações 
 
 #### 1. **Clonar o repositório**
    - Para clonar o projeto, use o comando `git clone` com o URL do repositório.
